@@ -7,7 +7,7 @@ const Index = () => {
   const [activeModule, setActiveModule] = useState('chat');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-violet-25 to-purple-25 flex">
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
       
       <div className="flex-1 flex flex-col">
