@@ -2,17 +2,19 @@
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
+import BidSettings from './BidSettings';
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState('chat');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-25 to-purple-25 flex">
+    <div className="min-h-screen bg-gray-50 flex">
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
       
       <div className="flex-1 flex flex-col">
         {activeModule === 'chat' && <ChatWindow />}
-        {activeModule !== 'chat' && (
+        {activeModule === 'bid-settings' && <BidSettings />}
+        {activeModule !== 'chat' && activeModule !== 'bid-settings' && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-700 mb-2">
@@ -45,7 +47,8 @@ function getModuleTitle(module: string): string {
     'knowledge-settings': '知识库设置',
     'enterprise-knowledge': '企业知识库',
     'personal-knowledge': '个人知识库',
-    'industry-knowledge': '行业知识库'
+    'industry-knowledge': '行业知识库',
+    'bid-settings': '生标设置'
   };
   return titles[module] || '未知模块';
 }

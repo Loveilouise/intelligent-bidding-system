@@ -13,23 +13,19 @@ const FeatureButtons: React.FC = () => {
 
   const handleFeatureClick = (featureId: string) => {
     console.log(`点击了功能: ${featureId}`);
-    // 这里可以添加具体的功能处理逻辑
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-      <h3 className="text-sm font-medium text-gray-600 mb-3">AI功能助手</h3>
-      <div className="flex flex-wrap gap-2">
-        {features.map((feature) => (
-          <button
-            key={feature.id}
-            onClick={() => handleFeatureClick(feature.id)}
-            className="px-3 py-2 text-sm text-gray-700 bg-gray-50 rounded-lg hover:bg-violet-50 hover:text-violet-600 transition-colors duration-200"
-          >
-            {feature.name}
-          </button>
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-2">
+      {features.map((feature) => (
+        <button
+          key={feature.id}
+          onClick={() => handleFeatureClick(feature.id)}
+          className="px-3 py-2 text-sm text-gray-700 bg-gray-50 rounded-lg hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200"
+        >
+          {feature.name}
+        </button>
+      ))}
     </div>
   );
 };

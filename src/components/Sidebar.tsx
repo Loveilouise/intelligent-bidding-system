@@ -5,6 +5,7 @@ import {
   Edit, 
   Filter, 
   Database,
+  Settings,
   ChevronDown,
   ChevronRight
 } from 'lucide-react';
@@ -32,7 +33,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
       children: [
         { id: 'ai-bid-generation', title: 'AI生标', icon: null },
         { id: 'history-bid-management', title: '历史生标管理', icon: null },
-        { id: 'template-management', title: '投标方案模板管理', icon: null }
+        { id: 'template-management', title: '投标方案模板管理', icon: null },
+        { id: 'bid-settings', title: '生标设置', icon: null }
       ]
     },
     {
@@ -121,14 +123,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
 
   return (
     <div className="w-64 bg-white shadow-lg border-r border-gray-200 flex flex-col">
-      {/* Logo/Header */}
       <div className="p-6 border-b border-gray-200">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-          AI助手平台
+          智能标书系统
         </h1>
       </div>
 
-      {/* Chat Link */}
       <div 
         className={`flex items-center px-4 py-3 cursor-pointer transition-all duration-200 border-b border-gray-100 ${
           activeModule === 'chat' 
@@ -143,7 +143,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
         <span className="font-medium">AI对话</span>
       </div>
 
-      {/* Menu Items */}
       <div className="flex-1 overflow-y-auto">
         {menuItems.map(item => renderMenuItem(item))}
       </div>
