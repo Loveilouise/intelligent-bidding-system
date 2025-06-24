@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
 import BidSettings from './BidSettings';
+import HistoryBidManagement from './HistoryBidManagement';
+import TemplateManagement from './TemplateManagement';
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState('chat');
@@ -14,7 +16,9 @@ const Index = () => {
       <div className="flex-1 flex flex-col">
         {activeModule === 'chat' && <ChatWindow />}
         {activeModule === 'bid-settings' && <BidSettings />}
-        {activeModule !== 'chat' && activeModule !== 'bid-settings' && (
+        {activeModule === 'history-bid-management' && <HistoryBidManagement />}
+        {activeModule === 'template-management' && <TemplateManagement />}
+        {!['chat', 'bid-settings', 'history-bid-management', 'template-management'].includes(activeModule) && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-700 mb-2">
