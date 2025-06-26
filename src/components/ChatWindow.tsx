@@ -37,8 +37,9 @@ const ChatWindow: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-6">
-      <div className="flex-1 flex flex-col">
+    <div className="h-full flex flex-col p-6">
+      {/* 主对话区域 - 占据大部分空间 */}
+      <div className="flex-1 flex flex-col min-h-0">
         {messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center text-center text-gray-500">
             <div>
@@ -50,8 +51,8 @@ const ChatWindow: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto pb-6">
-            <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto mb-4">
+            <div className="space-y-4 pb-4">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -71,34 +72,36 @@ const ChatWindow: React.FC = () => {
             </div>
           </div>
         )}
+      </div>
 
-        <div className="border-t border-gray-200 pt-4">
-          <div className="flex items-center space-x-2 mb-3">
-            <ModelSelector />
+      {/* 输入区域 - 固定在底部 */}
+      <div className="border-t border-gray-200 pt-4 mt-auto">
+        <div className="flex items-center space-x-2 mb-3">
+          <ModelSelector />
+        </div>
+        
+        <div className="flex items-end space-x-2">
+          <div className="flex-1">
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="输入您的问题..."
+              className="w-full p-3 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-purple-300 focus:border-transparent outline-none"
+              rows={1}
+            />
           </div>
-          
-          <div className="flex items-end space-x-2">
-            <div className="flex-1">
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="输入您的问题..."
-                className="w-full p-3 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-purple-300 focus:border-transparent outline-none"
-                rows={1}
-              />
-            </div>
-            <button
-              onClick={handleSendMessage}
-              className="bg-gradient-to-r from-purple-400 to-indigo-400 text-white p-3 rounded-xl hover:from-purple-500 hover:to-indigo-500 transition-all duration-200 flex items-center justify-center"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </div>
+          <button
+            onClick={handleSendMessage}
+            className="bg-gradient-to-r from-purple-400 to-indigo-400 text-white p-3 rounded-xl hover:from-purple-500 hover:to-indigo-500 transition-all duration-200 flex items-center justify-center"
+          >
+            <Send className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
-      <div className="mt-6">
+      {/* 功能按钮区域 - 紧贴输入框下方 */}
+      <div className="mt-4">
         <FeatureButtons />
       </div>
     </div>
