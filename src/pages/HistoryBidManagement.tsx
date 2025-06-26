@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown } from 'lucide-react';
+import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -30,7 +30,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface BidProject {
@@ -49,7 +48,6 @@ const HistoryBidManagement: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
 
   const [projects] = useState<BidProject[]>([
     {
@@ -117,24 +115,24 @@ const HistoryBidManagement: React.FC = () => {
   const paginatedProjects = filteredAndSortedProjects.slice(startIndex, startIndex + pageSize);
 
   const handleSearch = () => {
-    setCurrentPage(1); // 搜索时重置到第一页
+    setCurrentPage(1);
     console.log('搜索关键字:', searchTerm);
   };
 
-  const handleTypeChange = (type: string, checked: boolean) => {
-    if (checked) {
-      setSelectedTypes([...selectedTypes, type]);
-    } else {
+  const handleTypeChange = (type: string) => {
+    if (selectedTypes.includes(type)) {
       setSelectedTypes(selectedTypes.filter(t => t !== type));
+    } else {
+      setSelectedTypes([...selectedTypes, type]);
     }
     setCurrentPage(1);
   };
 
-  const handleStatusChange = (status: string, checked: boolean) => {
-    if (checked) {
-      setSelectedStatuses([...selectedStatuses, status]);
-    } else {
+  const handleStatusChange = (status: string) => {
+    if (selectedStatuses.includes(status)) {
       setSelectedStatuses(selectedStatuses.filter(s => s !== status));
+    } else {
+      setSelectedStatuses([...selectedStatuses, status]);
     }
     setCurrentPage(1);
   };
@@ -149,7 +147,6 @@ const HistoryBidManagement: React.FC = () => {
 
   const handleDelete = (id: string) => {
     console.log('删除项目:', id);
-    setDeleteProjectId(null);
   };
 
   const toggleSortOrder = () => {
@@ -173,8 +170,7 @@ const HistoryBidManagement: React.FC = () => {
     <div className="flex-1 p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">历史生标管理</h1>
-          <p className="text-gray-600">管理和维护历史投标项目，支持查看、编辑和删除操作</p>
+          <h1 className="text-2xl font-semibold text-gray-900">历史生标管理</h1>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -212,21 +208,18 @@ const HistoryBidManagement: React.FC = () => {
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-48 bg-white">
-                  <div className="space-y-2">
+                <PopoverContent className="w-48 bg-white p-2">
+                  <div className="space-y-1">
                     {bidTypes.map((type) => (
-                      <div key={type} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`type-${type}`}
-                          checked={selectedTypes.includes(type)}
-                          onCheckedChange={(checked) => handleTypeChange(type, checked as boolean)}
-                        />
-                        <label
-                          htmlFor={`type-${type}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {type}
-                        </label>
+                      <div
+                        key={type}
+                        className="flex items-center justify-between px-3 py-2 text-sm cursor-pointer rounded hover:bg-purple-50 hover:text-purple-600"
+                        onClick={() => handleTypeChange(type)}
+                      >
+                        <span>{type}</span>
+                        {selectedTypes.includes(type) && (
+                          <Check className="w-4 h-4 text-purple-600" />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -246,21 +239,18 @@ const HistoryBidManagement: React.FC = () => {
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-40 bg-white">
-                  <div className="space-y-2">
+                <PopoverContent className="w-40 bg-white p-2">
+                  <div className="space-y-1">
                     {bidStatuses.map((status) => (
-                      <div key={status} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`status-${status}`}
-                          checked={selectedStatuses.includes(status)}
-                          onCheckedChange={(checked) => handleStatusChange(status, checked as boolean)}
-                        />
-                        <label
-                          htmlFor={`status-${status}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {status}
-                        </label>
+                      <div
+                        key={status}
+                        className="flex items-center justify-between px-3 py-2 text-sm cursor-pointer rounded hover:bg-purple-50 hover:text-purple-600"
+                        onClick={() => handleStatusChange(status)}
+                      >
+                        <span>{status}</span>
+                        {selectedStatuses.includes(status) && (
+                          <Check className="w-4 h-4 text-purple-600" />
+                        )}
                       </div>
                     ))}
                   </div>

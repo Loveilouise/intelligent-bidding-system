@@ -2,32 +2,56 @@
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
+import UserProfile from '../components/UserProfile';
+import LoginForm from '../components/LoginForm';
 import HistoryBidManagement from './HistoryBidManagement';
 import TemplateManagement from './TemplateManagement';
 import AIBidGeneration from './AIBidGeneration';
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState('chat');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = (username: string, password: string) => {
+    // 简单的登录验证（实际项目中应该调用API）
+    if (username && password) {
+      setIsLoggedIn(true);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
+  if (!isLoggedIn) {
+    return <LoginForm onLogin={handleLogin} />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
       
       <div className="flex-1 flex flex-col">
-        {activeModule === 'chat' && <ChatWindow />}
-        {activeModule === 'history-bid-management' && <HistoryBidManagement />}
-        {activeModule === 'template-management' && <TemplateManagement />}
-        {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
-        {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation'].includes(activeModule) && (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-                {getModuleTitle(activeModule)}
-              </h2>
-              <p className="text-gray-500">功能开发中，敬请期待...</p>
+        <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-end">
+          <UserProfile onLogout={handleLogout} />
+        </div>
+        
+        <div className="flex-1">
+          {activeModule === 'chat' && <ChatWindow />}
+          {activeModule === 'history-bid-management' && <HistoryBidManagement />}
+          {activeModule === 'template-management' && <TemplateManagement />}
+          {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
+          {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation'].includes(activeModule) && (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+                  {getModuleTitle(activeModule)}
+                </h2>
+                <p className="text-gray-500">功能开发中，敬请期待...</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

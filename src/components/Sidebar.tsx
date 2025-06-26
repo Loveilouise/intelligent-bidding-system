@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   FileText, 
@@ -84,11 +85,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
     return (
       <div key={item.id}>
         <div
-          className={`flex items-center px-4 py-3 cursor-pointer transition-all duration-200 ${
+          className={`flex items-center px-3 py-3 cursor-pointer transition-all duration-200 ${
             isActive 
               ? 'bg-purple-100 border-r-4 border-purple-500 text-purple-700' 
               : 'text-gray-700 hover:bg-purple-50'
-          } ${depth > 0 ? 'pl-12' : ''}`}
+          } ${depth > 0 ? 'pl-10' : ''}`}
           onClick={() => {
             if (hasChildren) {
               toggleExpanded(item.id);
@@ -106,8 +107,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
               )}
             </div>
           )}
-          {item.icon && <div className="mr-3">{item.icon}</div>}
-          <span className="font-medium">{item.title}</span>
+          {item.icon && <div className="mr-2">{item.icon}</div>}
+          <span className="font-medium text-sm">{item.title}</span>
         </div>
         
         {hasChildren && isExpanded && (
@@ -120,25 +121,25 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
   };
 
   return (
-    <div className="w-64 bg-white shadow-lg border-r border-gray-200 flex flex-col">
-      <div className="p-6 border-b border-gray-200">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+    <div className="w-56 bg-white shadow-lg border-r border-gray-200 flex flex-col">
+      <div className="p-4 border-b border-gray-200">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
           智能标书系统
         </h1>
       </div>
 
       <div 
-        className={`flex items-center px-4 py-3 cursor-pointer transition-all duration-200 border-b border-gray-100 ${
+        className={`flex items-center px-3 py-3 cursor-pointer transition-all duration-200 border-b border-gray-100 ${
           activeModule === 'chat' 
             ? 'bg-purple-100 border-r-4 border-purple-500 text-purple-700' 
             : 'text-gray-700 hover:bg-purple-50'
         }`}
         onClick={() => setActiveModule('chat')}
       >
-        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center mr-3">
-          <span className="text-white text-sm font-bold">AI</span>
+        <div className="w-7 h-7 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center mr-2">
+          <span className="text-white text-xs font-bold">AI</span>
         </div>
-        <span className="font-medium">AI对话</span>
+        <span className="font-medium text-sm">AI对话</span>
       </div>
 
       <div className="flex-1 overflow-y-auto">
