@@ -87,9 +87,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
         <div
           className={`flex items-center px-3 py-3 cursor-pointer transition-all duration-200 ${
             isActive 
-              ? 'bg-purple-100 border-r-4 border-purple-500 text-purple-700' 
-              : 'text-gray-700 hover:bg-purple-50'
-          } ${depth > 0 ? 'pl-10' : ''}`}
+              ? 'bg-purple-50 border-r-4 border-purple-400 text-purple-600' 
+              : 'text-gray-700 hover:bg-purple-25'
+          } ${depth > 0 ? 'pl-8' : ''}`}
           onClick={() => {
             if (hasChildren) {
               toggleExpanded(item.id);
@@ -121,9 +121,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
   };
 
   return (
-    <div className="w-56 bg-white shadow-lg border-r border-gray-200 flex flex-col">
+    <div className="w-48 bg-white shadow-lg border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+        <h1 className="text-lg font-bold bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">
           智能标书系统
         </h1>
       </div>
@@ -131,12 +131,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
       <div 
         className={`flex items-center px-3 py-3 cursor-pointer transition-all duration-200 border-b border-gray-100 ${
           activeModule === 'chat' 
-            ? 'bg-purple-100 border-r-4 border-purple-500 text-purple-700' 
-            : 'text-gray-700 hover:bg-purple-50'
+            ? 'bg-purple-50 border-r-4 border-purple-400 text-purple-600' 
+            : 'text-gray-700 hover:bg-purple-25'
         }`}
         onClick={() => setActiveModule('chat')}
       >
-        <div className="w-7 h-7 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center mr-2">
+        <div className="w-6 h-6 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-lg flex items-center justify-center mr-2">
           <span className="text-white text-xs font-bold">AI</span>
         </div>
         <span className="font-medium text-sm">AI对话</span>
