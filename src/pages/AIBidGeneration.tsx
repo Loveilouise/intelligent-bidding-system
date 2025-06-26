@@ -18,7 +18,8 @@ import {
   Table,
   Save,
   Copy,
-  Trash2
+  Trash2,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,7 +53,7 @@ interface BidDocument {
 
 const AIBidGeneration: React.FC = () => {
   const [activeTab, setActiveTab] = useState('setup'); // setup, generation, editing
-  const [settingsMode, setSettingsMode] = useState('auto-parse');
+  const [settingsMode, setSettingsMode] = useState('auto-parse'); // 默认选择基于招标文件解析
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
     name: '',
     type: '',
@@ -80,109 +81,58 @@ const AIBidGeneration: React.FC = () => {
   ];
 
   const tabs = [
-    { id: 'setup', title: '生标设置', description: '配置生标方式和项目信息' },
-    { id: 'generation', title: 'AI生文', description: '生成标书内容' },
-    { id: 'editing', title: '标书编辑', description: '续写、润色、美化标书' }
+    { id: 'setup', title: '创建标书', description: '标书信息设置和生标配置' },
+    { id: 'generation', title: '生成目录', description: '智能生成标书目录结构' },
+    { id: 'editing', title: '生成全文', description: '生成完整标书内容并编辑' }
   ];
 
-  const handleStartGeneration = () => {
-    setGenerationStatus('generating');
-    setTimeout(() => {
-      setGenerationStatus('completed');
-      // 模拟生成的标书文档
-      setBidDocuments([
-        { id: '1', title: '技术方案', content: '基于项目需求，我们制定以下技术方案...', type: 'text', status: 'generated' },
-        { id: '2', title: '商务方案', content: '商务条款和报价清单...', type: 'text', status: 'generated' },
-        { id: '3', title: '项目组织架构', content: '', type: 'table', status: 'draft' }
-      ]);
-    }, 3000);
+  const handleNextStep = () => {
+    if (activeTab === 'setup') {
+      setActiveTab('generation');
+      // 开始生成目录
+      setGenerationStatus('generating');
+      setTimeout(() => {
+        setGenerationStatus('completed');
+        setBidDocuments([
+          { id: '1', title: '技术方案', content: '', type: 'text', status: 'draft' },
+          { id: '2', title: '商务方案', content: '', type: 'text', status: 'draft' },
+          { id: '3', title: '项目组织架构', content: '', type: 'table', status: 'draft' }
+        ]);
+      }, 2000);
+    } else if (activeTab === 'generation') {
+      setActiveTab('editing');
+    }
   };
 
   const renderSetupTab = () => (
     <div className="space-y-6">
-      {/* 生标设置 */}
+      {/* 标书信息 */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">生标设置</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div 
-            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-              settingsMode === 'auto-parse' 
-                ? 'border-purple-500 bg-purple-50' 
-                : 'border-gray-200 hover:border-purple-300'
-            }`}
-            onClick={() => setSettingsMode('auto-parse')}
-          >
-            <div className="flex items-center mb-2">
-              <FileText className="w-5 h-5 text-purple-500 mr-2" />
-              <h4 className="font-medium">基于招标文件解析</h4>
-            </div>
-            <p className="text-sm text-gray-600">自动生成及维护投标文件目录</p>
-          </div>
-          
-          <div 
-            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-              settingsMode === 'template-based' 
-                ? 'border-purple-500 bg-purple-50' 
-                : 'border-gray-200 hover:border-purple-300'
-            }`}
-            onClick={() => setSettingsMode('template-based')}
-          >
-            <div className="flex items-center mb-2">
-              <Settings className="w-5 h-5 text-purple-500 mr-2" />
-              <h4 className="font-medium">基于投标模板</h4>
-            </div>
-            <p className="text-sm text-gray-600">基于模板新建及维护投标文件目录</p>
-          </div>
-          
-          <div 
-            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-              settingsMode === 'custom-create' 
-                ? 'border-purple-500 bg-purple-50' 
-                : 'border-gray-200 hover:border-purple-300'
-            }`}
-            onClick={() => setSettingsMode('custom-create')}
-          >
-            <div className="flex items-center mb-2">
-              <Plus className="w-5 h-5 text-purple-500 mr-2" />
-              <h4 className="font-medium">自定义创建</h4>
-            </div>
-            <p className="text-sm text-gray-600">自定义新建及维护投标文件目录</p>
-          </div>
-        </div>
-
-        {settingsMode !== 'auto-parse' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>标书类型</Label>
-              <Select value={projectInfo.type} onValueChange={(value) => setProjectInfo({...projectInfo, type: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择标书类型" />
-                </SelectTrigger>
-                <SelectContent>
-                  {bidTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 项目信息 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">项目信息</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">标书信息</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="projectName">项目名称 *</Label>
+            <Label htmlFor="projectName">标书名称 *</Label>
             <Input
               id="projectName"
               value={projectInfo.name}
               onChange={(e) => setProjectInfo({...projectInfo, name: e.target.value})}
-              placeholder="请输入项目名称"
+              placeholder="请输入标书名称"
             />
+          </div>
+          <div>
+            <Label htmlFor="projectType">标书类型</Label>
+            <Select value={projectInfo.type} onValueChange={(value) => setProjectInfo({...projectInfo, type: value})}>
+              <SelectTrigger>
+                <SelectValue placeholder="选择标书类型" />
+              </SelectTrigger>
+              <SelectContent>
+                {bidTypes.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label htmlFor="budget">项目预算</Label>
@@ -215,12 +165,63 @@ const AIBidGeneration: React.FC = () => {
         </div>
       </div>
 
+      {/* 生标设置 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">生标设置</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div 
+            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+              settingsMode === 'auto-parse' 
+                ? 'border-purple-500 bg-purple-50' 
+                : 'border-gray-200 hover:border-purple-300'
+            }`}
+            onClick={() => setSettingsMode('auto-parse')}
+          >
+            <div className="flex items-center mb-2">
+              <FileText className="w-5 h-5 text-purple-500 mr-2" />
+              <h4 className="font-medium">基于招标文件解析</h4>
+            </div>
+            <p className="text-sm text-gray-600">自动解析招标文件，智能生成投标文件目录</p>
+          </div>
+          
+          <div 
+            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+              settingsMode === 'template-based' 
+                ? 'border-purple-500 bg-purple-50' 
+                : 'border-gray-200 hover:border-purple-300'
+            }`}
+            onClick={() => setSettingsMode('template-based')}
+          >
+            <div className="flex items-center mb-2">
+              <Settings className="w-5 h-5 text-purple-500 mr-2" />
+              <h4 className="font-medium">基于投标模板</h4>
+            </div>
+            <p className="text-sm text-gray-600">使用现有模板快速创建投标文件结构</p>
+          </div>
+          
+          <div 
+            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+              settingsMode === 'custom-create' 
+                ? 'border-purple-500 bg-purple-50' 
+                : 'border-gray-200 hover:border-purple-300'
+            }`}
+            onClick={() => setSettingsMode('custom-create')}
+          >
+            <div className="flex items-center mb-2">
+              <Plus className="w-5 h-5 text-purple-500 mr-2" />
+              <h4 className="font-medium">自定义创建</h4>
+            </div>
+            <p className="text-sm text-gray-600">完全自定义投标文件目录和结构</p>
+          </div>
+        </div>
+      </div>
+
       {/* 文件上传 */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">文件上传</h3>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
-          <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-600 mb-3">上传招标文件或相关资料</p>
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
+          <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4">上传招标文件或相关资料</p>
           <Button variant="outline">选择文件</Button>
         </div>
         
@@ -239,8 +240,9 @@ const AIBidGeneration: React.FC = () => {
         )}
         
         <div className="flex justify-end mt-6">
-          <Button onClick={handleStartGeneration} className="bg-purple-600 hover:bg-purple-700">
-            开始生成标书目录
+          <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
+            下一步
+            <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </div>
@@ -249,94 +251,62 @@ const AIBidGeneration: React.FC = () => {
 
   const renderGenerationTab = () => (
     <div className="space-y-6">
-      {/* AI生文工具栏 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">AI生文工具</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label>知识库选择</Label>
-            <Select defaultValue="enterprise">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {knowledgeBases.map((kb) => (
-                  <SelectItem key={kb.value} value={kb.value}>
-                    {kb.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      {/* 生成状态 */}
+      {generationStatus === 'generating' && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+          <div className="flex items-center justify-center mb-4">
+            <RefreshCw className="w-8 h-8 text-purple-500 animate-spin" />
           </div>
-          <div className="space-y-2">
-            <Label>生成内容类型</Label>
-            <Select defaultValue="text">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="text">文字内容</SelectItem>
-                <SelectItem value="image">项目配图</SelectItem>
-                <SelectItem value="table">相关表单</SelectItem>
-              </SelectContent>
-            </Select>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">正在生成标书目录...</h3>
+          <p className="text-gray-600">AI正在分析您的需求和上传的文件，请稍候</p>
+        </div>
+      )}
+
+      {/* 生成的标书目录 */}
+      {generationStatus === 'completed' && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">生成的标书目录</h3>
+            <Button variant="outline" size="sm">
+              <Plus className="w-4 h-4 mr-2" />
+              添加章节
+            </Button>
           </div>
-          <div className="flex items-end">
-            <Button className="w-full bg-purple-600 hover:bg-purple-700">
-              <Sparkles className="w-4 h-4 mr-2" />
-              生成内容
+          
+          <div className="space-y-3">
+            {bidDocuments.map((doc, index) => (
+              <div key={doc.id} className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-medium">
+                      {index + 1}
+                    </span>
+                    {doc.type === 'text' && <FileText className="w-5 h-5 text-blue-500" />}
+                    {doc.type === 'image' && <Image className="w-5 h-5 text-green-500" />}
+                    {doc.type === 'table' && <Table className="w-5 h-5 text-orange-500" />}
+                    <span className="font-medium">{doc.title}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="ghost" size="sm">
+                      <Edit3 className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
+              生成全文
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* 标书文档列表 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">标书文档</h3>
-          <Button variant="outline" size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            新建文档
-          </Button>
-        </div>
-        
-        <div className="space-y-3">
-          {bidDocuments.map((doc) => (
-            <div key={doc.id} className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-3">
-                  {doc.type === 'text' && <FileText className="w-5 h-5 text-blue-500" />}
-                  {doc.type === 'image' && <Image className="w-5 h-5 text-green-500" />}
-                  {doc.type === 'table' && <Table className="w-5 h-5 text-orange-500" />}
-                  <span className="font-medium">{doc.title}</span>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    doc.status === 'generated' ? 'bg-green-100 text-green-800' :
-                    doc.status === 'edited' ? 'bg-blue-100 text-blue-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {doc.status === 'generated' ? '已生成' : 
-                     doc.status === 'edited' ? '已编辑' : '草稿'}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm">
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Edit3 className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Copy className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-              {doc.content && (
-                <p className="text-sm text-gray-600 line-clamp-2">{doc.content}</p>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 
@@ -345,7 +315,7 @@ const AIBidGeneration: React.FC = () => {
       {/* 文档列表 */}
       <div className="lg:col-span-1">
         <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h3 className="font-semibold text-gray-900 mb-4">文档列表</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">标书章节</h3>
           <div className="space-y-2">
             {bidDocuments.map((doc) => (
               <div 
@@ -369,7 +339,7 @@ const AIBidGeneration: React.FC = () => {
       <div className="lg:col-span-2">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900">标书编辑</h3>
+            <h3 className="font-semibold text-gray-900">内容编辑</h3>
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm">
                 <Save className="w-4 h-4 mr-2" />
@@ -382,52 +352,34 @@ const AIBidGeneration: React.FC = () => {
             </div>
           </div>
 
-          {/* AI编辑工具 */}
+          {/* AI生成工具 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             <Button className="flex flex-col items-center p-4 h-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200">
+              <Sparkles className="w-6 h-6 mb-2" />
+              <span className="text-sm">AI生成</span>
+            </Button>
+            <Button className="flex flex-col items-center p-4 h-auto bg-green-50 hover:bg-green-100 text-green-700 border border-green-200">
               <Edit3 className="w-6 h-6 mb-2" />
               <span className="text-sm">AI续写</span>
             </Button>
-            <Button className="flex flex-col items-center p-4 h-auto bg-green-50 hover:bg-green-100 text-green-700 border border-green-200">
+            <Button className="flex flex-col items-center p-4 h-auto bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200">
               <RefreshCw className="w-6 h-6 mb-2" />
               <span className="text-sm">AI润色</span>
             </Button>
-            <Button className="flex flex-col items-center p-4 h-auto bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200">
+            <Button className="flex flex-col items-center p-4 h-auto bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200">
               <Palette className="w-6 h-6 mb-2" />
               <span className="text-sm">AI美化</span>
-            </Button>
-            <Button className="flex flex-col items-center p-4 h-auto bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200">
-              <Download className="w-6 h-6 mb-2" />
-              <span className="text-sm">标书下载</span>
             </Button>
           </div>
 
           {/* 内容编辑区 */}
           <div className="border border-gray-200 rounded-lg p-4">
             <Textarea
-              placeholder="选择左侧文档开始编辑，或使用AI工具生成内容..."
+              placeholder="选择左侧章节开始编辑，或使用AI工具生成内容..."
               rows={15}
               className="resize-none"
               value={selectedDocument ? bidDocuments.find(d => d.id === selectedDocument)?.content : ''}
             />
-          </div>
-
-          {/* 操作选项 */}
-          <div className="flex items-center justify-between mt-4 p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-4">
-              <Label className="text-sm font-medium">操作方式：</Label>
-              <div className="flex items-center space-x-2">
-                <input type="radio" id="insert" name="operation" className="text-purple-600" />
-                <Label htmlFor="insert" className="text-sm">插入</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input type="radio" id="overwrite" name="operation" className="text-purple-600" />
-                <Label htmlFor="overwrite" className="text-sm">覆盖</Label>
-              </div>
-            </div>
-            <div className="text-sm text-gray-500">
-              可多次生成结果供选择
-            </div>
           </div>
         </div>
       </div>
@@ -439,30 +391,41 @@ const AIBidGeneration: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">AI生标</h1>
-          <p className="text-gray-600">基于人工智能技术，智能生成和编辑专业投标方案</p>
+          <p className="text-gray-600">智能标书生成系统 - 创建标书 → 生成目录 → 生成全文</p>
         </div>
 
-        {/* 标签导航 */}
+        {/* 流程步骤指示器 */}
         <div className="mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
-                      ? 'border-purple-500 text-purple-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                  onClick={() => setActiveTab(tab.id)}
-                >
-                  <div className="flex flex-col items-center">
-                    <span>{tab.title}</span>
-                    <span className="text-xs text-gray-400 mt-1">{tab.description}</span>
+          <div className="flex items-center justify-center space-x-8">
+            {tabs.map((tab, index) => (
+              <div key={tab.id} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
+                    activeTab === tab.id 
+                      ? 'bg-purple-600 text-white' 
+                      : tabs.findIndex(t => t.id === activeTab) > index
+                        ? 'bg-green-500 text-white'
+                        : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    {tabs.findIndex(t => t.id === activeTab) > index ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : (
+                      index + 1
+                    )}
                   </div>
-                </button>
-              ))}
-            </nav>
+                  <span className={`mt-2 text-sm font-medium ${
+                    activeTab === tab.id ? 'text-purple-600' : 'text-gray-500'
+                  }`}>
+                    {tab.title}
+                  </span>
+                </div>
+                {index < tabs.length - 1 && (
+                  <div className={`w-16 h-0.5 mx-4 ${
+                    tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
+                  }`} />
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
