@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Upload, 
@@ -19,13 +18,18 @@ import {
   Save,
   Copy,
   Trash2,
-  ArrowRight
+  ArrowRight,
+  ZoomIn,
+  ZoomOut,
+  Minus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface ProjectInfo {
   name: string;
@@ -49,11 +53,20 @@ interface BidDocument {
   content: string;
   type: 'text' | 'image' | 'table';
   status: 'draft' | 'generated' | 'edited';
+  level: number;
+  children?: BidDocument[];
+}
+
+interface CatalogItem {
+  id: string;
+  title: string;
+  level: number;
+  children?: CatalogItem[];
 }
 
 const AIBidGeneration: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('setup'); // setup, generation, editing
-  const [settingsMode, setSettingsMode] = useState('auto-parse'); // 默认选择基于招标文件解析
+  const [activeTab, setActiveTab] = useState('setup');
+  const [settingsMode, setSettingsMode] = useState('auto-parse');
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
     name: '',
     type: '',
@@ -65,6 +78,23 @@ const AIBidGeneration: React.FC = () => {
   const [bidDocuments, setBidDocuments] = useState<BidDocument[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<string>('');
   const [generationStatus, setGenerationStatus] = useState<'idle' | 'generating' | 'completed'>('idle');
+  const [catalogType, setCatalogType] = useState<'business' | 'technical'>('business');
+  const [catalogZoom, setCatalogZoom] = useState(100);
+  const [rightPanelTab, setRightPanelTab] = useState<'requirements' | 'information'>('requirements');
+  const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([
+    { 
+      id: '1', 
+      title: '商务标书', 
+      level: 1,
+      children: [
+        { id: '1-1', title: '投标函', level: 2 },
+        { id: '1-2', title: '法定代表人身份证明', level: 2 },
+        { id: '1-3', title: '授权委托书', level: 2 }
+      ]
+    },
+    { id: '2', title: '资质证明文件', level: 1 },
+    { id: '3', title: '财务状况报告', level: 1 }
+  ]);
 
   const bidTypes = [
     { value: 'construction', label: '建筑工程' },
@@ -89,19 +119,111 @@ const AIBidGeneration: React.FC = () => {
   const handleNextStep = () => {
     if (activeTab === 'setup') {
       setActiveTab('generation');
-      // 开始生成目录
       setGenerationStatus('generating');
       setTimeout(() => {
         setGenerationStatus('completed');
         setBidDocuments([
-          { id: '1', title: '技术方案', content: '', type: 'text', status: 'draft' },
-          { id: '2', title: '商务方案', content: '', type: 'text', status: 'draft' },
-          { id: '3', title: '项目组织架构', content: '', type: 'table', status: 'draft' }
+          { id: '1', title: '技术方案', content: '', type: 'text', status: 'draft', level: 1 },
+          { id: '2', title: '商务方案', content: '', type: 'text', status: 'draft', level: 1 },
+          { id: '3', title: '项目组织架构', content: '', type: 'table', status: 'draft', level: 1 }
         ]);
       }, 2000);
     } else if (activeTab === 'generation') {
       setActiveTab('editing');
     }
+  };
+
+  const handleZoomIn = () => {
+    setCatalogZoom(prev => Math.min(prev + 10, 150));
+  };
+
+  const handleZoomOut = () => {
+    setCatalogZoom(prev => Math.max(prev - 10, 50));
+  };
+
+  const handleRegenerateCatalog = () => {
+    setGenerationStatus('generating');
+    setTimeout(() => {
+      setGenerationStatus('completed');
+    }, 1500);
+  };
+
+  const addSameLevelItem = (parentId: string | null, afterId: string) => {
+    console.log('Adding same level item after:', afterId);
+  };
+
+  const addSubLevelItem = (parentId: string) => {
+    console.log('Adding sub level item under:', parentId);
+  };
+
+  const deleteItem = (itemId: string) => {
+    console.log('Deleting item:', itemId);
+  };
+
+  const renderCatalogItem = (item: CatalogItem, parentId: string | null = null) => {
+    return (
+      <div key={item.id} className="group">
+        <div 
+          className="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer"
+          style={{ paddingLeft: `${item.level * 16 + 8}px` }}
+        >
+          <span className="text-sm">{item.title}</span>
+          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 hover:bg-green-100"
+                onMouseEnter={(e) => {
+                  const tooltip = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (tooltip) tooltip.style.display = 'block';
+                }}
+                onMouseLeave={(e) => {
+                  const tooltip = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (tooltip) tooltip.style.display = 'none';
+                }}
+              >
+                <Plus className="h-3 w-3 text-green-600" />
+              </Button>
+              <div className="absolute left-0 top-8 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
+                <button
+                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                  onClick={() => addSameLevelItem(parentId, item.id)}
+                >
+                  创建同级章节
+                </button>
+                <button
+                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
+                  onClick={() => addSubLevelItem(item.id)}
+                >
+                  创建子级章节
+                </button>
+              </div>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-red-100">
+                  <Minus className="h-3 w-3 text-red-600" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>确认删除</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    确定要删除"{item.title}"吗？此操作不可撤销。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>取消</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteItem(item.id)}>删除</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+        {item.children && item.children.map(child => renderCatalogItem(child, item.id))}
+      </div>
+    );
   };
 
   const renderSetupTab = () => (
@@ -251,7 +373,6 @@ const AIBidGeneration: React.FC = () => {
 
   const renderGenerationTab = () => (
     <div className="space-y-6">
-      {/* 生成状态 */}
       {generationStatus === 'generating' && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
           <div className="flex items-center justify-center mb-4">
@@ -262,48 +383,126 @@ const AIBidGeneration: React.FC = () => {
         </div>
       )}
 
-      {/* 生成的标书目录 */}
       {generationStatus === 'completed' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">生成的标书目录</h3>
-            <Button variant="outline" size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              添加章节
-            </Button>
-          </div>
-          
-          <div className="space-y-3">
-            {bidDocuments.map((doc, index) => (
-              <div key={doc.id} className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-medium">
-                      {index + 1}
-                    </span>
-                    {doc.type === 'text' && <FileText className="w-5 h-5 text-blue-500" />}
-                    {doc.type === 'image' && <Image className="w-5 h-5 text-green-500" />}
-                    {doc.type === 'table' && <Table className="w-5 h-5 text-orange-500" />}
-                    <span className="font-medium">{doc.title}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <Edit3 className="w-4 h-4" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+          {/* 左侧目录 */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+              {/* 目录标题和切换 */}
+              <div className="border-b border-gray-200 p-4">
+                <Tabs value={catalogType} onValueChange={(value) => setCatalogType(value as 'business' | 'technical')}>
+                  <TabsList className="grid w-fit grid-cols-2">
+                    <TabsTrigger value="business">商务标</TabsTrigger>
+                    <TabsTrigger value="technical">技术标</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+
+              {/* 操作按钮栏 */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" onClick={handleZoomOut}>
+                    <ZoomOut className="w-4 h-4" />
+                  </Button>
+                  <span className="text-sm text-gray-600">{catalogZoom}%</span>
+                  <Button variant="outline" size="sm" onClick={handleZoomIn}>
+                    <ZoomIn className="w-4 h-4" />
+                  </Button>
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      重新生成
                     </Button>
-                    <Button variant="ghost" size="sm">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>确认重新生成</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        重新生成将覆盖当前目录，确定要继续吗？
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>取消</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleRegenerateCatalog}>确认</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+
+              {/* 目录内容 */}
+              <div className="flex-1 overflow-y-auto p-4" style={{ fontSize: `${catalogZoom}%` }}>
+                <div className="space-y-1">
+                  {catalogItems.map(item => renderCatalogItem(item))}
                 </div>
               </div>
-            ))}
+
+              <div className="p-4 border-t border-gray-200">
+                <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700 w-full">
+                  生成全文
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
           </div>
 
-          <div className="flex justify-end mt-6">
-            <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
-              生成全文
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+          {/* 右侧信息面板 */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+              <Tabs value={rightPanelTab} onValueChange={(value) => setRightPanelTab(value as 'requirements' | 'information')}>
+                <TabsList className="grid w-full grid-cols-2 m-4 mb-0">
+                  <TabsTrigger value="requirements">招标要求</TabsTrigger>
+                  <TabsTrigger value="information">招标信息</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="requirements" className="flex-1 p-4 overflow-y-auto">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">技术要求</h4>
+                      <p className="text-sm text-gray-600">
+                        项目需要满足国家相关技术标准，具备完整的技术方案和实施计划...
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">资质要求</h4>
+                      <p className="text-sm text-gray-600">
+                        投标人应具备相应的资质证书，有类似项目经验...
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">商务要求</h4>
+                      <p className="text-sm text-gray-600">
+                        投标保证金、履约保证金等商务要求...
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="information" className="flex-1 p-4 overflow-y-auto">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">项目概况</h4>
+                      <p className="text-sm text-gray-600">
+                        项目名称、建设地点、建设规模等基本信息...
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">投标须知</h4>
+                      <p className="text-sm text-gray-600">
+                        投标文件编制要求、提交方式、开标时间等...
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">评标办法</h4>
+                      <p className="text-sm text-gray-600">
+                        评标标准、评分细则、中标条件等...
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
         </div>
       )}
