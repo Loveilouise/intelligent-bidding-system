@@ -1,7 +1,7 @@
+
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
-import BidSettings from './BidSettings';
 import HistoryBidManagement from './HistoryBidManagement';
 import TemplateManagement from './TemplateManagement';
 import AIBidGeneration from './AIBidGeneration';
@@ -15,11 +15,10 @@ const Index = () => {
       
       <div className="flex-1 flex flex-col">
         {activeModule === 'chat' && <ChatWindow />}
-        {activeModule === 'bid-settings' && <BidSettings />}
         {activeModule === 'history-bid-management' && <HistoryBidManagement />}
         {activeModule === 'template-management' && <TemplateManagement />}
         {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
-        {!['chat', 'bid-settings', 'history-bid-management', 'template-management', 'ai-bid-generation'].includes(activeModule) && (
+        {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation'].includes(activeModule) && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-700 mb-2">
@@ -52,8 +51,7 @@ function getModuleTitle(module: string): string {
     'knowledge-settings': '知识库设置',
     'enterprise-knowledge': '企业知识库',
     'personal-knowledge': '个人知识库',
-    'industry-knowledge': '行业知识库',
-    'bid-settings': '生标设置'
+    'industry-knowledge': '行业知识库'
   };
   return titles[module] || '未知模块';
 }

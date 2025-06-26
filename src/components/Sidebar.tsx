@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   FileText, 
@@ -33,8 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
       children: [
         { id: 'ai-bid-generation', title: 'AI生标', icon: null },
         { id: 'history-bid-management', title: '历史生标管理', icon: null },
-        { id: 'template-management', title: '投标方案模板管理', icon: null },
-        { id: 'bid-settings', title: '生标设置', icon: null }
+        { id: 'template-management', title: '投标方案模板管理', icon: null }
       ]
     },
     {
