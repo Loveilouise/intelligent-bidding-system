@@ -45,7 +45,7 @@ const TemplateManagement: React.FC = () => {
       description: '智能监控、消防、安防等系统集成标准方案',
       usageCount: 5
     }
-  ]);
+  ];
 
   const filteredTemplates = templates.filter(template =>
     template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,7 +92,7 @@ const TemplateManagement: React.FC = () => {
               </div>
               <Button 
                 onClick={handleAdd}
-                className="bg-purple-300 hover:bg-purple-400 text-white"
+                className="bg-purple-400 hover:bg-purple-500 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 新增模板
@@ -118,7 +118,7 @@ const TemplateManagement: React.FC = () => {
                   <TableRow key={template.id}>
                     <TableCell>
                       <div className="flex items-center space-x-2">
-                        <FileText className="w-4 h-4 text-purple-300" />
+                        <FileText className="w-4 h-4 text-purple-400" />
                         <span className="font-medium">{template.name}</span>
                       </div>
                     </TableCell>
@@ -151,7 +151,7 @@ const TemplateManagement: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEdit(template.id)}
-                          className="text-gray-600 hover:text-purple-300"
+                          className="text-gray-600 hover:text-purple-400"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -188,7 +188,7 @@ const TemplateManagement: React.FC = () => {
               </p>
               <Button 
                 onClick={handleAdd}
-                className="bg-purple-300 hover:bg-purple-400 text-white"
+                className="bg-purple-400 hover:bg-purple-500 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 创建第一个模板
