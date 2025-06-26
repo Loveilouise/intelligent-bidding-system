@@ -19,8 +19,8 @@ import {
   Copy,
   Trash2,
   ArrowRight,
-  ZoomIn,
-  ZoomOut,
+  ChevronDown,
+  ChevronRight,
   Minus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -79,7 +79,7 @@ const AIBidGeneration: React.FC = () => {
   const [selectedDocument, setSelectedDocument] = useState<string>('');
   const [generationStatus, setGenerationStatus] = useState<'idle' | 'generating' | 'completed'>('idle');
   const [catalogType, setCatalogType] = useState<'business' | 'technical'>('business');
-  const [catalogZoom, setCatalogZoom] = useState(100);
+  const [catalogExpanded, setCatalogExpanded] = useState(true);
   const [rightPanelTab, setRightPanelTab] = useState<'requirements' | 'information'>('requirements');
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([
     { 
@@ -133,6 +133,10 @@ const AIBidGeneration: React.FC = () => {
     }
   };
 
+  const handleToggleExpand = () => {
+    setCatalogExpanded(!catalogExpanded);
+  };
+
   const handleZoomIn = () => {
     setCatalogZoom(prev => Math.min(prev + 10, 150));
   };
@@ -161,6 +165,10 @@ const AIBidGeneration: React.FC = () => {
   };
 
   const renderCatalogItem = (item: CatalogItem, parentId: string | null = null) => {
+    if (!catalogExpanded && item.level > 1) {
+      return null;
+    }
+
     return (
       <div key={item.id} className="group">
         <div 
@@ -173,28 +181,39 @@ const AIBidGeneration: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 hover:bg-green-100"
-                onMouseEnter={(e) => {
-                  const tooltip = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (tooltip) tooltip.style.display = 'block';
-                }}
-                onMouseLeave={(e) => {
-                  const tooltip = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (tooltip) tooltip.style.display = 'none';
+                className="h-6 w-6 p-0 hover:bg-gray-100"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const dropdown = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (dropdown) {
+                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                  }
                 }}
               >
-                <Plus className="h-3 w-3 text-green-600" />
+                <Plus className="h-3 w-3 text-gray-900" />
               </Button>
-              <div className="absolute left-0 top-8 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
+              <div 
+                className="absolute left-0 top-8 bg-white border border-gray-200 rounded shadow-lg z-10 min-w-32"
+                style={{ display: 'none' }}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button
-                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
-                  onClick={() => addSameLevelItem(parentId, item.id)}
+                  className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 whitespace-nowrap"
+                  onClick={() => {
+                    addSameLevelItem(parentId, item.id);
+                    const dropdown = document.querySelector('[style*="display: block"]') as HTMLElement;
+                    if (dropdown) dropdown.style.display = 'none';
+                  }}
                 >
                   创建同级章节
                 </button>
                 <button
-                  className="block w-full text-left px-3 py-2 text-xs hover:bg-gray-50"
-                  onClick={() => addSubLevelItem(item.id)}
+                  className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 whitespace-nowrap"
+                  onClick={() => {
+                    addSubLevelItem(item.id);
+                    const dropdown = document.querySelector('[style*="display: block"]') as HTMLElement;
+                    if (dropdown) dropdown.style.display = 'none';
+                  }}
                 >
                   创建子级章节
                 </button>
@@ -202,8 +221,8 @@ const AIBidGeneration: React.FC = () => {
             </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-red-100">
-                  <Minus className="h-3 w-3 text-red-600" />
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
+                  <Trash2 className="h-3 w-3 text-gray-900" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -221,7 +240,7 @@ const AIBidGeneration: React.FC = () => {
             </AlertDialog>
           </div>
         </div>
-        {item.children && item.children.map(child => renderCatalogItem(child, item.id))}
+        {catalogExpanded && item.children && item.children.map(child => renderCatalogItem(child, item.id))}
       </div>
     );
   };
@@ -401,12 +420,8 @@ const AIBidGeneration: React.FC = () => {
               {/* 操作按钮栏 */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" onClick={handleZoomOut}>
-                    <ZoomOut className="w-4 h-4" />
-                  </Button>
-                  <span className="text-sm text-gray-600">{catalogZoom}%</span>
-                  <Button variant="outline" size="sm" onClick={handleZoomIn}>
-                    <ZoomIn className="w-4 h-4" />
+                  <Button variant="outline" size="sm" onClick={handleToggleExpand}>
+                    {catalogExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </Button>
                 </div>
                 <AlertDialog>
@@ -432,7 +447,7 @@ const AIBidGeneration: React.FC = () => {
               </div>
 
               {/* 目录内容 */}
-              <div className="flex-1 overflow-y-auto p-4" style={{ fontSize: `${catalogZoom}%` }}>
+              <div className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-1">
                   {catalogItems.map(item => renderCatalogItem(item))}
                 </div>
@@ -588,18 +603,17 @@ const AIBidGeneration: React.FC = () => {
   return (
     <div className="flex-1 p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-900 mb-2">AI生标</h1>
-          <p className="text-gray-600">智能标书生成系统 - 创建标书 → 生成目录 → 生成全文</p>
         </div>
 
         {/* 流程步骤指示器 */}
-        <div className="mb-6">
-          <div className="flex items-center justify-center space-x-8">
+        <div className="mb-4">
+          <div className="flex items-center justify-center space-x-6">
             {tabs.map((tab, index) => (
               <div key={tab.id} className="flex items-center">
                 <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
                     activeTab === tab.id 
                       ? 'bg-purple-600 text-white' 
                       : tabs.findIndex(t => t.id === activeTab) > index
@@ -607,19 +621,19 @@ const AIBidGeneration: React.FC = () => {
                         : 'bg-gray-200 text-gray-500'
                   }`}>
                     {tabs.findIndex(t => t.id === activeTab) > index ? (
-                      <CheckCircle className="w-5 h-5" />
+                      <CheckCircle className="w-4 h-4" />
                     ) : (
                       index + 1
                     )}
                   </div>
-                  <span className={`mt-2 text-sm font-medium ${
+                  <span className={`mt-1 text-xs font-medium ${
                     activeTab === tab.id ? 'text-purple-600' : 'text-gray-500'
                   }`}>
                     {tab.title}
                   </span>
                 </div>
                 {index < tabs.length - 1 && (
-                  <div className={`w-16 h-0.5 mx-4 ${
+                  <div className={`w-12 h-0.5 mx-3 ${
                     tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
                   }`} />
                 )}
