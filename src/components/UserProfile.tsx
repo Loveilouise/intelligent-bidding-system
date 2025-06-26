@@ -24,8 +24,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="flex items-center space-x-2 px-3 py-2">
-          <div className="w-8 h-8 bg-purple-50 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-purple-400" />
+          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-purple-600" />
           </div>
           <div className="text-left">
             <div className="text-sm font-medium text-gray-900">{user.name}</div>

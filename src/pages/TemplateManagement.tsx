@@ -45,7 +45,7 @@ const TemplateManagement: React.FC = () => {
       description: '智能监控、消防、安防等系统集成标准方案',
       usageCount: 5
     }
-  ];
+  ]);
 
   const filteredTemplates = templates.filter(template =>
     template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,7 +72,8 @@ const TemplateManagement: React.FC = () => {
     <div className="flex-1 p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">投标方案模板管理</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">投标方案模板管理</h1>
+          <p className="text-gray-600">管理投标施工方案模板，支持新增、编辑和维护操作</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -92,7 +93,7 @@ const TemplateManagement: React.FC = () => {
               </div>
               <Button 
                 onClick={handleAdd}
-                className="bg-purple-400 hover:bg-purple-500 text-white"
+                className="bg-purple-600 hover:bg-purple-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 新增模板
@@ -118,12 +119,12 @@ const TemplateManagement: React.FC = () => {
                   <TableRow key={template.id}>
                     <TableCell>
                       <div className="flex items-center space-x-2">
-                        <FileText className="w-4 h-4 text-purple-400" />
+                        <FileText className="w-4 h-4 text-purple-500" />
                         <span className="font-medium">{template.name}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="inline-flex px-2 py-1 text-xs font-medium text-purple-600 bg-purple-50 rounded-full">
+                      <span className="inline-flex px-2 py-1 text-xs font-medium text-purple-700 bg-purple-50 rounded-full">
                         {template.category}
                       </span>
                     </TableCell>
@@ -151,7 +152,7 @@ const TemplateManagement: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEdit(template.id)}
-                          className="text-gray-600 hover:text-purple-400"
+                          className="text-gray-600 hover:text-purple-600"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -188,7 +189,7 @@ const TemplateManagement: React.FC = () => {
               </p>
               <Button 
                 onClick={handleAdd}
-                className="bg-purple-400 hover:bg-purple-500 text-white"
+                className="bg-purple-600 hover:bg-purple-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 创建第一个模板
