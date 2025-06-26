@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Upload, 
@@ -21,7 +22,17 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronRight,
-  Minus
+  Minus,
+  ArrowLeft,
+  Bold,
+  Italic,
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Undo,
+  Redo,
+  Type
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +41,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ProjectInfo {
   name: string;
@@ -81,6 +93,8 @@ const AIBidGeneration: React.FC = () => {
   const [catalogType, setCatalogType] = useState<'business' | 'technical'>('business');
   const [catalogExpanded, setCatalogExpanded] = useState(true);
   const [rightPanelTab, setRightPanelTab] = useState<'requirements' | 'information'>('requirements');
+  const [editingTab, setEditingTab] = useState<'cover' | 'business' | 'technical'>('cover');
+  const [editingContent, setEditingContent] = useState('');
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([
     { 
       id: '1', 
@@ -102,12 +116,6 @@ const AIBidGeneration: React.FC = () => {
     { value: 'service', label: '服务类' },
     { value: 'design', label: '设计类' },
     { value: 'consulting', label: '咨询类' }
-  ];
-
-  const knowledgeBases = [
-    { value: 'enterprise', label: '企业知识库' },
-    { value: 'personal', label: '个人知识库' },
-    { value: 'uploaded', label: '上传文档（临时）' }
   ];
 
   const tabs = [
@@ -133,16 +141,16 @@ const AIBidGeneration: React.FC = () => {
     }
   };
 
+  const handlePrevStep = () => {
+    if (activeTab === 'generation') {
+      setActiveTab('setup');
+    } else if (activeTab === 'editing') {
+      setActiveTab('generation');
+    }
+  };
+
   const handleToggleExpand = () => {
     setCatalogExpanded(!catalogExpanded);
-  };
-
-  const handleZoomIn = () => {
-    setCatalogZoom(prev => Math.min(prev + 10, 150));
-  };
-
-  const handleZoomOut = () => {
-    setCatalogZoom(prev => Math.max(prev - 10, 50));
   };
 
   const handleRegenerateCatalog = () => {
@@ -177,48 +185,68 @@ const AIBidGeneration: React.FC = () => {
         >
           <span className="text-sm">{item.title}</span>
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 hover:bg-gray-100"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const dropdown = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (dropdown) {
-                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-                  }
-                }}
-              >
-                <Plus className="h-3 w-3 text-gray-900" />
-              </Button>
-              <div 
-                className="absolute left-0 top-8 bg-white border border-gray-200 rounded shadow-lg z-10 min-w-32"
-                style={{ display: 'none' }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 whitespace-nowrap"
-                  onClick={() => {
-                    addSameLevelItem(parentId, item.id);
-                    const dropdown = document.querySelector('[style*="display: block"]') as HTMLElement;
-                    if (dropdown) dropdown.style.display = 'none';
-                  }}
-                >
-                  创建同级章节
-                </button>
-                <button
-                  className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 whitespace-nowrap"
-                  onClick={() => {
-                    addSubLevelItem(item.id);
-                    const dropdown = document.querySelector('[style*="display: block"]') as HTMLElement;
-                    if (dropdown) dropdown.style.display = 'none';
-                  }}
-                >
-                  创建子级章节
-                </button>
-              </div>
-            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="relative">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-gray-100"
+                      onMouseEnter={(e) => {
+                        const dropdown = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (dropdown) {
+                          dropdown.style.display = 'block';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        setTimeout(() => {
+                          const dropdown = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (dropdown && !dropdown.matches(':hover')) {
+                            dropdown.style.display = 'none';
+                          }
+                        }, 100);
+                      }}
+                    >
+                      <Plus className="h-3 w-3 text-gray-900" />
+                    </Button>
+                    <div 
+                      className="absolute left-0 top-8 bg-white border border-gray-200 rounded shadow-lg z-10 min-w-32"
+                      style={{ display: 'none' }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.display = 'block';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    >
+                      <button
+                        className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 whitespace-nowrap text-gray-900"
+                        onClick={() => {
+                          addSameLevelItem(parentId, item.id);
+                          document.querySelectorAll('[style*="display: block"]').forEach(el => {
+                            (el as HTMLElement).style.display = 'none';
+                          });
+                        }}
+                      >
+                        创建同级章节
+                      </button>
+                      <button
+                        className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 whitespace-nowrap text-gray-900"
+                        onClick={() => {
+                          addSubLevelItem(item.id);
+                          document.querySelectorAll('[style*="display: block"]').forEach(el => {
+                            (el as HTMLElement).style.display = 'none';
+                          });
+                        }}
+                      >
+                        创建子级章节
+                      </button>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+              </Tooltip>
+            </TooltipProvider>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
@@ -379,13 +407,6 @@ const AIBidGeneration: React.FC = () => {
             ))}
           </div>
         )}
-        
-        <div className="flex justify-end mt-6">
-          <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
-            下一步
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </div>
       </div>
     </div>
   );
@@ -421,7 +442,7 @@ const AIBidGeneration: React.FC = () => {
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-2">
                   <Button variant="outline" size="sm" onClick={handleToggleExpand}>
-                    {catalogExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    {catalogExpanded ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                   </Button>
                 </div>
                 <AlertDialog>
@@ -451,13 +472,6 @@ const AIBidGeneration: React.FC = () => {
                 <div className="space-y-1">
                   {catalogItems.map(item => renderCatalogItem(item))}
                 </div>
-              </div>
-
-              <div className="p-4 border-t border-gray-200">
-                <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700 w-full">
-                  生成全文
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
               </div>
             </div>
           </div>
@@ -525,75 +539,103 @@ const AIBidGeneration: React.FC = () => {
   );
 
   const renderEditingTab = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* 文档列表 */}
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[700px]">
+      {/* 左侧导航 */}
       <div className="lg:col-span-1">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h3 className="font-semibold text-gray-900 mb-4">标书章节</h3>
-          <div className="space-y-2">
-            {bidDocuments.map((doc) => (
-              <div 
-                key={doc.id}
-                className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                  selectedDocument === doc.id ? 'bg-purple-100 border-purple-300' : 'bg-gray-50 hover:bg-gray-100'
-                }`}
-                onClick={() => setSelectedDocument(doc.id)}
-              >
-                <div className="flex items-center space-x-2">
-                  <FileText className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm font-medium">{doc.title}</span>
-                </div>
-              </div>
-            ))}
+        <div className="bg-white rounded-lg border border-gray-200 h-full">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900">文档结构</h3>
+          </div>
+          <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')}>
+            <TabsList className="grid w-full grid-cols-1 m-4 mb-0">
+              <TabsTrigger value="cover">封面</TabsTrigger>
+              <TabsTrigger value="business">商务标</TabsTrigger>
+              <TabsTrigger value="technical">技术标</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* 中间编辑区域 */}
+      <div className="lg:col-span-2">
+        <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+          {/* Word工具栏 */}
+          <div className="flex items-center space-x-2 p-3 border-b border-gray-200 bg-gray-50">
+            <Button variant="ghost" size="sm">
+              <Undo className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm">
+              <Redo className="w-4 h-4" />
+            </Button>
+            <div className="w-px h-6 bg-gray-300 mx-2" />
+            <Select defaultValue="16">
+              <SelectTrigger className="w-16 h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="12">12</SelectItem>
+                <SelectItem value="14">14</SelectItem>
+                <SelectItem value="16">16</SelectItem>
+                <SelectItem value="18">18</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="ghost" size="sm">
+              <Bold className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm">
+              <Italic className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm">
+              <Underline className="w-4 h-4" />
+            </Button>
+            <div className="w-px h-6 bg-gray-300 mx-2" />
+            <Button variant="ghost" size="sm">
+              <AlignLeft className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm">
+              <AlignCenter className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm">
+              <AlignRight className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* 编辑内容区 */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="min-h-full bg-white">
+              <Textarea
+                placeholder="开始编辑您的标书内容..."
+                className="w-full h-full min-h-[500px] border-none resize-none focus:ring-0 text-base leading-relaxed"
+                value={editingContent}
+                onChange={(e) => setEditingContent(e.target.value)}
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 编辑区域 */}
-      <div className="lg:col-span-2">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900">内容编辑</h3>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
-                <Save className="w-4 h-4 mr-2" />
-                保存
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                导出
-              </Button>
-            </div>
-          </div>
-
-          {/* AI生成工具 */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <Button className="flex flex-col items-center p-4 h-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200">
-              <Sparkles className="w-6 h-6 mb-2" />
-              <span className="text-sm">AI生成</span>
+      {/* 右侧AI工具 */}
+      <div className="lg:col-span-1">
+        <div className="bg-white rounded-lg border border-gray-200 h-full p-4">
+          <h3 className="font-semibold text-gray-900 mb-4">AI助手</h3>
+          <div className="space-y-3">
+            <Button className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200">
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI生成
             </Button>
-            <Button className="flex flex-col items-center p-4 h-auto bg-green-50 hover:bg-green-100 text-green-700 border border-green-200">
-              <Edit3 className="w-6 h-6 mb-2" />
-              <span className="text-sm">AI续写</span>
+            <Button className="w-full justify-start bg-green-50 hover:bg-green-100 text-green-700 border border-green-200">
+              <Edit3 className="w-4 h-4 mr-2" />
+              AI续写
             </Button>
-            <Button className="flex flex-col items-center p-4 h-auto bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200">
-              <RefreshCw className="w-6 h-6 mb-2" />
-              <span className="text-sm">AI润色</span>
+            <Button className="w-full justify-start bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              AI润色
             </Button>
-            <Button className="flex flex-col items-center p-4 h-auto bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200">
-              <Palette className="w-6 h-6 mb-2" />
-              <span className="text-sm">AI美化</span>
+            <Button className="w-full justify-start bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200">
+              <Palette className="w-4 h-4 mr-2" />
+              AI美化
             </Button>
-          </div>
-
-          {/* 内容编辑区 */}
-          <div className="border border-gray-200 rounded-lg p-4">
-            <Textarea
-              placeholder="选择左侧章节开始编辑，或使用AI工具生成内容..."
-              rows={15}
-              className="resize-none"
-              value={selectedDocument ? bidDocuments.find(d => d.id === selectedDocument)?.content : ''}
-            />
           </div>
         </div>
       </div>
@@ -603,17 +645,16 @@ const AIBidGeneration: React.FC = () => {
   return (
     <div className="flex-1 p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">AI生标</h1>
-        </div>
-
-        {/* 流程步骤指示器 */}
-        <div className="mb-4">
-          <div className="flex items-center justify-center space-x-6">
+        {/* 页面标题和流程指示器 */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
+          
+          {/* 流程步骤指示器 */}
+          <div className="flex items-center space-x-6">
             {tabs.map((tab, index) => (
               <div key={tab.id} className="flex items-center">
-                <div className="flex flex-col items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
+                <div className="flex items-center">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                     activeTab === tab.id 
                       ? 'bg-purple-600 text-white' 
                       : tabs.findIndex(t => t.id === activeTab) > index
@@ -621,24 +662,51 @@ const AIBidGeneration: React.FC = () => {
                         : 'bg-gray-200 text-gray-500'
                   }`}>
                     {tabs.findIndex(t => t.id === activeTab) > index ? (
-                      <CheckCircle className="w-4 h-4" />
+                      <CheckCircle className="w-3 h-3" />
                     ) : (
                       index + 1
                     )}
                   </div>
-                  <span className={`mt-1 text-xs font-medium ${
+                  <span className={`ml-2 text-sm font-medium ${
                     activeTab === tab.id ? 'text-purple-600' : 'text-gray-500'
                   }`}>
                     {tab.title}
                   </span>
                 </div>
                 {index < tabs.length - 1 && (
-                  <div className={`w-12 h-0.5 mx-3 ${
+                  <div className={`w-8 h-0.5 mx-3 ${
                     tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
                   }`} />
                 )}
               </div>
             ))}
+          </div>
+
+          {/* 操作按钮 */}
+          <div className="flex items-center space-x-2">
+            {activeTab !== 'setup' && (
+              <Button variant="outline" onClick={handlePrevStep}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                上一步
+              </Button>
+            )}
+            {activeTab === 'setup' && (
+              <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
+                下一步
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            )}
+            {activeTab === 'generation' && (
+              <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
+                下一步
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            )}
+            {activeTab === 'editing' && (
+              <Button className="bg-purple-600 hover:bg-purple-700">
+                提交
+              </Button>
+            )}
           </div>
         </div>
 
