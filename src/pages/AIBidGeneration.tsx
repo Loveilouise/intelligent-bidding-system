@@ -73,6 +73,7 @@ interface CatalogItem {
   id: string;
   title: string;
   level: number;
+  expanded?: boolean;
   children?: CatalogItem[];
 }
 
@@ -100,14 +101,15 @@ const AIBidGeneration: React.FC = () => {
       id: '1', 
       title: '商务标书', 
       level: 1,
+      expanded: true,
       children: [
         { id: '1-1', title: '投标函', level: 2 },
         { id: '1-2', title: '法定代表人身份证明', level: 2 },
         { id: '1-3', title: '授权委托书', level: 2 }
       ]
     },
-    { id: '2', title: '资质证明文件', level: 1 },
-    { id: '3', title: '财务状况报告', level: 1 }
+    { id: '2', title: '资质证明文件', level: 1, expanded: true },
+    { id: '3', title: '财务状况报告', level: 1, expanded: true }
   ]);
 
   const bidTypes = [
@@ -119,9 +121,9 @@ const AIBidGeneration: React.FC = () => {
   ];
 
   const tabs = [
-    { id: 'setup', title: '创建标书', description: '标书信息设置和生标配置' },
-    { id: 'generation', title: '生成目录', description: '智能生成标书目录结构' },
-    { id: 'editing', title: '生成全文', description: '生成完整标书内容并编辑' }
+    { id: 'setup', title: '创建标书' },
+    { id: 'generation', title: '生成目录' },
+    { id: 'editing', title: '生成全文' }
   ];
 
   const handleNextStep = () => {
@@ -160,97 +162,146 @@ const AIBidGeneration: React.FC = () => {
     }, 1500);
   };
 
+  const toggleItemExpansion = (itemId: string) => {
+    const updateItems = (items: CatalogItem[]): CatalogItem[] => {
+      return items.map(item => {
+        if (item.id === itemId) {
+          return { ...item, expanded: !item.expanded };
+        }
+        if (item.children) {
+          return { ...item, children: updateItems(item.children) };
+        }
+        return item;
+      });
+    };
+    setCatalogItems(updateItems(catalogItems));
+  };
+
   const addSameLevelItem = (parentId: string | null, afterId: string) => {
-    console.log('Adding same level item after:', afterId);
+    const newId = Date.now().toString();
+    const newItem: CatalogItem = {
+      id: newId,
+      title: '新建章节',
+      level: catalogItems.find(item => item.id === afterId)?.level || 1
+    };
+    
+    const updateItems = (items: CatalogItem[]): CatalogItem[] => {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].id === afterId) {
+          items.splice(i + 1, 0, newItem);
+          return items;
+        }
+        if (items[i].children) {
+          items[i].children = updateItems(items[i].children);
+        }
+      }
+      return items;
+    };
+    
+    setCatalogItems([...updateItems(catalogItems)]);
   };
 
   const addSubLevelItem = (parentId: string) => {
-    console.log('Adding sub level item under:', parentId);
+    const newId = Date.now().toString();
+    const parent = catalogItems.find(item => item.id === parentId);
+    const newItem: CatalogItem = {
+      id: newId,
+      title: '新建子章节',
+      level: (parent?.level || 1) + 1
+    };
+    
+    const updateItems = (items: CatalogItem[]): CatalogItem[] => {
+      return items.map(item => {
+        if (item.id === parentId) {
+          return {
+            ...item,
+            expanded: true,
+            children: [...(item.children || []), newItem]
+          };
+        }
+        if (item.children) {
+          return { ...item, children: updateItems(item.children) };
+        }
+        return item;
+      });
+    };
+    
+    setCatalogItems(updateItems(catalogItems));
   };
 
   const deleteItem = (itemId: string) => {
-    console.log('Deleting item:', itemId);
+    const updateItems = (items: CatalogItem[]): CatalogItem[] => {
+      return items.filter(item => {
+        if (item.id === itemId) {
+          return false;
+        }
+        if (item.children) {
+          item.children = updateItems(item.children);
+        }
+        return true;
+      });
+    };
+    setCatalogItems(updateItems(catalogItems));
   };
 
   const renderCatalogItem = (item: CatalogItem, parentId: string | null = null) => {
-    if (!catalogExpanded && item.level > 1) {
-      return null;
-    }
-
     return (
       <div key={item.id} className="group">
         <div 
           className="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer"
           style={{ paddingLeft: `${item.level * 16 + 8}px` }}
         >
-          <span className="text-sm">{item.title}</span>
+          <div className="flex items-center flex-1">
+            {item.children && item.children.length > 0 && (
+              <button
+                onClick={() => toggleItemExpansion(item.id)}
+                className="mr-2 p-0.5 hover:bg-gray-200 rounded"
+              >
+                {item.expanded ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronRight className="h-3 w-3" />
+                )}
+              </button>
+            )}
+            <span className="text-sm">{item.title}</span>
+          </div>
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative">
+            <div className="relative">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-6 w-6 p-0 hover:bg-gray-100"
-                      onMouseEnter={(e) => {
-                        const dropdown = e.currentTarget.nextElementSibling as HTMLElement;
-                        if (dropdown) {
-                          dropdown.style.display = 'block';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        setTimeout(() => {
-                          const dropdown = e.currentTarget.nextElementSibling as HTMLElement;
-                          if (dropdown && !dropdown.matches(':hover')) {
-                            dropdown.style.display = 'none';
-                          }
-                        }, 100);
-                      }}
                     >
-                      <Plus className="h-3 w-3 text-gray-900" />
+                      <Plus className="h-3 w-3 text-black" />
                     </Button>
-                    <div 
-                      className="absolute left-0 top-8 bg-white border border-gray-200 rounded shadow-lg z-10 min-w-32"
-                      style={{ display: 'none' }}
-                      onMouseEnter={(e) => {
-                        (e.target as HTMLElement).style.display = 'block';
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    >
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="bg-white border border-gray-200 shadow-lg p-0 z-50">
+                    <div className="flex flex-col min-w-32">
                       <button
-                        className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 whitespace-nowrap text-gray-900"
-                        onClick={() => {
-                          addSameLevelItem(parentId, item.id);
-                          document.querySelectorAll('[style*="display: block"]').forEach(el => {
-                            (el as HTMLElement).style.display = 'none';
-                          });
-                        }}
+                        className="px-3 py-2 text-sm hover:bg-gray-50 text-left text-black whitespace-nowrap"
+                        onClick={() => addSameLevelItem(parentId, item.id)}
                       >
                         创建同级章节
                       </button>
                       <button
-                        className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50 whitespace-nowrap text-gray-900"
-                        onClick={() => {
-                          addSubLevelItem(item.id);
-                          document.querySelectorAll('[style*="display: block"]').forEach(el => {
-                            (el as HTMLElement).style.display = 'none';
-                          });
-                        }}
+                        className="px-3 py-2 text-sm hover:bg-gray-50 text-left text-black whitespace-nowrap"
+                        onClick={() => addSubLevelItem(item.id)}
                       >
                         创建子级章节
                       </button>
                     </div>
-                  </div>
-                </TooltipTrigger>
-              </Tooltip>
-            </TooltipProvider>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-100">
-                  <Trash2 className="h-3 w-3 text-gray-900" />
+                  <Trash2 className="h-3 w-3 text-black" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -268,7 +319,7 @@ const AIBidGeneration: React.FC = () => {
             </AlertDialog>
           </div>
         </div>
-        {catalogExpanded && item.children && item.children.map(child => renderCatalogItem(child, item.id))}
+        {item.expanded && item.children && item.children.map(child => renderCatalogItem(child, item.id))}
       </div>
     );
   };
@@ -424,9 +475,9 @@ const AIBidGeneration: React.FC = () => {
       )}
 
       {generationStatus === 'completed' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
-          {/* 左侧目录 */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-[600px]">
+          {/* 左侧目录 - 增加占比 */}
+          <div className="lg:col-span-3">
             <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
               {/* 目录标题和切换 */}
               <div className="border-b border-gray-200 p-4">
@@ -442,7 +493,7 @@ const AIBidGeneration: React.FC = () => {
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-2">
                   <Button variant="outline" size="sm" onClick={handleToggleExpand}>
-                    {catalogExpanded ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                    {catalogExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   </Button>
                 </div>
                 <AlertDialog>
@@ -476,8 +527,8 @@ const AIBidGeneration: React.FC = () => {
             </div>
           </div>
 
-          {/* 右侧信息面板 */}
-          <div className="lg:col-span-1">
+          {/* 右侧信息面板 - 减少占比 */}
+          <div className="lg:col-span-2">
             <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
               <Tabs value={rightPanelTab} onValueChange={(value) => setRightPanelTab(value as 'requirements' | 'information')}>
                 <TabsList className="grid w-full grid-cols-2 m-4 mb-0">
@@ -546,59 +597,83 @@ const AIBidGeneration: React.FC = () => {
           <div className="p-4 border-b border-gray-200">
             <h3 className="font-semibold text-gray-900">文档结构</h3>
           </div>
-          <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')}>
-            <TabsList className="grid w-full grid-cols-1 m-4 mb-0">
-              <TabsTrigger value="cover">封面</TabsTrigger>
-              <TabsTrigger value="business">商务标</TabsTrigger>
-              <TabsTrigger value="technical">技术标</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="p-4">
+            <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')} orientation="horizontal">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="cover">封面</TabsTrigger>
+                <TabsTrigger value="business">商务标</TabsTrigger>
+                <TabsTrigger value="technical">技术标</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
       </div>
 
       {/* 中间编辑区域 */}
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-3">
         <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
           {/* Word工具栏 */}
-          <div className="flex items-center space-x-2 p-3 border-b border-gray-200 bg-gray-50">
-            <Button variant="ghost" size="sm">
-              <Undo className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Redo className="w-4 h-4" />
-            </Button>
-            <div className="w-px h-6 bg-gray-300 mx-2" />
-            <Select defaultValue="16">
-              <SelectTrigger className="w-16 h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="12">12</SelectItem>
-                <SelectItem value="14">14</SelectItem>
-                <SelectItem value="16">16</SelectItem>
-                <SelectItem value="18">18</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="ghost" size="sm">
-              <Bold className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Italic className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Underline className="w-4 h-4" />
-            </Button>
-            <div className="w-px h-6 bg-gray-300 mx-2" />
-            <Button variant="ghost" size="sm">
-              <AlignLeft className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <AlignCenter className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <AlignRight className="w-4 h-4" />
-            </Button>
+          <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-gray-50">
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm">
+                <Undo className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm">
+                <Redo className="w-4 h-4" />
+              </Button>
+              <div className="w-px h-6 bg-gray-300 mx-2" />
+              <Select defaultValue="16">
+                <SelectTrigger className="w-16 h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="12">12</SelectItem>
+                  <SelectItem value="14">14</SelectItem>
+                  <SelectItem value="16">16</SelectItem>
+                  <SelectItem value="18">18</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="ghost" size="sm">
+                <Bold className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm">
+                <Italic className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm">
+                <Underline className="w-4 h-4" />
+              </Button>
+              <div className="w-px h-6 bg-gray-300 mx-2" />
+              <Button variant="ghost" size="sm">
+                <AlignLeft className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm">
+                <AlignCenter className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm">
+                <AlignRight className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* AI功能按钮 */}
+            <div className="flex items-center space-x-2">
+              <Button className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200" size="sm">
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI生成
+              </Button>
+              <Button className="bg-green-50 hover:bg-green-100 text-green-700 border border-green-200" size="sm">
+                <Edit3 className="w-4 h-4 mr-2" />
+                AI续写
+              </Button>
+              <Button className="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200" size="sm">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                AI润色
+              </Button>
+              <Button className="bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200" size="sm">
+                <Palette className="w-4 h-4 mr-2" />
+                AI美化
+              </Button>
+            </div>
           </div>
 
           {/* 编辑内容区 */}
@@ -614,31 +689,6 @@ const AIBidGeneration: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* 右侧AI工具 */}
-      <div className="lg:col-span-1">
-        <div className="bg-white rounded-lg border border-gray-200 h-full p-4">
-          <h3 className="font-semibold text-gray-900 mb-4">AI助手</h3>
-          <div className="space-y-3">
-            <Button className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200">
-              <Sparkles className="w-4 h-4 mr-2" />
-              AI生成
-            </Button>
-            <Button className="w-full justify-start bg-green-50 hover:bg-green-100 text-green-700 border border-green-200">
-              <Edit3 className="w-4 h-4 mr-2" />
-              AI续写
-            </Button>
-            <Button className="w-full justify-start bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              AI润色
-            </Button>
-            <Button className="w-full justify-start bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200">
-              <Palette className="w-4 h-4 mr-2" />
-              AI美化
-            </Button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
@@ -646,7 +696,7 @@ const AIBidGeneration: React.FC = () => {
     <div className="flex-1 p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* 页面标题和流程指示器 */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
           
           {/* 流程步骤指示器 */}
@@ -686,20 +736,17 @@ const AIBidGeneration: React.FC = () => {
           <div className="flex items-center space-x-2">
             {activeTab !== 'setup' && (
               <Button variant="outline" onClick={handlePrevStep}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
                 上一步
               </Button>
             )}
             {activeTab === 'setup' && (
               <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
                 下一步
-                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
             {activeTab === 'generation' && (
               <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
                 下一步
-                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
             {activeTab === 'editing' && (
