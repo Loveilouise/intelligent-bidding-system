@@ -269,88 +269,86 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 <TabsTrigger value="charts" className="text-xs">图表</TabsTrigger>
                 <TabsTrigger value="templates" className="text-xs">模板</TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="materials" className="p-3 m-0">
+                <div className="space-y-2">
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <FileText className="w-4 h-4 mr-2 text-blue-500" />
+                      <span className="text-sm">公司简介模板</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">标准公司介绍文本</p>
+                  </div>
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <FileText className="w-4 h-4 mr-2 text-green-500" />
+                      <span className="text-sm">项目经验说明</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">类似项目经验描述</p>
+                  </div>
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <FileText className="w-4 h-4 mr-2 text-purple-500" />
+                      <span className="text-sm">技术方案框架</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">通用技术实施方案</p>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="charts" className="p-3 m-0">
+                <div className="space-y-2">
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <BarChart3 className="w-4 h-4 mr-2 text-blue-500" />
+                      <span className="text-sm">项目进度图</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">甘特图模板</p>
+                  </div>
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <Image className="w-4 h-4 mr-2 text-green-500" />
+                      <span className="text-sm">系统架构图</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">技术架构示意图</p>
+                  </div>
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <BarChart3 className="w-4 h-4 mr-2 text-orange-500" />
+                      <span className="text-sm">成本分析表</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">预算分析图表</p>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="templates" className="p-3 m-0">
+                <div className="space-y-2">
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <FileText className="w-4 h-4 mr-2 text-red-500" />
+                      <span className="text-sm">投标函模板</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">标准投标函格式</p>
+                  </div>
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <FileText className="w-4 h-4 mr-2 text-blue-500" />
+                      <span className="text-sm">技术方案模板</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">技术实施方案框架</p>
+                  </div>
+                  <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div className="flex items-center">
+                      <FileText className="w-4 h-4 mr-2 text-purple-500" />
+                      <span className="text-sm">商务方案模板</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">商务条款标准格式</p>
+                  </div>
+                </div>
+              </TabsContent>
             </Tabs>
           </div>
-
-          <ScrollArea className="flex-1">
-            <TabsContent value="materials" className="p-3 m-0">
-              <div className="space-y-2">
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="text-sm">公司简介模板</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">标准公司介绍文本</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-green-500" />
-                    <span className="text-sm">项目经验说明</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">类似项目经验描述</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-purple-500" />
-                    <span className="text-sm">技术方案框架</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">通用技术实施方案</p>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="charts" className="p-3 m-0">
-              <div className="space-y-2">
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <BarChart3 className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="text-sm">项目进度图</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">甘特图模板</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <Image className="w-4 h-4 mr-2 text-green-500" />
-                    <span className="text-sm">系统架构图</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">技术架构示意图</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <BarChart3 className="w-4 h-4 mr-2 text-orange-500" />
-                    <span className="text-sm">成本分析表</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">预算分析图表</p>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="templates" className="p-3 m-0">
-              <div className="space-y-2">
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-red-500" />
-                    <span className="text-sm">投标函模板</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">标准投标函格式</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="text-sm">技术方案模板</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">技术实施方案框架</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-purple-500" />
-                    <span className="text-sm">商务方案模板</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">商务条款标准格式</p>
-                </div>
-              </div>
-            </TabsContent>
-          </ScrollArea>
         </div>
       </div>
     </div>
