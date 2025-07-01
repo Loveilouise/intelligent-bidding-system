@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Clock, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -130,11 +129,6 @@ const AIBidGeneration: React.FC = () => {
             {activeTab === 'generation' && (
               <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
                 下一步
-              </Button>
-            )}
-            {activeTab === 'editing' && (
-              <Button className="bg-purple-600 hover:bg-purple-700">
-                提交
               </Button>
             )}
           </div>
