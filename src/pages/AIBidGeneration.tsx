@@ -17,6 +17,7 @@ const AIBidGeneration: React.FC = () => {
   });
   const [uploadedFiles] = useState<UploadedFile[]>([]);
   const [generationStatus, setGenerationStatus] = useState<'idle' | 'generating' | 'completed'>('idle');
+  const [fullTextGenerationStatus, setFullTextGenerationStatus] = useState<'idle' | 'generating' | 'completed'>('idle');
   const [catalogType, setCatalogType] = useState<'business' | 'technical'>('business');
   const [catalogExpanded, setCatalogExpanded] = useState(true);
   const [rightPanelTab, setRightPanelTab] = useState<'requirements' | 'information'>('requirements');
@@ -55,7 +56,11 @@ const AIBidGeneration: React.FC = () => {
         setGenerationStatus('completed');
       }, 2000);
     } else if (activeTab === 'generation') {
-      setActiveTab('editing');
+      setFullTextGenerationStatus('generating');
+      setTimeout(() => {
+        setFullTextGenerationStatus('completed');
+        setActiveTab('editing');
+      }, 3000);
     }
   };
 
@@ -64,6 +69,7 @@ const AIBidGeneration: React.FC = () => {
       setActiveTab('setup');
     } else if (activeTab === 'editing') {
       setActiveTab('generation');
+      setFullTextGenerationStatus('idle');
     }
   };
 
@@ -73,6 +79,77 @@ const AIBidGeneration: React.FC = () => {
       setGenerationStatus('completed');
     }, 1500);
   };
+
+  const handleSave = () => {
+    console.log('保存标书');
+  };
+
+  const handleDownload = () => {
+    console.log('下载标书');
+  };
+
+  // 生成全文动画页面
+  if (fullTextGenerationStatus === 'generating') {
+    return (
+      <div className="flex-1 p-6 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
+            
+            <div className="flex items-center space-x-6">
+              {tabs.map((tab, index) => (
+                <div key={tab.id} className="flex items-center">
+                  <div className="flex items-center">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                      activeTab === tab.id 
+                        ? 'bg-purple-600 text-white' 
+                        : tabs.findIndex(t => t.id === activeTab) > index
+                          ? 'bg-green-500 text-white'
+                          : 'bg-gray-200 text-gray-500'
+                    }`}>
+                      {tabs.findIndex(t => t.id === activeTab) > index ? (
+                        <CheckCircle className="w-3 h-3" />
+                      ) : (
+                        index + 1
+                      )}
+                    </div>
+                    <span className={`ml-2 text-sm font-medium ${
+                      activeTab === tab.id ? 'text-purple-600' : 'text-gray-500'
+                    }`}>
+                      {tab.title}
+                    </span>
+                  </div>
+                  {index < tabs.length - 1 && (
+                    <div className={`w-8 h-0.5 mx-3 ${
+                      tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" onClick={handlePrevStep}>
+                上一步
+              </Button>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成全文</h2>
+              <p className="text-gray-600 mb-4">AI正在根据目录结构生成完整的标书内容...</p>
+              <div className="flex items-center justify-center text-sm text-gray-500">
+                <Clock className="w-4 h-4 mr-2" />
+                预计需要2-3分钟
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 p-6 bg-gray-50">
@@ -120,6 +197,16 @@ const AIBidGeneration: React.FC = () => {
               <Button variant="outline" onClick={handlePrevStep}>
                 上一步
               </Button>
+            )}
+            {activeTab === 'editing' && (
+              <>
+                <Button variant="outline" onClick={handleSave}>
+                  保存
+                </Button>
+                <Button onClick={handleDownload} className="bg-purple-600 hover:bg-purple-700">
+                  下载标书
+                </Button>
+              </>
             )}
             {activeTab === 'setup' && (
               <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">

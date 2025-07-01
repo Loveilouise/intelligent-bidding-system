@@ -1,12 +1,11 @@
 
 import React, { useState } from 'react';
-import { Save, Download, Sparkles, Palette, ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type } from 'lucide-react';
+import { Sparkles, Palette, ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { toast } from '@/hooks/use-toast';
 
 interface BidEditingProps {
   editingTab: 'cover' | 'business' | 'technical';
@@ -94,17 +93,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
     }
   ]);
 
-  const handleSave = () => {
-    toast({
-      title: "保存成功",
-      description: "标书内容已保存",
-    });
-  };
-
-  const handleDownload = () => {
-    console.log('下载标书');
-  };
-
   const handleAIPolish = () => {
     console.log('AI润色');
   };
@@ -160,22 +148,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
-      {/* 顶部工具栏 */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">生成全文</h3>
-        
-        <div className="flex items-center space-x-2">
-          <Button onClick={handleSave} variant="outline" size="sm">
-            <Save className="w-4 h-4 mr-2" />
-            保存
-          </Button>
-          <Button onClick={handleDownload} className="bg-purple-600 hover:bg-purple-700" size="sm">
-            <Download className="w-4 h-4 mr-2" />
-            下载标书
-          </Button>
-        </div>
-      </div>
-
       <div className="flex flex-1 overflow-hidden">
         {/* 左侧大纲目录 */}
         <div className="w-64 border-r border-gray-200 flex flex-col">
