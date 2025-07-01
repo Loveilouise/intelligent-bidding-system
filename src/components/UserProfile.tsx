@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { User, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ onLogout }) => {
   const [user] = useState({
     name: '李雯雯',
-    email: 'zhangsan@example.com'
+    email: 'liwenwen@example.com'
   });
 
   return (
