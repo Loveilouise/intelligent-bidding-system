@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Clock, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BidSetup from '@/components/BidSetup';
 import BidGeneration from '@/components/BidGeneration';
@@ -117,7 +118,6 @@ const AIBidGeneration: React.FC = () => {
           <div className="flex items-center space-x-2">
             {activeTab !== 'setup' && (
               <Button variant="outline" onClick={handlePrevStep}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
                 上一步
               </Button>
             )}

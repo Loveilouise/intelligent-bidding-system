@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Save, Download, Sparkles, Palette, ChevronRight, ChevronDown, FileText, Image, BarChart3 } from 'lucide-react';
+import { Save, Download, Sparkles, Palette, ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -197,10 +197,52 @@ const BidEditing: React.FC<BidEditingProps> = ({
 
         {/* 中间可编辑区域 */}
         <div className="flex-1 flex flex-col">
-          {/* 编辑工具栏 */}
+          {/* Word样式工具栏 */}
           <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-gray-50">
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
-              <span>项目编号: 0747-2261SCCN812</span>
+            <div className="flex items-center space-x-1">
+              {/* 文本格式工具 */}
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Bold className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Italic className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Underline className="w-4 h-4" />
+              </Button>
+              
+              <Separator orientation="vertical" className="h-6 mx-2" />
+              
+              {/* 对齐工具 */}
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <AlignLeft className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <AlignCenter className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <AlignRight className="w-4 h-4" />
+              </Button>
+              
+              <Separator orientation="vertical" className="h-6 mx-2" />
+              
+              {/* 列表工具 */}
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <List className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <ListOrdered className="w-4 h-4" />
+              </Button>
+              
+              <Separator orientation="vertical" className="h-6 mx-2" />
+              
+              {/* 其他工具 */}
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Link className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Type className="w-4 h-4" />
+              </Button>
             </div>
             
             <div className="flex items-center space-x-2">
@@ -218,40 +260,12 @@ const BidEditing: React.FC<BidEditingProps> = ({
           {/* 文档编辑区域 */}
           <div className="flex-1 p-6 bg-white" style={{ backgroundColor: '#fafafa' }}>
             <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg min-h-full p-8">
-              <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                  北京银行云链优化项目商务
-                </h1>
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                  （区块链）、对接三方供应
-                </h2>
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                  链平台系统改造项目采购项
-                </h2>
-                <h2 className="text-xl font-semibold text-gray-800 mb-8">
-                  目
-                </h2>
-                <p className="text-sm text-gray-600 mb-4">
-                  项目编号：0747-2261SCCN812
-                </p>
-              </div>
-
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">投标文件</h3>
-              </div>
-
               <Textarea
                 value={editingContent}
                 onChange={(e) => setEditingContent(e.target.value)}
                 placeholder="在此输入或编辑标书内容..."
-                className="min-h-[400px] border-0 resize-none focus-visible:ring-0 text-sm leading-relaxed"
+                className="min-h-[600px] border-0 resize-none focus-visible:ring-0 text-sm leading-relaxed"
               />
-
-              <div className="mt-8 text-center">
-                <p className="text-sm text-gray-600">
-                  投标人：演示投标人企业信息
-                </p>
-              </div>
             </div>
           </div>
         </div>
