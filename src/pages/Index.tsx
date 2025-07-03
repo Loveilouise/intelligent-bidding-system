@@ -10,6 +10,9 @@ import AIBidGeneration from './AIBidGeneration';
 import KnowledgeSettings from './KnowledgeSettings';
 import PersonalKnowledge from './PersonalKnowledge';
 import IndustryKnowledge from './IndustryKnowledge';
+import TenderAnnouncements from './TenderAnnouncements';
+import IntentionProjects from './IntentionProjects';
+import AIRecommendations from './AIRecommendations';
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState('chat');
@@ -47,7 +50,10 @@ const Index = () => {
           {activeModule === 'knowledge-settings' && <KnowledgeSettings />}
           {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
           {activeModule === 'industry-knowledge' && <IndustryKnowledge />}
-          {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation', 'knowledge-settings', 'personal-knowledge', 'industry-knowledge'].includes(activeModule) && (
+          {activeModule === 'tender-announcements' && <TenderAnnouncements />}
+          {activeModule === 'intention-projects' && <IntentionProjects />}
+          {activeModule === 'ai-recommendations' && <AIRecommendations />}
+          {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation', 'knowledge-settings', 'personal-knowledge', 'industry-knowledge', 'tender-announcements', 'intention-projects', 'ai-recommendations'].includes(activeModule) && (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <h2 className="text-2xl font-semibold text-gray-700 mb-2">
