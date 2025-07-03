@@ -7,6 +7,9 @@ import LoginForm from '../components/LoginForm';
 import HistoryBidManagement from './HistoryBidManagement';
 import TemplateManagement from './TemplateManagement';
 import AIBidGeneration from './AIBidGeneration';
+import KnowledgeSettings from './KnowledgeSettings';
+import PersonalKnowledge from './PersonalKnowledge';
+import IndustryKnowledge from './IndustryKnowledge';
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState('chat');
@@ -41,7 +44,10 @@ const Index = () => {
           {activeModule === 'history-bid-management' && <HistoryBidManagement />}
           {activeModule === 'template-management' && <TemplateManagement />}
           {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
-          {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation'].includes(activeModule) && (
+          {activeModule === 'knowledge-settings' && <KnowledgeSettings />}
+          {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
+          {activeModule === 'industry-knowledge' && <IndustryKnowledge />}
+          {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation', 'knowledge-settings', 'personal-knowledge', 'industry-knowledge'].includes(activeModule) && (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <h2 className="text-2xl font-semibold text-gray-700 mb-2">
