@@ -8,6 +8,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import WorkspaceSelector from './WorkspaceSelector';
 
 interface UserProfileProps {
@@ -22,6 +32,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
     email: 'liwenwen@gmail.com'
   });
   const [isOpen, setIsOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogoutClick = () => {
+    setIsOpen(false);
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
+    onLogout();
+  };
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -63,11 +84,26 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
         </div>
         
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onLogout} className="cursor-pointer text-destructive hover:text-destructive">
+        <DropdownMenuItem onClick={handleLogoutClick} className="cursor-pointer text-destructive hover:text-destructive">
           <LogOut className="w-4 h-4 mr-2" />
           退出登录
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认退出登录</AlertDialogTitle>
+            <AlertDialogDescription>
+              您确定要退出登录吗？退出后需要重新登录才能继续使用。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout}>确认退出</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DropdownMenu>
   );
 };
