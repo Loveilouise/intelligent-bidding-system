@@ -58,10 +58,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
           个人中心
         </DropdownMenuItem>
         
-        <DropdownMenuItem onClick={onWorkspaceManagement} className="cursor-pointer">
-          <Settings className="w-4 h-4 mr-2" />
-          切换工作空间
-        </DropdownMenuItem>
+        <div className="px-2 py-1">
+          <WorkspaceSelector onWorkspaceClick={onWorkspaceManagement} />
+        </div>
         
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onLogout} className="cursor-pointer text-destructive hover:text-destructive">
