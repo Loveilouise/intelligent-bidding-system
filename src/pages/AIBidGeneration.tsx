@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import BidSetup from '@/components/BidSetup';
 import BidGeneration from '@/components/BidGeneration';
 import BidEditing from '@/components/BidEditing';
+import DownloadSettingsDialog from '@/components/DownloadSettingsDialog';
 import { ProjectInfo, UploadedFile, CatalogItem } from '@/types/bid';
 
 const AIBidGeneration: React.FC = () => {
@@ -41,6 +42,7 @@ const AIBidGeneration: React.FC = () => {
     { id: '2', title: '资质证明文件', level: 1, expanded: true },
     { id: '3', title: '财务状况报告', level: 1, expanded: true }
   ]);
+  const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
 
   const tabs = [
     { id: 'setup', title: '创建标书' },
@@ -85,7 +87,12 @@ const AIBidGeneration: React.FC = () => {
   };
 
   const handleDownload = () => {
-    console.log('下载标书');
+    setDownloadDialogOpen(true);
+  };
+
+  const handleActualDownload = () => {
+    console.log('执行下载操作');
+    setDownloadDialogOpen(false);
   };
 
   // 生成全文动画页面
@@ -261,6 +268,12 @@ const AIBidGeneration: React.FC = () => {
             />
           )}
         </div>
+        
+        <DownloadSettingsDialog
+          open={downloadDialogOpen}
+          onOpenChange={setDownloadDialogOpen}
+          onDownload={handleActualDownload}
+        />
       </div>
     </div>
   );
