@@ -13,10 +13,12 @@ import IndustryKnowledge from './IndustryKnowledge';
 import TenderAnnouncements from './TenderAnnouncements';
 import IntentionProjects from './IntentionProjects';
 import AIRecommendations from './AIRecommendations';
+import PersonalCenter from './PersonalCenter';
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState('chat');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showPersonalCenter, setShowPersonalCenter] = useState(false);
 
   const handleLogin = (username: string, password: string) => {
     // 简单的登录验证（实际项目中应该调用API）
@@ -27,10 +29,27 @@ const Index = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setShowPersonalCenter(false);
+  };
+
+  const handlePersonalCenter = () => {
+    setShowPersonalCenter(true);
+  };
+
+  const handleWorkspaceManagement = () => {
+    setShowPersonalCenter(true);
+  };
+
+  const handleBackToMain = () => {
+    setShowPersonalCenter(false);
   };
 
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
+  }
+
+  if (showPersonalCenter) {
+    return <PersonalCenter onBack={handleBackToMain} />;
   }
 
   return (
@@ -39,7 +58,11 @@ const Index = () => {
       
       <div className="flex-1 flex flex-col">
         <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-end">
-          <UserProfile onLogout={handleLogout} />
+          <UserProfile 
+            onLogout={handleLogout} 
+            onPersonalCenter={handlePersonalCenter}
+            onWorkspaceManagement={handleWorkspaceManagement}
+          />
         </div>
         
         <div className="flex-1">
