@@ -17,9 +17,9 @@ const PersonalCenter: React.FC<PersonalCenterProps> = ({ onBack }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="flex">
       {/* 侧边导航 */}
-      <div className="w-64 bg-card border-r border-border">
+      <div className="w-64 bg-card border-r border-border h-screen">
         <div className="p-4 border-b border-border">
           <Button
             variant="ghost"
@@ -52,7 +52,7 @@ const PersonalCenter: React.FC<PersonalCenterProps> = ({ onBack }) => {
       </div>
 
       {/* 主内容区 */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 overflow-y-auto">
         {activeTab === 'account' && <AccountManagement />}
         {activeTab === 'workspace' && <WorkspaceManagement />}
       </div>

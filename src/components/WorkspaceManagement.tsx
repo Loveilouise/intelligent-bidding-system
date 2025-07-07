@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -42,64 +42,55 @@ const WorkspaceManagement: React.FC = () => {
         <p className="text-muted-foreground">管理您的工作空间信息和成员</p>
       </div>
 
-      <Tabs defaultValue="space" className="w-full">
-        <TabsList>
-          <TabsTrigger value="space">空间管理</TabsTrigger>
-          <TabsTrigger value="members">成员管理</TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>工作空间信息</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>工作空间名称</Label>
+              <div className="flex space-x-2">
+                <Input
+                  value={isEditing.name ? editValues.name : workspaceInfo.name}
+                  onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
+                  disabled={!isEditing.name}
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleEdit('name')}
+                >
+                  <Edit2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
 
-        <TabsContent value="space" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>工作空间信息</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>工作空间名称</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    value={isEditing.name ? editValues.name : workspaceInfo.name}
-                    onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                    disabled={!isEditing.name}
+            <div className="space-y-2">
+              <Label>工作空间简介</Label>
+              <div className="flex space-x-2">
+                <div className="flex-1">
+                  <Textarea
+                    value={isEditing.description ? editValues.description : workspaceInfo.description}
+                    onChange={(e) => setEditValues({ ...editValues, description: e.target.value })}
+                    disabled={!isEditing.description}
+                    rows={3}
                   />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleEdit('name')}
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
                 </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleEdit('description')}
+                >
+                  <Edit2 className="w-4 h-4" />
+                </Button>
               </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              <div className="space-y-2">
-                <Label>工作空间简介</Label>
-                <div className="flex space-x-2">
-                  <div className="flex-1">
-                    <Textarea
-                      value={isEditing.description ? editValues.description : workspaceInfo.description}
-                      onChange={(e) => setEditValues({ ...editValues, description: e.target.value })}
-                      disabled={!isEditing.description}
-                      rows={3}
-                    />
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleEdit('description')}
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="members">
-          <MemberManagement />
-        </TabsContent>
-      </Tabs>
+        <MemberManagement />
+      </div>
     </div>
   );
 };

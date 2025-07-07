@@ -68,8 +68,8 @@ const MemberManagement: React.FC = () => {
 
   const filteredMembers = members.filter(member => {
     return (
-      (!filters.status || member.status === filters.status) &&
-      (!filters.role || member.role === filters.role) &&
+      (!filters.status || filters.status === 'all' || member.status === filters.status) &&
+      (!filters.role || filters.role === 'all' || member.role === filters.role) &&
       (!filters.username || member.username.includes(filters.username)) &&
       (!filters.phone || member.phone.includes(filters.phone))
     );
@@ -139,7 +139,7 @@ const MemberManagement: React.FC = () => {
                 <SelectValue placeholder="账号状态" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部状态</SelectItem>
+                <SelectItem value="all">全部状态</SelectItem>
                 <SelectItem value="active">已激活</SelectItem>
                 <SelectItem value="inactive">未激活</SelectItem>
               </SelectContent>
@@ -153,7 +153,7 @@ const MemberManagement: React.FC = () => {
                 <SelectValue placeholder="成员角色" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部角色</SelectItem>
+                <SelectItem value="all">全部角色</SelectItem>
                 <SelectItem value="admin">管理员</SelectItem>
                 <SelectItem value="member">成员</SelectItem>
                 <SelectItem value="viewer">查看者</SelectItem>

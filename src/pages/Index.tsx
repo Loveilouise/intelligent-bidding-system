@@ -48,10 +48,6 @@ const Index = () => {
     return <LoginForm onLogin={handleLogin} />;
   }
 
-  if (showPersonalCenter) {
-    return <PersonalCenter onBack={handleBackToMain} />;
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
@@ -66,25 +62,31 @@ const Index = () => {
         </div>
         
         <div className="flex-1">
-          {activeModule === 'chat' && <ChatWindow />}
-          {activeModule === 'history-bid-management' && <HistoryBidManagement />}
-          {activeModule === 'template-management' && <TemplateManagement />}
-          {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
-          {activeModule === 'knowledge-settings' && <KnowledgeSettings />}
-          {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
-          {activeModule === 'industry-knowledge' && <IndustryKnowledge />}
-          {activeModule === 'tender-announcements' && <TenderAnnouncements />}
-          {activeModule === 'intention-projects' && <IntentionProjects />}
-          {activeModule === 'ai-recommendations' && <AIRecommendations />}
-          {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation', 'knowledge-settings', 'personal-knowledge', 'industry-knowledge', 'tender-announcements', 'intention-projects', 'ai-recommendations'].includes(activeModule) && (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-                  {getModuleTitle(activeModule)}
-                </h2>
-                <p className="text-gray-500">功能开发中，敬请期待...</p>
-              </div>
-            </div>
+          {showPersonalCenter ? (
+            <PersonalCenter onBack={handleBackToMain} />
+          ) : (
+            <>
+              {activeModule === 'chat' && <ChatWindow />}
+              {activeModule === 'history-bid-management' && <HistoryBidManagement />}
+              {activeModule === 'template-management' && <TemplateManagement />}
+              {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
+              {activeModule === 'knowledge-settings' && <KnowledgeSettings />}
+              {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
+              {activeModule === 'industry-knowledge' && <IndustryKnowledge />}
+              {activeModule === 'tender-announcements' && <TenderAnnouncements />}
+              {activeModule === 'intention-projects' && <IntentionProjects />}
+              {activeModule === 'ai-recommendations' && <AIRecommendations />}
+              {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation', 'knowledge-settings', 'personal-knowledge', 'industry-knowledge', 'tender-announcements', 'intention-projects', 'ai-recommendations'].includes(activeModule) && (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+                      {getModuleTitle(activeModule)}
+                    </h2>
+                    <p className="text-gray-500">功能开发中，敬请期待...</p>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
