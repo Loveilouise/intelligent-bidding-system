@@ -92,15 +92,13 @@ const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({ open, onO
             <Label>成员默认权限</Label>
             <Select
               value={formData.defaultPermission}
-              onValueChange={(value) => setFormData({ ...formData, defaultPermission: value })}
+              disabled
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="admin">管理员</SelectItem>
-                <SelectItem value="member">成员</SelectItem>
-                <SelectItem value="viewer">查看者</SelectItem>
               </SelectContent>
             </Select>
           </div>

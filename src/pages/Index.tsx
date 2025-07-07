@@ -19,6 +19,7 @@ const Index = () => {
   const [activeModule, setActiveModule] = useState('chat');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPersonalCenter, setShowPersonalCenter] = useState(false);
+  const [activePersonalTab, setActivePersonalTab] = useState('account');
 
   const handleLogin = (username: string, password: string) => {
     // 简单的登录验证（实际项目中应该调用API）
@@ -38,6 +39,7 @@ const Index = () => {
 
   const handleWorkspaceManagement = () => {
     setShowPersonalCenter(true);
+    setActivePersonalTab('workspace');
   };
 
   const handleBackToMain = () => {
@@ -63,7 +65,7 @@ const Index = () => {
         
         <div className="flex-1">
           {showPersonalCenter ? (
-            <PersonalCenter onBack={handleBackToMain} />
+            <PersonalCenter onBack={handleBackToMain} activeTab={activePersonalTab} />
           ) : (
             <>
               {activeModule === 'chat' && <ChatWindow />}

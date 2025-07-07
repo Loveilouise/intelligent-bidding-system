@@ -8,31 +8,27 @@ import { Button } from '@/components/ui/button';
 import { Edit2 } from 'lucide-react';
 import MemberManagement from './MemberManagement';
 import { useToast } from '@/hooks/use-toast';
+import EditWorkspaceDialog from './EditWorkspaceDialog';
 
 const WorkspaceManagement: React.FC = () => {
   const [workspaceInfo, setWorkspaceInfo] = useState({
     name: '智能标书工作空间',
     description: '企业标书智能生成与管理平台，提供全流程标书制作解决方案'
   });
-  const [isEditing, setIsEditing] = useState({
-    name: false,
-    description: false
-  });
-  const [editValues, setEditValues] = useState(workspaceInfo);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingField, setEditingField] = useState<'name' | 'description'>('name');
   const { toast } = useToast();
 
   const handleEdit = (field: 'name' | 'description') => {
-    if (isEditing[field]) {
-      // 保存
-      setWorkspaceInfo({ ...workspaceInfo, [field]: editValues[field] });
-      setIsEditing({ ...isEditing, [field]: false });
-      toast({
-        title: `${field === 'name' ? '工作空间名称' : '工作空间简介'}更新成功`,
-      });
-    } else {
-      // 开始编辑
-      setIsEditing({ ...isEditing, [field]: true });
-    }
+    setEditingField(field);
+    setShowEditDialog(true);
+  };
+
+  const handleSave = (newValue: string) => {
+    setWorkspaceInfo({ ...workspaceInfo, [editingField]: newValue });
+    toast({
+      title: `${editingField === 'name' ? '工作空间名称' : '工作空间简介'}更新成功`,
+    });
   };
 
   return (
@@ -48,49 +44,48 @@ const WorkspaceManagement: React.FC = () => {
             <CardTitle>工作空间信息</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>工作空间名称</Label>
-              <div className="flex space-x-2">
-                <Input
-                  value={isEditing.name ? editValues.name : workspaceInfo.name}
-                  onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                  disabled={!isEditing.name}
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleEdit('name')}
-                >
-                  <Edit2 className="w-4 h-4" />
-                </Button>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <Label>工作空间名称</Label>
+                <div className="mt-1 text-sm">{workspaceInfo.name}</div>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleEdit('name')}
+              >
+                <Edit2 className="w-4 h-4 mr-1" />
+                编辑
+              </Button>
             </div>
 
-            <div className="space-y-2">
-              <Label>工作空间简介</Label>
-              <div className="flex space-x-2">
-                <div className="flex-1">
-                  <Textarea
-                    value={isEditing.description ? editValues.description : workspaceInfo.description}
-                    onChange={(e) => setEditValues({ ...editValues, description: e.target.value })}
-                    disabled={!isEditing.description}
-                    rows={3}
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleEdit('description')}
-                >
-                  <Edit2 className="w-4 h-4" />
-                </Button>
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <Label>工作空间简介</Label>
+                <div className="mt-1 text-sm">{workspaceInfo.description}</div>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleEdit('description')}
+              >
+                <Edit2 className="w-4 h-4 mr-1" />
+                编辑
+              </Button>
             </div>
           </CardContent>
         </Card>
 
         <MemberManagement />
       </div>
+
+      <EditWorkspaceDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        field={editingField}
+        currentValue={workspaceInfo[editingField]}
+        onSave={handleSave}
+      />
     </div>
   );
 };

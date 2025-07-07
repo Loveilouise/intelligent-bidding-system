@@ -17,6 +17,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import EditUsernameDialog from './EditUsernameDialog';
+import EditEmailDialog from './EditEmailDialog';
 
 const AccountManagement: React.FC = () => {
   const [userInfo, setUserInfo] = useState({
@@ -26,11 +28,8 @@ const AccountManagement: React.FC = () => {
     phone: '138****8888',
     email: 'liwenwen@gmail.com'
   });
-  const [isEditing, setIsEditing] = useState({
-    username: false,
-    email: false
-  });
-  const [editValues, setEditValues] = useState(userInfo);
+  const [showEditUsername, setShowEditUsername] = useState(false);
+  const [showEditEmail, setShowEditEmail] = useState(false);
   const { toast } = useToast();
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,18 +46,18 @@ const AccountManagement: React.FC = () => {
     }
   };
 
-  const handleEdit = (field: 'username' | 'email') => {
-    if (isEditing[field]) {
-      // 保存
-      setUserInfo({ ...userInfo, [field]: editValues[field] });
-      setIsEditing({ ...isEditing, [field]: false });
-      toast({
-        title: `${field === 'username' ? '用户名' : '邮箱'}更新成功`,
-      });
-    } else {
-      // 开始编辑
-      setIsEditing({ ...isEditing, [field]: true });
-    }
+  const handleUsernameUpdate = (newValue: string) => {
+    setUserInfo({ ...userInfo, username: newValue });
+    toast({
+      title: "用户名更新成功",
+    });
+  };
+
+  const handleEmailUpdate = (newValue: string) => {
+    setUserInfo({ ...userInfo, email: newValue });
+    toast({
+      title: "邮箱更新成功",
+    });
   };
 
   const handleLogout = () => {
@@ -113,54 +112,45 @@ const AccountManagement: React.FC = () => {
           </div>
 
           {/* 用户名 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>用户名</Label>
-              <div className="flex space-x-2">
-                <Input
-                  value={isEditing.username ? editValues.username : userInfo.username}
-                  onChange={(e) => setEditValues({ ...editValues, username: e.target.value })}
-                  disabled={!isEditing.username}
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleEdit('username')}
-                >
-                  <Edit2 className="w-4 h-4" />
-                </Button>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <Label>用户名</Label>
+                <div className="mt-1 text-sm">{userInfo.username}</div>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowEditUsername(true)}
+              >
+                <Edit2 className="w-4 h-4 mr-1" />
+                编辑
+              </Button>
             </div>
 
-            <div className="space-y-2">
+            <div>
               <Label>账号</Label>
-              <Input value={userInfo.account} disabled />
+              <div className="mt-1 text-sm text-muted-foreground">{userInfo.account}</div>
             </div>
-          </div>
 
-          {/* 联系方式 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div>
               <Label>手机号</Label>
-              <Input value={userInfo.phone} disabled />
+              <div className="mt-1 text-sm text-muted-foreground">{userInfo.phone}</div>
             </div>
 
-            <div className="space-y-2">
-              <Label>邮箱</Label>
-              <div className="flex space-x-2">
-                <Input
-                  value={isEditing.email ? editValues.email : userInfo.email}
-                  onChange={(e) => setEditValues({ ...editValues, email: e.target.value })}
-                  disabled={!isEditing.email}
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleEdit('email')}
-                >
-                  <Edit2 className="w-4 h-4" />
-                </Button>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <Label>邮箱</Label>
+                <div className="mt-1 text-sm">{userInfo.email}</div>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowEditEmail(true)}
+              >
+                <Edit2 className="w-4 h-4 mr-1" />
+                编辑
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -224,6 +214,20 @@ const AccountManagement: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      <EditUsernameDialog
+        open={showEditUsername}
+        onOpenChange={setShowEditUsername}
+        currentValue={userInfo.username}
+        onSave={handleUsernameUpdate}
+      />
+
+      <EditEmailDialog
+        open={showEditEmail}
+        onOpenChange={setShowEditEmail}
+        currentValue={userInfo.email}
+        onSave={handleEmailUpdate}
+      />
     </div>
   );
 };

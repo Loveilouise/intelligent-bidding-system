@@ -6,10 +6,11 @@ import WorkspaceManagement from '@/components/WorkspaceManagement';
 
 interface PersonalCenterProps {
   onBack: () => void;
+  activeTab?: string;
 }
 
-const PersonalCenter: React.FC<PersonalCenterProps> = ({ onBack }) => {
-  const [activeTab, setActiveTab] = useState('account');
+const PersonalCenter: React.FC<PersonalCenterProps> = ({ onBack, activeTab: initialActiveTab = 'account' }) => {
+  const [activeTab, setActiveTab] = useState(initialActiveTab);
 
   const tabs = [
     { id: 'account', label: '账号管理', icon: User },
