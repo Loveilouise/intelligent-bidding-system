@@ -25,7 +25,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center space-x-2 px-3 py-2">
+        <div className="flex items-center space-x-2 px-3 py-2 cursor-pointer hover:bg-accent/50 rounded-md transition-colors">
           <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
             <User className="w-4 h-4 text-purple-600" />
           </div>
@@ -34,7 +34,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
             <div className="text-xs text-gray-500">{user.email}</div>
           </div>
           <ChevronDown className="w-4 h-4 text-gray-400" />
-        </Button>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 bg-popover">
         <div className="px-3 py-2">
