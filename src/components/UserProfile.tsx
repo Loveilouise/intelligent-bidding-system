@@ -21,11 +21,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
     name: '李雯雯',
     email: 'liwenwen@gmail.com'
   });
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <div className="flex items-center space-x-2 px-3 py-2 cursor-pointer hover:bg-accent/50 rounded-md transition-colors">
+        <div 
+          className="flex items-center space-x-2 px-3 py-2 cursor-pointer hover:bg-accent/50 rounded-md transition-colors"
+          onMouseEnter={() => setIsOpen(true)}
+          onMouseLeave={() => setIsOpen(false)}
+        >
           <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
             <User className="w-4 h-4 text-purple-600" />
           </div>
@@ -36,7 +41,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
           <ChevronDown className="w-4 h-4 text-gray-400" />
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 bg-popover">
+      <DropdownMenuContent 
+        align="end" 
+        className="w-56 bg-popover"
+        onMouseEnter={() => setIsOpen(true)}
+        onMouseLeave={() => setIsOpen(false)}
+      >
         <div className="px-3 py-2">
           <p className="text-sm font-medium text-foreground">{user.name}</p>
           <p className="text-xs text-muted-foreground">{user.email}</p>
@@ -48,9 +58,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
           个人中心
         </DropdownMenuItem>
         
-        <div className="px-2 py-1">
-          <WorkspaceSelector onWorkspaceClick={onWorkspaceManagement} />
-        </div>
+        <DropdownMenuItem onClick={onWorkspaceManagement} className="cursor-pointer">
+          <Settings className="w-4 h-4 mr-2" />
+          切换工作空间
+        </DropdownMenuItem>
         
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onLogout} className="cursor-pointer text-destructive hover:text-destructive">
