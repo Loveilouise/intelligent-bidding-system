@@ -6,9 +6,7 @@ import LoginForm from '../components/LoginForm';
 import HistoryBidManagement from './HistoryBidManagement';
 import TemplateManagement from './TemplateManagement';
 import AIBidGeneration from './AIBidGeneration';
-import KnowledgeSettings from './KnowledgeSettings';
 import PersonalKnowledge from './PersonalKnowledge';
-import IndustryKnowledge from './IndustryKnowledge';
 import PersonalCenter from './PersonalCenter';
 
 const Index = () => {
@@ -64,13 +62,11 @@ const Index = () => {
             <PersonalCenter onBack={handleBackToMain} activeTab={activePersonalTab} />
           ) : (
             <>
+              {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
               {activeModule === 'history-bid-management' && <HistoryBidManagement />}
               {activeModule === 'template-management' && <TemplateManagement />}
-              {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
-              {activeModule === 'knowledge-settings' && <KnowledgeSettings />}
               {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
-              {activeModule === 'industry-knowledge' && <IndustryKnowledge />}
-              {!['history-bid-management', 'template-management', 'ai-bid-generation', 'knowledge-settings', 'personal-knowledge', 'industry-knowledge'].includes(activeModule) && (
+              {!['ai-bid-generation', 'history-bid-management', 'template-management', 'personal-knowledge'].includes(activeModule) && (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
                     <h2 className="text-2xl font-semibold text-gray-700 mb-2">
@@ -90,14 +86,10 @@ const Index = () => {
 
 function getModuleTitle(module: string): string {
   const titles: Record<string, string> = {
-    'bid-management': 'AI生标管理',
     'ai-bid-generation': 'AI生标',
-    'history-bid-management': '历史生标管理',
-    'template-management': '投标方案模板管理',
-    'knowledge-settings': '知识库设置',
-    'enterprise-knowledge': '企业知识库',
-    'personal-knowledge': '个人知识库',
-    'industry-knowledge': '行业知识库'
+    'history-bid-management': '历史标书',
+    'template-management': '模板库',
+    'personal-knowledge': '素材库'
   };
   return titles[module] || '未知模块';
 }

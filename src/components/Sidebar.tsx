@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { 
   FileText, 
   Database,
-  ChevronDown,
-  ChevronRight
+  FolderOpen,
+  Archive
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -16,83 +16,48 @@ interface MenuItem {
   id: string;
   title: string;
   icon: React.ReactNode;
-  children?: MenuItem[];
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
-  const [expandedItems, setExpandedItems] = useState<string[]>(['bid-management']);
-
   const menuItems: MenuItem[] = [
     {
-      id: 'bid-management',
-      title: 'AI生标管理',
-      icon: <FileText className="w-5 h-5" />,
-      children: [
-        { id: 'ai-bid-generation', title: 'AI生标', icon: null },
-        { id: 'history-bid-management', title: '历史生标管理', icon: null },
-        { id: 'template-management', title: '投标方案模板管理', icon: null }
-      ]
+      id: 'ai-bid-generation',
+      title: 'AI生标',
+      icon: <FileText className="w-5 h-5" />
     },
     {
-      id: 'knowledge-base',
-      title: '知识库管理',
-      icon: <Database className="w-5 h-5" />,
-      children: [
-        { id: 'knowledge-settings', title: '知识库设置', icon: null },
-        { id: 'enterprise-knowledge', title: '企业知识库', icon: null },
-        { id: 'personal-knowledge', title: '个人知识库', icon: null },
-        { id: 'industry-knowledge', title: '行业知识库', icon: null }
-      ]
+      id: 'history-bid-management',
+      title: '历史标书',
+      icon: <Archive className="w-5 h-5" />
+    },
+    {
+      id: 'template-management',
+      title: '模板库',
+      icon: <FolderOpen className="w-5 h-5" />
+    },
+    {
+      id: 'personal-knowledge',
+      title: '素材库',
+      icon: <Database className="w-5 h-5" />
     }
   ];
 
-  const toggleExpanded = (itemId: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
-
-  const renderMenuItem = (item: MenuItem, depth = 0) => {
-    const isExpanded = expandedItems.includes(item.id);
-    const hasChildren = item.children && item.children.length > 0;
+  const renderMenuItem = (item: MenuItem) => {
     const isActive = activeModule === item.id;
 
     return (
       <div key={item.id}>
         <div
-          className={`flex items-center px-3 py-3 cursor-pointer transition-all duration-200 ${
+          className={`flex items-center px-4 py-3 cursor-pointer transition-all duration-200 ${
             isActive 
               ? 'bg-sky-50 border-r-4 border-sky-500 text-sky-700' 
               : 'text-gray-700 hover:bg-sky-50'
-          } ${depth > 0 ? 'pl-10' : ''}`}
-          onClick={() => {
-            if (hasChildren) {
-              toggleExpanded(item.id);
-            } else {
-              setActiveModule(item.id);
-            }
-          }}
+          }`}
+          onClick={() => setActiveModule(item.id)}
         >
-          {hasChildren && (
-            <div className="mr-2">
-              {isExpanded ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )}
-            </div>
-          )}
-          {item.icon && <div className="mr-2">{item.icon}</div>}
+          <div className="mr-3">{item.icon}</div>
           <span className="font-medium text-sm">{item.title}</span>
         </div>
-        
-        {hasChildren && isExpanded && (
-          <div className="bg-gray-50">
-            {item.children!.map(child => renderMenuItem(child, depth + 1))}
-          </div>
-        )}
       </div>
     );
   };
