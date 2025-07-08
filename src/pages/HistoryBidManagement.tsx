@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -189,7 +188,7 @@ const HistoryBidManagement: React.FC = () => {
               </div>
               <Button 
                 onClick={handleSearch}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-6"
+                className="bg-sky-600 hover:bg-sky-700 text-white px-6"
               >
                 <Search className="w-4 h-4 mr-2" />
                 搜索
@@ -201,7 +200,7 @@ const HistoryBidManagement: React.FC = () => {
                   <Button variant="outline" className="min-w-[120px] justify-between">
                     投标类型
                     {selectedTypes.length > 0 && (
-                      <span className="ml-2 bg-purple-100 text-purple-600 text-xs px-2 py-1 rounded-full">
+                      <span className="ml-2 bg-sky-100 text-sky-600 text-xs px-2 py-1 rounded-full">
                         {selectedTypes.length}
                       </span>
                     )}
@@ -213,12 +212,12 @@ const HistoryBidManagement: React.FC = () => {
                     {bidTypes.map((type) => (
                       <div
                         key={type}
-                        className="flex items-center justify-between px-3 py-2 text-sm cursor-pointer rounded hover:bg-purple-50 hover:text-purple-600"
+                        className="flex items-center justify-between px-3 py-2 text-sm cursor-pointer rounded hover:bg-sky-50 hover:text-sky-600"
                         onClick={() => handleTypeChange(type)}
                       >
                         <span>{type}</span>
                         {selectedTypes.includes(type) && (
-                          <Check className="w-4 h-4 text-purple-600" />
+                          <Check className="w-4 h-4 text-sky-600" />
                         )}
                       </div>
                     ))}
@@ -232,7 +231,7 @@ const HistoryBidManagement: React.FC = () => {
                   <Button variant="outline" className="min-w-[100px] justify-between">
                     状态
                     {selectedStatuses.length > 0 && (
-                      <span className="ml-2 bg-purple-100 text-purple-600 text-xs px-2 py-1 rounded-full">
+                      <span className="ml-2 bg-sky-100 text-sky-600 text-xs px-2 py-1 rounded-full">
                         {selectedStatuses.length}
                       </span>
                     )}
@@ -244,12 +243,12 @@ const HistoryBidManagement: React.FC = () => {
                     {bidStatuses.map((status) => (
                       <div
                         key={status}
-                        className="flex items-center justify-between px-3 py-2 text-sm cursor-pointer rounded hover:bg-purple-50 hover:text-purple-600"
+                        className="flex items-center justify-between px-3 py-2 text-sm cursor-pointer rounded hover:bg-sky-50 hover:text-sky-600"
                         onClick={() => handleStatusChange(status)}
                       >
                         <span>{status}</span>
                         {selectedStatuses.includes(status) && (
-                          <Check className="w-4 h-4 text-purple-600" />
+                          <Check className="w-4 h-4 text-sky-600" />
                         )}
                       </div>
                     ))}
@@ -320,7 +319,7 @@ const HistoryBidManagement: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEdit(project.id)}
-                          className="text-gray-600 hover:text-purple-600"
+                          className="text-gray-600 hover:text-sky-600"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>

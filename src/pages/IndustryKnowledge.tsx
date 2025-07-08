@@ -152,7 +152,7 @@ const IndustryKnowledge: React.FC = () => {
             </Button>
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="bg-purple-600 hover:bg-purple-700">
+                <Button className="bg-sky-600 hover:bg-sky-700">
                   <Plus className="w-4 h-4 mr-2" />
                   创建行业库
                 </Button>
@@ -191,7 +191,7 @@ const IndustryKnowledge: React.FC = () => {
                   </div>
                   <div className="flex space-x-2">
                     <Button variant="outline" className="flex-1">取消</Button>
-                    <Button onClick={handleCreateIndustry} className="flex-1 bg-purple-600 hover:bg-purple-700">创建</Button>
+                    <Button onClick={handleCreateIndustry} className="flex-1 bg-sky-600 hover:bg-sky-700">创建</Button>
                   </div>
                 </div>
               </DialogContent>
@@ -373,7 +373,7 @@ const IndustryKnowledge: React.FC = () => {
                 </div>
                 <div className="flex space-x-2">
                   <Button variant="outline">测试连接</Button>
-                  <Button onClick={handleConnectSystem} className="bg-purple-600 hover:bg-purple-700">保存配置</Button>
+                  <Button onClick={handleConnectSystem} className="bg-sky-600 hover:bg-sky-700">保存配置</Button>
                 </div>
               </CardContent>
             </Card>

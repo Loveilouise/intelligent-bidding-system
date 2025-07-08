@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -109,7 +108,7 @@ const AIBidGeneration: React.FC = () => {
                   <div className="flex items-center">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                       activeTab === tab.id 
-                        ? 'bg-purple-600 text-white' 
+                        ? 'bg-sky-600 text-white' 
                         : tabs.findIndex(t => t.id === activeTab) > index
                           ? 'bg-green-500 text-white'
                           : 'bg-gray-200 text-gray-500'
@@ -121,7 +120,7 @@ const AIBidGeneration: React.FC = () => {
                       )}
                     </div>
                     <span className={`ml-2 text-sm font-medium ${
-                      activeTab === tab.id ? 'text-purple-600' : 'text-gray-500'
+                      activeTab === tab.id ? 'text-sky-600' : 'text-gray-500'
                     }`}>
                       {tab.title}
                     </span>
@@ -144,7 +143,7 @@ const AIBidGeneration: React.FC = () => {
 
           <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+              <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成全文</h2>
               <p className="text-gray-600 mb-4">AI正在根据目录结构生成完整的标书内容...</p>
               <div className="flex items-center justify-center text-sm text-gray-500">
@@ -172,7 +171,7 @@ const AIBidGeneration: React.FC = () => {
                 <div className="flex items-center">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                     activeTab === tab.id 
-                      ? 'bg-purple-600 text-white' 
+                      ? 'bg-sky-600 text-white' 
                       : tabs.findIndex(t => t.id === activeTab) > index
                         ? 'bg-green-500 text-white'
                         : 'bg-gray-200 text-gray-500'
@@ -184,7 +183,7 @@ const AIBidGeneration: React.FC = () => {
                     )}
                   </div>
                   <span className={`ml-2 text-sm font-medium ${
-                    activeTab === tab.id ? 'text-purple-600' : 'text-gray-500'
+                    activeTab === tab.id ? 'text-sky-600' : 'text-gray-500'
                   }`}>
                     {tab.title}
                   </span>
@@ -210,18 +209,18 @@ const AIBidGeneration: React.FC = () => {
                 <Button variant="outline" onClick={handleSave}>
                   保存
                 </Button>
-                <Button onClick={handleDownload} className="bg-purple-600 hover:bg-purple-700">
+                <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
                   下载标书
                 </Button>
               </>
             )}
             {activeTab === 'setup' && (
-              <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
+              <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
                 下一步
               </Button>
             )}
             {activeTab === 'generation' && (
-              <Button onClick={handleNextStep} className="bg-purple-600 hover:bg-purple-700">
+              <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
                 下一步
               </Button>
             )}
