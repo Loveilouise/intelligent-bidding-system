@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Upload, Search, Filter, MoreHorizontal, Trash2, Download, FileText, Image, Table as TableIcon } from 'lucide-react';
+import { Plus, Search, Filter, MoreHorizontal, Trash2, Download, FileText, Image, Table as TableIcon, Edit, FolderPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,42 +14,38 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 interface KnowledgeFile {
   id: string;
   name: string;
-  type: 'pdf' | 'docx' | 'doc' | 'image' | 'table';
+  type: 'pdf' | 'docx' | 'doc' | 'image' | 'table' | 'other';
   size: string;
   uploadTime: string;
   status: 'processing' | 'completed' | 'failed';
+  folderId: string;
 }
 
-interface PersonalKB {
+interface MaterialFolder {
   id: string;
   name: string;
-  description: string;
-  documentsCount: number;
-  createdAt: string;
+  isEditing?: boolean;
 }
 
 const PersonalKnowledge: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [folderSearchTerm, setFolderSearchTerm] = useState('');
+  const [selectedFolderId, setSelectedFolderId] = useState<string>('1');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<string | null>(null);
+  const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
+  const [deleteFolderDialogOpen, setDeleteFolderDialogOpen] = useState(false);
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [editingFolderName, setEditingFolderName] = useState('');
 
-  const [personalKBs] = useState<PersonalKB[]>([
-    {
-      id: '1',
-      name: '项目文档库',
-      description: '存储项目相关文档',
-      documentsCount: 45,
-      createdAt: '2024-01-15'
-    },
-    {
-      id: '2',
-      name: '学习资料库',
-      description: '个人学习资料整理',
-      documentsCount: 32,
-      createdAt: '2024-02-20'
-    }
+  const [folders, setFolders] = useState<MaterialFolder[]>([
+    { id: '1', name: '新建文件夹' },
+    { id: '2', name: '项目文档' },
+    { id: '3', name: '设计素材' },
+    { id: '4', name: '表格数据' }
   ]);
 
   const [files] = useState<KnowledgeFile[]>([
@@ -59,7 +55,8 @@ const PersonalKnowledge: React.FC = () => {
       type: 'pdf',
       size: '2.4 MB',
       uploadTime: '2024-03-15 14:30',
-      status: 'completed'
+      status: 'completed',
+      folderId: '1'
     },
     {
       id: '2',
@@ -67,7 +64,8 @@ const PersonalKnowledge: React.FC = () => {
       type: 'docx',
       size: '1.8 MB',
       uploadTime: '2024-03-14 16:20',
-      status: 'completed'
+      status: 'completed',
+      folderId: '2'
     },
     {
       id: '3',
@@ -75,7 +73,8 @@ const PersonalKnowledge: React.FC = () => {
       type: 'table',
       size: '856 KB',
       uploadTime: '2024-03-13 10:15',
-      status: 'processing'
+      status: 'processing',
+      folderId: '4'
     },
     {
       id: '4',
@@ -83,7 +82,8 @@ const PersonalKnowledge: React.FC = () => {
       type: 'image',
       size: '324 KB',
       uploadTime: '2024-03-12 09:45',
-      status: 'completed'
+      status: 'completed',
+      folderId: '3'
     }
   ]);
 
@@ -115,14 +115,19 @@ const PersonalKnowledge: React.FC = () => {
     }
   };
 
-  const filteredFiles = files.filter(file => {
+  const filteredFiles = files.filter(file => file.folderId === selectedFolderId).filter(file => {
     if (activeTab === 'all') return true;
     if (activeTab === 'documents') return ['pdf', 'docx', 'doc'].includes(file.type);
     if (activeTab === 'images') return file.type === 'image';
     if (activeTab === 'tables') return file.type === 'table';
+    if (activeTab === 'others') return !['pdf', 'docx', 'doc', 'image', 'table'].includes(file.type);
     return true;
   }).filter(file => 
     file.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredFolders = folders.filter(folder =>
+    folder.name.toLowerCase().includes(folderSearchTerm.toLowerCase())
   );
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,7 +142,12 @@ const PersonalKnowledge: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const handleDeleteFolder = (folderId: string) => {
+    setFolderToDelete(folderId);
+    setDeleteFolderDialogOpen(true);
+  };
+
+  const confirmDeleteFile = () => {
     if (fileToDelete) {
       console.log('删除文件:', fileToDelete);
       setDeleteDialogOpen(false);
@@ -145,89 +155,216 @@ const PersonalKnowledge: React.FC = () => {
     }
   };
 
+  const confirmDeleteFolder = () => {
+    if (folderToDelete) {
+      setFolders(folders.filter(f => f.id !== folderToDelete));
+      setDeleteFolderDialogOpen(false);
+      setFolderToDelete(null);
+      if (selectedFolderId === folderToDelete && folders.length > 1) {
+        setSelectedFolderId(folders.find(f => f.id !== folderToDelete)?.id || '1');
+      }
+    }
+  };
+
+  const handleAddFolder = () => {
+    setShowNewFolderInput(true);
+    setNewFolderName('');
+  };
+
+  const handleCreateFolder = () => {
+    if (newFolderName.trim()) {
+      const newFolder: MaterialFolder = {
+        id: Date.now().toString(),
+        name: newFolderName.trim()
+      };
+      setFolders([...folders, newFolder]);
+      setShowNewFolderInput(false);
+      setNewFolderName('');
+    }
+  };
+
+  const handleCancelNewFolder = () => {
+    setShowNewFolderInput(false);
+    setNewFolderName('');
+  };
+
+  const handleStartEdit = (folderId: string, currentName: string) => {
+    setEditingFolderId(folderId);
+    setEditingFolderName(currentName);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingFolderId && editingFolderName.trim()) {
+      setFolders(folders.map(f => 
+        f.id === editingFolderId 
+          ? { ...f, name: editingFolderName.trim() }
+          : f
+      ));
+      setEditingFolderId(null);
+      setEditingFolderName('');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingFolderId(null);
+    setEditingFolderName('');
+  };
+
+  const selectedFolder = folders.find(f => f.id === selectedFolderId);
+
   return (
     <div className="flex-1 p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">个人知识库</h1>
-          <div className="flex space-x-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="border-sky-600 text-sky-600 hover:bg-sky-50">
-                  <Plus className="w-4 h-4 mr-2" />
-                  新建知识库
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>创建个人知识库</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Input placeholder="知识库名称" />
-                  </div>
-                  <div>
-                    <Input placeholder="知识库描述" />
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" className="flex-1">取消</Button>
-                    <Button className="flex-1 bg-sky-600 hover:bg-sky-700">创建</Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-            <div className="relative">
-              <input
-                type="file"
-                id="file-upload"
-                className="hidden"
-                multiple
-                accept=".pdf,.docx,.doc"
-                onChange={handleFileUpload}
-              />
-              <Button 
-                className="bg-sky-600 hover:bg-sky-700"
-                onClick={() => document.getElementById('file-upload')?.click()}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                上传文件
-              </Button>
-            </div>
+          <h1 className="text-2xl font-semibold text-gray-900">素材库</h1>
+          <div className="relative">
+            <input
+              type="file"
+              id="file-upload"
+              className="hidden"
+              multiple
+              accept=".pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg"
+              onChange={handleFileUpload}
+            />
+            <Button 
+              className="bg-sky-600 hover:bg-sky-700"
+              onClick={() => document.getElementById('file-upload')?.click()}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              上传素材
+            </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* 知识库列表 */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* 左侧素材库列表 */}
           <div className="lg:col-span-1">
             <Card>
-              <CardHeader>
-                <CardTitle>我的知识库</CardTitle>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">搜索素材库</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAddFolder}
+                    className="h-6 w-6 p-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="搜索..."
+                    value={folderSearchTerm}
+                    onChange={(e) => setFolderSearchTerm(e.target.value)}
+                    className="pl-10 h-8"
+                  />
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {personalKBs.map((kb) => (
+              <CardContent className="pt-0">
+                <div className="space-y-1">
+                  {filteredFolders.map((folder) => (
                     <div
-                      key={kb.id}
-                      className="p-3 border rounded-lg hover:bg-sky-50 cursor-pointer border-sky-200 hover:border-sky-400 transition-colors"
+                      key={folder.id}
+                      className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
+                        selectedFolderId === folder.id 
+                          ? 'bg-sky-50 border border-sky-200' 
+                          : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => setSelectedFolderId(folder.id)}
                     >
-                      <div className="font-medium text-sm">{kb.name}</div>
-                      <div className="text-xs text-gray-500 mt-1">{kb.description}</div>
-                      <div className="text-xs text-gray-400 mt-2">
-                        {kb.documentsCount} 个文档
-                      </div>
+                      {editingFolderId === folder.id ? (
+                        <div className="flex items-center space-x-2 flex-1">
+                          <Input
+                            value={editingFolderName}
+                            onChange={(e) => setEditingFolderName(e.target.value)}
+                            className="h-6 text-xs"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleSaveEdit();
+                              if (e.key === 'Escape') handleCancelEdit();
+                            }}
+                            onBlur={handleSaveEdit}
+                            autoFocus
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center space-x-2 flex-1">
+                            <FolderPlus className="w-4 h-4 text-gray-500" />
+                            <span className="text-xs font-medium truncate">{folder.name}</span>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreHorizontal className="w-3 h-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem onClick={(e) => {
+                                e.stopPropagation();
+                                handleStartEdit(folder.id, folder.name);
+                              }}>
+                                <Edit className="w-3 h-3 mr-2" />
+                                重命名
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="text-red-600"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteFolder(folder.id);
+                                }}
+                              >
+                                <Trash2 className="w-3 h-3 mr-2" />
+                                删除
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </>
+                      )}
                     </div>
                   ))}
+                  {showNewFolderInput && (
+                    <div className="p-2 border border-sky-200 rounded-lg bg-sky-50">
+                      <Input
+                        placeholder="输入文件夹名称"
+                        value={newFolderName}
+                        onChange={(e) => setNewFolderName(e.target.value)}
+                        className="h-6 text-xs mb-2"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleCreateFolder();
+                          if (e.key === 'Escape') handleCancelNewFolder();
+                        }}
+                        autoFocus
+                      />
+                      <div className="flex space-x-1">
+                        <Button size="sm" onClick={handleCreateFolder} className="h-6 text-xs">
+                          确定
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={handleCancelNewFolder} className="h-6 text-xs">
+                          取消
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* 文件管理 */}
-          <div className="lg:col-span-3">
+          {/* 右侧文件管理 */}
+          <div className="lg:col-span-4">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>文件管理</CardTitle>
+                  <CardTitle className="text-lg">
+                    {selectedFolder?.name || '素材管理'}
+                  </CardTitle>
                   <div className="flex items-center space-x-2">
                     <div className="relative">
                       <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -252,6 +389,7 @@ const PersonalKnowledge: React.FC = () => {
                     <TabsTrigger value="documents">文档</TabsTrigger>
                     <TabsTrigger value="images">图片</TabsTrigger>
                     <TabsTrigger value="tables">表格</TabsTrigger>
+                    <TabsTrigger value="others">其他</TabsTrigger>
                   </TabsList>
                 </Tabs>
 
@@ -266,41 +404,49 @@ const PersonalKnowledge: React.FC = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredFiles.map((file) => (
-                      <TableRow key={file.id}>
-                        <TableCell>
-                          <div className="flex items-center space-x-3">
-                            {getFileIcon(file.type)}
-                            <span className="font-medium">{file.name}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{file.size}</TableCell>
-                        <TableCell>{file.uploadTime}</TableCell>
-                        <TableCell>{getStatusBadge(file.status)}</TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem>
-                                <Download className="w-4 h-4 mr-2" />
-                                下载
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                className="text-red-600"
-                                onClick={() => handleDeleteFile(file.id)}
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                删除
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                    {filteredFiles.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                          暂无文件
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : (
+                      filteredFiles.map((file) => (
+                        <TableRow key={file.id}>
+                          <TableCell>
+                            <div className="flex items-center space-x-3">
+                              {getFileIcon(file.type)}
+                              <span className="font-medium">{file.name}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>{file.size}</TableCell>
+                          <TableCell>{file.uploadTime}</TableCell>
+                          <TableCell>{getStatusBadge(file.status)}</TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuItem>
+                                  <Download className="w-4 h-4 mr-2" />
+                                  下载
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="text-red-600"
+                                  onClick={() => handleDeleteFile(file.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  删除
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -308,7 +454,7 @@ const PersonalKnowledge: React.FC = () => {
           </div>
         </div>
 
-        {/* 删除确认对话框 */}
+        {/* 删除文件确认对话框 */}
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -319,7 +465,25 @@ const PersonalKnowledge: React.FC = () => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>取消</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              <AlertDialogAction onClick={confirmDeleteFile} className="bg-red-600 hover:bg-red-700">
+                删除
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* 删除文件夹确认对话框 */}
+        <AlertDialog open={deleteFolderDialogOpen} onOpenChange={setDeleteFolderDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>确认删除文件夹</AlertDialogTitle>
+              <AlertDialogDescription>
+                您确定要删除这个文件夹吗？文件夹中的所有文件也会被删除，此操作无法撤销。
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>取消</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDeleteFolder} className="bg-red-600 hover:bg-red-700">
                 删除
               </AlertDialogAction>
             </AlertDialogFooter>
