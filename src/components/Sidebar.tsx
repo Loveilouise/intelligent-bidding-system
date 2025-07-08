@@ -2,10 +2,7 @@
 import React, { useState } from 'react';
 import { 
   FileText, 
-  Edit, 
-  Filter, 
   Database,
-  Settings,
   ChevronDown,
   ChevronRight
 } from 'lucide-react';
@@ -34,26 +31,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
         { id: 'ai-bid-generation', title: 'AI生标', icon: null },
         { id: 'history-bid-management', title: '历史生标管理', icon: null },
         { id: 'template-management', title: '投标方案模板管理', icon: null }
-      ]
-    },
-    {
-      id: 'writing-management',
-      title: 'AI帮写管理',
-      icon: <Edit className="w-5 h-5" />,
-      children: [
-        { id: 'ai-writing', title: 'AI帮写', icon: null },
-        { id: 'document-download', title: '标书下载', icon: null },
-        { id: 'history-writing-management', title: '历史帮写管理', icon: null }
-      ]
-    },
-    {
-      id: 'bid-screening',
-      title: 'AI筛标',
-      icon: <Filter className="w-5 h-5" />,
-      children: [
-        { id: 'tender-announcements', title: '招标公告', icon: null },
-        { id: 'intention-projects', title: '意向项目', icon: null },
-        { id: 'ai-recommendations', title: 'AI推荐', icon: null }
       ]
     },
     {
@@ -126,20 +103,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
         <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
           智能标书系统
         </h1>
-      </div>
-
-      <div 
-        className={`flex items-center px-3 py-3 cursor-pointer transition-all duration-200 border-b border-gray-100 ${
-          activeModule === 'chat' 
-            ? 'bg-purple-100 border-r-4 border-purple-500 text-purple-700' 
-            : 'text-gray-700 hover:bg-purple-50'
-        }`}
-        onClick={() => setActiveModule('chat')}
-      >
-        <div className="w-7 h-7 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center mr-2">
-          <span className="text-white text-xs font-bold">AI</span>
-        </div>
-        <span className="font-medium text-sm">AI对话</span>
       </div>
 
       <div className="flex-1 overflow-y-auto">

@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
-import ChatWindow from '../components/ChatWindow';
 import UserProfile from '../components/UserProfile';
 import LoginForm from '../components/LoginForm';
 import HistoryBidManagement from './HistoryBidManagement';
@@ -10,13 +9,10 @@ import AIBidGeneration from './AIBidGeneration';
 import KnowledgeSettings from './KnowledgeSettings';
 import PersonalKnowledge from './PersonalKnowledge';
 import IndustryKnowledge from './IndustryKnowledge';
-import TenderAnnouncements from './TenderAnnouncements';
-import IntentionProjects from './IntentionProjects';
-import AIRecommendations from './AIRecommendations';
 import PersonalCenter from './PersonalCenter';
 
 const Index = () => {
-  const [activeModule, setActiveModule] = useState('chat');
+  const [activeModule, setActiveModule] = useState('ai-bid-generation');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPersonalCenter, setShowPersonalCenter] = useState(false);
   const [activePersonalTab, setActivePersonalTab] = useState('account');
@@ -68,17 +64,13 @@ const Index = () => {
             <PersonalCenter onBack={handleBackToMain} activeTab={activePersonalTab} />
           ) : (
             <>
-              {activeModule === 'chat' && <ChatWindow />}
               {activeModule === 'history-bid-management' && <HistoryBidManagement />}
               {activeModule === 'template-management' && <TemplateManagement />}
               {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
               {activeModule === 'knowledge-settings' && <KnowledgeSettings />}
               {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
               {activeModule === 'industry-knowledge' && <IndustryKnowledge />}
-              {activeModule === 'tender-announcements' && <TenderAnnouncements />}
-              {activeModule === 'intention-projects' && <IntentionProjects />}
-              {activeModule === 'ai-recommendations' && <AIRecommendations />}
-              {!['chat', 'history-bid-management', 'template-management', 'ai-bid-generation', 'knowledge-settings', 'personal-knowledge', 'industry-knowledge', 'tender-announcements', 'intention-projects', 'ai-recommendations'].includes(activeModule) && (
+              {!['history-bid-management', 'template-management', 'ai-bid-generation', 'knowledge-settings', 'personal-knowledge', 'industry-knowledge'].includes(activeModule) && (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
                     <h2 className="text-2xl font-semibold text-gray-700 mb-2">
@@ -99,18 +91,9 @@ const Index = () => {
 function getModuleTitle(module: string): string {
   const titles: Record<string, string> = {
     'bid-management': 'AI生标管理',
-    'writing-management': 'AI帮写管理',
-    'bid-screening': 'AI筛标',
-    'knowledge-base': '知识库管理',
     'ai-bid-generation': 'AI生标',
     'history-bid-management': '历史生标管理',
     'template-management': '投标方案模板管理',
-    'tender-announcements': '招标公告',
-    'intention-projects': '意向项目',
-    'ai-recommendations': 'AI推荐',
-    'ai-writing': 'AI帮写',
-    'document-download': '标书下载',
-    'history-writing-management': '历史帮写管理',
     'knowledge-settings': '知识库设置',
     'enterprise-knowledge': '企业知识库',
     'personal-knowledge': '个人知识库',
