@@ -49,7 +49,7 @@ const Index = () => {
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
       
       <div className="flex-1 flex flex-col">
-        <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-end">
+        <div className="bg-white border-b border-gray-200 px-4 py-2 flex justify-end">
           <UserProfile 
             onLogout={handleLogout} 
             onPersonalCenter={handlePersonalCenter}
@@ -57,7 +57,7 @@ const Index = () => {
           />
         </div>
         
-        <div className="flex-1">
+        <div className="flex-1 overflow-hidden">
           {showPersonalCenter ? (
             <PersonalCenter onBack={handleBackToMain} activeTab={activePersonalTab} />
           ) : (

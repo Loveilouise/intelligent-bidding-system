@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Search, Filter, MoreHorizontal, Trash2, Download, FileText, Image, Table as TableIcon, Edit, FolderPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -213,244 +212,247 @@ const PersonalKnowledge: React.FC = () => {
   const selectedFolder = folders.find(f => f.id === selectedFolderId);
 
   return (
-    <div className="flex-1 p-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">素材库</h1>
-          <div className="relative">
-            <input
-              type="file"
-              id="file-upload"
-              className="hidden"
-              multiple
-              accept=".pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg"
-              onChange={handleFileUpload}
-            />
-            <Button 
-              className="bg-sky-600 hover:bg-sky-700"
-              onClick={() => document.getElementById('file-upload')?.click()}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              上传素材
-            </Button>
+    <div className="flex-1 flex flex-col h-full bg-gray-50">
+      <div className="flex-1 flex overflow-hidden">
+        {/* 头部标题栏 */}
+        <div className="absolute top-0 left-0 right-0 bg-white border-b border-gray-200 px-4 py-3 z-10">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold text-gray-900">素材库</h1>
+            <div className="relative">
+              <input
+                type="file"
+                id="file-upload"
+                className="hidden"
+                multiple
+                accept=".pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg"
+                onChange={handleFileUpload}
+              />
+              <Button 
+                size="sm"
+                className="bg-sky-600 hover:bg-sky-700"
+                onClick={() => document.getElementById('file-upload')?.click()}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                上传素材
+              </Button>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* 主要内容区域 */}
+        <div className="flex flex-1 pt-16">
           {/* 左侧素材库列表 */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">搜索素材库</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleAddFolder}
-                    className="h-6 w-6 p-0"
+          <div className="w-60 bg-white border-r border-gray-200 flex flex-col">
+            <div className="p-3 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-gray-700">搜索素材库</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAddFolder}
+                  className="h-6 w-6 p-0"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder="搜索..."
+                  value={folderSearchTerm}
+                  onChange={(e) => setFolderSearchTerm(e.target.value)}
+                  className="pl-10 h-8"
+                />
+              </div>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-3">
+              <div className="space-y-1">
+                {filteredFolders.map((folder) => (
+                  <div
+                    key={folder.id}
+                    className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
+                      selectedFolderId === folder.id 
+                        ? 'bg-sky-50 border border-sky-200' 
+                        : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => setSelectedFolderId(folder.id)}
                   >
-                    <Plus className="w-4 h-4" />
+                    {editingFolderId === folder.id ? (
+                      <div className="flex items-center space-x-2 flex-1">
+                        <Input
+                          value={editingFolderName}
+                          onChange={(e) => setEditingFolderName(e.target.value)}
+                          className="h-6 text-xs"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSaveEdit();
+                            if (e.key === 'Escape') handleCancelEdit();
+                          }}
+                          onBlur={handleSaveEdit}
+                          autoFocus
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center space-x-2 flex-1">
+                          <FolderPlus className="w-4 h-4 text-gray-500" />
+                          <span className="text-xs font-medium truncate">{folder.name}</span>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreHorizontal className="w-3 h-3" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartEdit(folder.id, folder.name);
+                            }}>
+                              <Edit className="w-3 h-3 mr-2" />
+                              重命名
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="text-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteFolder(folder.id);
+                              }}
+                            >
+                              <Trash2 className="w-3 h-3 mr-2" />
+                              删除
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </>
+                    )}
+                  </div>
+                ))}
+                {showNewFolderInput && (
+                  <div className="p-2 border border-sky-200 rounded-lg bg-sky-50">
+                    <Input
+                      placeholder="输入文件夹名称"
+                      value={newFolderName}
+                      onChange={(e) => setNewFolderName(e.target.value)}
+                      className="h-6 text-xs mb-2"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleCreateFolder();
+                        if (e.key === 'Escape') handleCancelNewFolder();
+                      }}
+                      autoFocus
+                    />
+                    <div className="flex space-x-1">
+                      <Button size="sm" onClick={handleCreateFolder} className="h-6 text-xs">
+                        确定
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={handleCancelNewFolder} className="h-6 text-xs">
+                        取消
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 右侧文件管理 */}
+          <div className="flex-1 bg-white flex flex-col">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-medium">
+                  {selectedFolder?.name || '素材管理'}
+                </h2>
+                <div className="flex items-center space-x-2">
+                  <div className="relative">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input
+                      placeholder="搜索文件..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 w-64"
+                    />
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Filter className="w-4 h-4 mr-2" />
+                    筛选
                   </Button>
                 </div>
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <Input
-                    placeholder="搜索..."
-                    value={folderSearchTerm}
-                    onChange={(e) => setFolderSearchTerm(e.target.value)}
-                    className="pl-10 h-8"
-                  />
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-1">
-                  {filteredFolders.map((folder) => (
-                    <div
-                      key={folder.id}
-                      className={`group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
-                        selectedFolderId === folder.id 
-                          ? 'bg-sky-50 border border-sky-200' 
-                          : 'hover:bg-gray-50'
-                      }`}
-                      onClick={() => setSelectedFolderId(folder.id)}
-                    >
-                      {editingFolderId === folder.id ? (
-                        <div className="flex items-center space-x-2 flex-1">
-                          <Input
-                            value={editingFolderName}
-                            onChange={(e) => setEditingFolderName(e.target.value)}
-                            className="h-6 text-xs"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') handleSaveEdit();
-                              if (e.key === 'Escape') handleCancelEdit();
-                            }}
-                            onBlur={handleSaveEdit}
-                            autoFocus
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex items-center space-x-2 flex-1">
-                            <FolderPlus className="w-4 h-4 text-gray-500" />
-                            <span className="text-xs font-medium truncate">{folder.name}</span>
+              </div>
+              
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList>
+                  <TabsTrigger value="all">全部</TabsTrigger>
+                  <TabsTrigger value="documents">文档</TabsTrigger>
+                  <TabsTrigger value="images">图片</TabsTrigger>
+                  <TabsTrigger value="tables">表格</TabsTrigger>
+                  <TabsTrigger value="others">其他</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>文件名</TableHead>
+                    <TableHead>文件大小</TableHead>
+                    <TableHead>上传时间</TableHead>
+                    <TableHead>状态</TableHead>
+                    <TableHead>操作</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredFiles.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                        暂无文件
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredFiles.map((file) => (
+                      <TableRow key={file.id}>
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            {getFileIcon(file.type)}
+                            <span className="font-medium">{file.name}</span>
                           </div>
+                        </TableCell>
+                        <TableCell>{file.size}</TableCell>
+                        <TableCell>{file.uploadTime}</TableCell>
+                        <TableCell>{getStatusBadge(file.status)}</TableCell>
+                        <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <MoreHorizontal className="w-3 h-3" />
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                              <DropdownMenuItem onClick={(e) => {
-                                e.stopPropagation();
-                                handleStartEdit(folder.id, folder.name);
-                              }}>
-                                <Edit className="w-3 h-3 mr-2" />
-                                重命名
+                              <DropdownMenuItem>
+                                <Download className="w-4 h-4 mr-2" />
+                                下载
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 className="text-red-600"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteFolder(folder.id);
-                                }}
+                                onClick={() => handleDeleteFile(file.id)}
                               >
-                                <Trash2 className="w-3 h-3 mr-2" />
+                                <Trash2 className="w-4 h-4 mr-2" />
                                 删除
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                  {showNewFolderInput && (
-                    <div className="p-2 border border-sky-200 rounded-lg bg-sky-50">
-                      <Input
-                        placeholder="输入文件夹名称"
-                        value={newFolderName}
-                        onChange={(e) => setNewFolderName(e.target.value)}
-                        className="h-6 text-xs mb-2"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleCreateFolder();
-                          if (e.key === 'Escape') handleCancelNewFolder();
-                        }}
-                        autoFocus
-                      />
-                      <div className="flex space-x-1">
-                        <Button size="sm" onClick={handleCreateFolder} className="h-6 text-xs">
-                          确定
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={handleCancelNewFolder} className="h-6 text-xs">
-                          取消
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* 右侧文件管理 */}
-          <div className="lg:col-span-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">
-                    {selectedFolder?.name || '素材管理'}
-                  </CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <div className="relative">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                      <Input
-                        placeholder="搜索文件..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 w-64"
-                      />
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Filter className="w-4 h-4 mr-2" />
-                      筛选
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
-                  <TabsList>
-                    <TabsTrigger value="all">全部</TabsTrigger>
-                    <TabsTrigger value="documents">文档</TabsTrigger>
-                    <TabsTrigger value="images">图片</TabsTrigger>
-                    <TabsTrigger value="tables">表格</TabsTrigger>
-                    <TabsTrigger value="others">其他</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>文件名</TableHead>
-                      <TableHead>文件大小</TableHead>
-                      <TableHead>上传时间</TableHead>
-                      <TableHead>状态</TableHead>
-                      <TableHead>操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredFiles.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                          暂无文件
                         </TableCell>
                       </TableRow>
-                    ) : (
-                      filteredFiles.map((file) => (
-                        <TableRow key={file.id}>
-                          <TableCell>
-                            <div className="flex items-center space-x-3">
-                              {getFileIcon(file.type)}
-                              <span className="font-medium">{file.name}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>{file.size}</TableCell>
-                          <TableCell>{file.uploadTime}</TableCell>
-                          <TableCell>{getStatusBadge(file.status)}</TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreHorizontal className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                <DropdownMenuItem>
-                                  <Download className="w-4 h-4 mr-2" />
-                                  下载
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  className="text-red-600"
-                                  onClick={() => handleDeleteFile(file.id)}
-                                >
-                                  <Trash2 className="w-4 h-4 mr-2" />
-                                  删除
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </div>
 
