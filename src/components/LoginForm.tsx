@@ -52,36 +52,36 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-blue-500/10 to-blue-600/10"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 via-sky-100 to-sky-200">
+      <div className="absolute inset-0 bg-gradient-to-br from-sky-400/10 via-sky-500/10 to-sky-600/10"></div>
       <Card className="w-full max-w-md relative z-10 shadow-xl border-0 bg-white/95 backdrop-blur-sm">
         <CardHeader className="text-center pb-8">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-gradient-to-br from-sky-100 to-sky-200 rounded-2xl flex items-center justify-center shadow-lg">
               <img 
-                src="/lovable-uploads/37efcfe7-e959-49db-81e9-db90892f04c8.png" 
+                src="/lovable-uploads/66bc4a96-4c4e-4093-a308-07b2fcdda06d.png" 
                 alt="智能标书系统" 
                 className="w-10 h-10"
               />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-sky-600 to-sky-500 bg-clip-text text-transparent">
             智能标书系统
           </CardTitle>
           <p className="text-gray-600 mt-3 text-base">欢迎使用智能标书管理平台</p>
         </CardHeader>
         <CardContent className="px-8 pb-8">
           <Tabs defaultValue="account" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-blue-50 border border-blue-100">
+            <TabsList className="grid w-full grid-cols-2 bg-sky-50 border border-sky-100">
               <TabsTrigger 
                 value="account" 
-                className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm"
+                className="data-[state=active]:bg-white data-[state=active]:text-sky-600 data-[state=active]:shadow-sm"
               >
                 账号登录
               </TabsTrigger>
               <TabsTrigger 
                 value="sms"
-                className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm"
+                className="data-[state=active]:bg-white data-[state=active]:text-sky-600 data-[state=active]:shadow-sm"
               >
                 短信登录
               </TabsTrigger>
@@ -98,7 +98,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                    className="h-12 border-gray-200 focus:border-sky-400 focus:ring-sky-400/20"
                   />
                 </div>
                 <div className="space-y-2">
@@ -110,12 +110,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                    className="h-12 border-gray-200 focus:border-sky-400 focus:ring-sky-400/20"
                   />
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full h-12 bg-sky-600 hover:bg-sky-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                   disabled={isLoading}
                 >
                   {isLoading ? '登录中...' : '登录'}
@@ -134,7 +134,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
-                    className="h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                    className="h-12 border-gray-200 focus:border-sky-400 focus:ring-sky-400/20"
                   />
                 </div>
                 <div className="space-y-2">
@@ -147,14 +147,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                       value={smsCode}
                       onChange={(e) => setSmsCode(e.target.value)}
                       required
-                      className="flex-1 h-12 border-gray-200 focus:border-blue-400 focus:ring-blue-400/20"
+                      className="flex-1 h-12 border-gray-200 focus:border-sky-400 focus:ring-sky-400/20"
                     />
                     <Button
                       type="button"
                       variant="outline"
                       onClick={handleSendSms}
                       disabled={isSendingSms || !phone}
-                      className="h-12 px-4 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
+                      className="h-12 px-4 border-sky-200 text-sky-600 hover:bg-sky-50 hover:border-sky-300"
                     >
                       {isSendingSms ? '发送中...' : '获取验证码'}
                     </Button>
@@ -162,7 +162,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full h-12 bg-sky-600 hover:bg-sky-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                   disabled={isLoading}
                 >
                   {isLoading ? '登录中...' : '登录'}

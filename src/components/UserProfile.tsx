@@ -49,12 +49,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <div 
-          className="flex items-center space-x-2 px-3 py-2 cursor-pointer hover:bg-blue-50 rounded-md transition-colors"
+          className="flex items-center space-x-2 px-3 py-2 cursor-pointer hover:bg-sky-50 rounded-md transition-colors"
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
         >
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-blue-600" />
+          <div className="w-8 h-8 bg-sky-100 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-sky-600" />
           </div>
           <div className="text-left">
             <div className="text-sm font-medium text-gray-900">{user.name}</div>
@@ -101,7 +101,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmLogout} className="bg-blue-600 hover:bg-blue-700">确认退出</AlertDialogAction>
+            <AlertDialogAction onClick={confirmLogout} className="bg-sky-600 hover:bg-sky-700">确认退出</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
