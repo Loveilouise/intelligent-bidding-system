@@ -92,7 +92,7 @@ const TemplateManagement: React.FC = () => {
               </div>
               <Button 
                 onClick={handleAdd}
-                className="bg-purple-500 hover:bg-purple-600 text-white"
+                className="bg-sky-600 hover:bg-sky-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 新增模板
@@ -118,12 +118,12 @@ const TemplateManagement: React.FC = () => {
                   <TableRow key={template.id}>
                     <TableCell>
                       <div className="flex items-center space-x-2">
-                        <FileText className="w-4 h-4 text-purple-500" />
+                        <FileText className="w-4 h-4 text-sky-600" />
                         <span className="font-medium">{template.name}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="inline-flex px-2 py-1 text-xs font-medium text-purple-700 bg-purple-50 rounded-full">
+                      <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-50 rounded-full">
                         {template.category}
                       </span>
                     </TableCell>
@@ -151,7 +151,7 @@ const TemplateManagement: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEdit(template.id)}
-                          className="text-gray-600 hover:text-purple-600"
+                          className="text-gray-600 hover:text-sky-600"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -188,7 +188,7 @@ const TemplateManagement: React.FC = () => {
               </p>
               <Button 
                 onClick={handleAdd}
-                className="bg-purple-500 hover:bg-purple-600 text-white"
+                className="bg-sky-600 hover:bg-sky-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 创建第一个模板

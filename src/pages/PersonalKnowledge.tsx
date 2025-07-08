@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Plus, Upload, Search, Filter, MoreHorizontal, Trash2, Download, FileText, Image, Table as TableIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -152,7 +153,7 @@ const PersonalKnowledge: React.FC = () => {
           <div className="flex space-x-2">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" className="border-sky-600 text-sky-600 hover:bg-sky-50">
                   <Plus className="w-4 h-4 mr-2" />
                   新建知识库
                 </Button>
@@ -170,7 +171,7 @@ const PersonalKnowledge: React.FC = () => {
                   </div>
                   <div className="flex space-x-2">
                     <Button variant="outline" className="flex-1">取消</Button>
-                    <Button className="flex-1 bg-purple-600 hover:bg-purple-700">创建</Button>
+                    <Button className="flex-1 bg-sky-600 hover:bg-sky-700">创建</Button>
                   </div>
                 </div>
               </DialogContent>
@@ -185,7 +186,7 @@ const PersonalKnowledge: React.FC = () => {
                 onChange={handleFileUpload}
               />
               <Button 
-                className="bg-purple-600 hover:bg-purple-700"
+                className="bg-sky-600 hover:bg-sky-700"
                 onClick={() => document.getElementById('file-upload')?.click()}
               >
                 <Upload className="w-4 h-4 mr-2" />
@@ -207,7 +208,7 @@ const PersonalKnowledge: React.FC = () => {
                   {personalKBs.map((kb) => (
                     <div
                       key={kb.id}
-                      className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                      className="p-3 border rounded-lg hover:bg-sky-50 cursor-pointer border-sky-200 hover:border-sky-400 transition-colors"
                     >
                       <div className="font-medium text-sm">{kb.name}</div>
                       <div className="text-xs text-gray-500 mt-1">{kb.description}</div>
@@ -322,7 +323,7 @@ const PersonalKnowledge: React.FC = () => {
                 删除
               </AlertDialogAction>
             </AlertDialogFooter>
-          </AlertDialogContent>
+          </AlertDialogFooter>
         </AlertDialog>
       </div>
     </div>

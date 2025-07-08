@@ -137,13 +137,13 @@ const BidSetup: React.FC<BidSetupProps> = ({
           <div 
             className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
               settingsMode === 'auto-parse' 
-                ? 'border-purple-500 bg-purple-50' 
-                : 'border-gray-200 hover:border-purple-300'
+                ? 'border-sky-600 bg-sky-50' 
+                : 'border-gray-200 hover:border-sky-400'
             }`}
             onClick={() => setSettingsMode('auto-parse')}
           >
             <div className="flex items-center mb-2">
-              <FileText className="w-5 h-5 text-purple-500 mr-2" />
+              <FileText className="w-5 h-5 text-sky-600 mr-2" />
               <h4 className="font-medium">基于招标文件解析</h4>
             </div>
             <p className="text-sm text-gray-600">自动解析招标文件，智能生成投标文件目录</p>
@@ -152,13 +152,13 @@ const BidSetup: React.FC<BidSetupProps> = ({
           <div 
             className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
               settingsMode === 'template-based' 
-                ? 'border-purple-500 bg-purple-50' 
-                : 'border-gray-200 hover:border-purple-300'
+                ? 'border-sky-600 bg-sky-50' 
+                : 'border-gray-200 hover:border-sky-400'
             }`}
             onClick={() => setSettingsMode('template-based')}
           >
             <div className="flex items-center mb-2">
-              <Settings className="w-5 h-5 text-purple-500 mr-2" />
+              <Settings className="w-5 h-5 text-sky-600 mr-2" />
               <h4 className="font-medium">基于投标模板</h4>
             </div>
             <p className="text-sm text-gray-600">使用现有模板快速创建投标文件结构</p>
@@ -167,13 +167,13 @@ const BidSetup: React.FC<BidSetupProps> = ({
           <div 
             className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
               settingsMode === 'custom-create' 
-                ? 'border-purple-500 bg-purple-50' 
-                : 'border-gray-200 hover:border-purple-300'
+                ? 'border-sky-600 bg-sky-50' 
+                : 'border-gray-200 hover:border-sky-400'
             }`}
             onClick={() => setSettingsMode('custom-create')}
           >
             <div className="flex items-center mb-2">
-              <Plus className="w-5 h-5 text-purple-500 mr-2" />
+              <Plus className="w-5 h-5 text-sky-600 mr-2" />
               <h4 className="font-medium">自定义创建</h4>
             </div>
             <p className="text-sm text-gray-600">完全自定义投标文件目录和结构</p>
@@ -185,10 +185,10 @@ const BidSetup: React.FC<BidSetupProps> = ({
       {settingsMode === 'auto-parse' && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">文件上传</h3>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
-            <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <div className="border-2 border-dashed border-sky-400 rounded-lg p-8 text-center hover:border-sky-600 transition-colors bg-sky-50/30">
+            <Upload className="w-12 h-12 text-sky-600 mx-auto mb-4" />
             <p className="text-gray-600 mb-4">上传招标文件或相关资料</p>
-            <Button variant="outline">选择文件</Button>
+            <Button variant="outline" className="border-sky-600 text-sky-600 hover:bg-sky-50">选择文件</Button>
           </div>
           
           {uploadedFiles.length > 0 && (
@@ -196,7 +196,7 @@ const BidSetup: React.FC<BidSetupProps> = ({
               {uploadedFiles.map((file) => (
                 <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <FileText className="w-4 h-4 text-purple-500" />
+                    <FileText className="w-4 h-4 text-sky-600" />
                     <span className="text-sm">{file.name}</span>
                   </div>
                   <span className="text-xs text-green-600">已上传</span>
@@ -216,13 +216,13 @@ const BidSetup: React.FC<BidSetupProps> = ({
                 key={template.value}
                 className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                   selectedTemplate === template.value
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-purple-300'
+                    ? 'border-sky-600 bg-sky-50'
+                    : 'border-gray-200 hover:border-sky-400'
                 }`}
                 onClick={() => setSelectedTemplate(template.value)}
               >
                 <div className="flex items-center">
-                  <FileText className="w-5 h-5 text-purple-500 mr-3" />
+                  <FileText className="w-5 h-5 text-sky-600 mr-3" />
                   <span className="font-medium">{template.label}</span>
                 </div>
               </div>
@@ -243,7 +243,7 @@ const BidSetup: React.FC<BidSetupProps> = ({
                 }
               }}
               placeholder={catalogReference}
-              className="min-h-[400px] resize-none text-sm leading-relaxed"
+              className="min-h-[400px] resize-none text-sm leading-relaxed border-sky-200 focus:border-sky-600"
               style={{ maxHeight: '400px', overflowY: 'auto' }}
             />
             <div className="absolute bottom-2 right-2 text-xs text-gray-400">

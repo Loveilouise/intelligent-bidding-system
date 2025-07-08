@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Plus, Settings, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -80,7 +81,7 @@ const KnowledgeSettings: React.FC = () => {
           <h1 className="text-2xl font-semibold text-gray-900">知识库设置</h1>
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="bg-purple-600 hover:bg-purple-700">
+              <Button className="bg-sky-600 hover:bg-sky-700">
                 <Plus className="w-4 h-4 mr-2" />
                 创建知识库
               </Button>
@@ -118,7 +119,7 @@ const KnowledgeSettings: React.FC = () => {
                 </div>
                 <div className="flex space-x-2">
                   <Button variant="outline" className="flex-1">取消</Button>
-                  <Button onClick={handleCreateKB} className="flex-1 bg-purple-600 hover:bg-purple-700">创建</Button>
+                  <Button onClick={handleCreateKB} className="flex-1 bg-sky-600 hover:bg-sky-700">创建</Button>
                 </div>
               </div>
             </DialogContent>
@@ -193,7 +194,7 @@ const KnowledgeSettings: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Settings className="w-5 h-5 mr-2" />
+                  <Settings className="w-5 h-5 mr-2 text-sky-600" />
                   基础设置
                 </CardTitle>
               </CardHeader>
@@ -277,7 +278,7 @@ const KnowledgeSettings: React.FC = () => {
                   />
                   <Label htmlFor="auto-update">启用自动更新</Label>
                 </div>
-                <Button onClick={handleSaveSettings} className="w-full bg-purple-600 hover:bg-purple-700">
+                <Button onClick={handleSaveSettings} className="w-full bg-sky-600 hover:bg-sky-700">
                   保存设置
                 </Button>
               </CardContent>

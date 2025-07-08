@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { RefreshCw, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -198,7 +197,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
         <div className="flex items-center justify-center mb-4">
-          <RefreshCw className="w-8 h-8 text-purple-500 animate-spin" />
+          <RefreshCw className="w-8 h-8 text-sky-600 animate-spin" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">正在生成标书目录...</h3>
         <p className="text-gray-600">AI正在分析您的需求和上传的文件，请稍候</p>
@@ -233,7 +232,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
               <div className="flex items-center space-x-2">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-sky-600 text-sky-600 hover:bg-sky-50">
                       <RefreshCw className="w-4 h-4 mr-2" />
                       重新生成
                     </Button>
@@ -247,7 +246,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>取消</AlertDialogCancel>
-                      <AlertDialogAction onClick={onRegenerateCatalog}>确认</AlertDialogAction>
+                      <AlertDialogAction onClick={onRegenerateCatalog} className="bg-sky-600 hover:bg-sky-700">确认</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
