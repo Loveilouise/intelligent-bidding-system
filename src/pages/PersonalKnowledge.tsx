@@ -323,7 +323,7 @@ const PersonalKnowledge: React.FC = () => {
                 删除
               </AlertDialogAction>
             </AlertDialogFooter>
-          </AlertDialogFooter>
+          </AlertDialogContent>
         </AlertDialog>
       </div>
     </div>
