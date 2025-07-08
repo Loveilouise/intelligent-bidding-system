@@ -52,20 +52,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-cyan-400/10 to-blue-600/10"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-blue-500/10 to-blue-600/10"></div>
       <Card className="w-full max-w-md relative z-10 shadow-xl border-0 bg-white/95 backdrop-blur-sm">
         <CardHeader className="text-center pb-8">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center shadow-lg">
               <img 
-                src="/lovable-uploads/b2bd735d-5d1f-48e3-b5ac-73b072de73d3.png" 
+                src="/lovable-uploads/37efcfe7-e959-49db-81e9-db90892f04c8.png" 
                 alt="智能标书系统" 
                 className="w-10 h-10"
               />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-700 bg-clip-text text-transparent">
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
             智能标书系统
           </CardTitle>
           <p className="text-gray-600 mt-3 text-base">欢迎使用智能标书管理平台</p>
@@ -115,7 +115,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                   disabled={isLoading}
                 >
                   {isLoading ? '登录中...' : '登录'}
@@ -162,7 +162,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                   disabled={isLoading}
                 >
                   {isLoading ? '登录中...' : '登录'}
