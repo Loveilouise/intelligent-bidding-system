@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { User, LogOut, ChevronDown, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -52,8 +53,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
         >
-          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-purple-600" />
+          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-left">
             <div className="text-sm font-medium text-gray-900">{user.name}</div>
