@@ -49,7 +49,10 @@ const Index = () => {
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
       
       <div className="flex-1 flex flex-col">
-        <div className="bg-white border-b border-gray-200 px-4 py-2 flex justify-end">
+        <div className="bg-white border-b border-gray-200 px-4 py-2 flex justify-between items-center">
+          <h1 className="text-xl font-semibold text-gray-900">
+            {getModuleTitle(activeModule)}
+          </h1>
           <UserProfile 
             onLogout={handleLogout} 
             onPersonalCenter={handlePersonalCenter}

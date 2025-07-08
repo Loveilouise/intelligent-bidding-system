@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Search, Filter, MoreHorizontal, Trash2, Download, FileText, Image, Table as TableIcon, Edit, FolderPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -214,30 +213,6 @@ const PersonalKnowledge: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-50">
-      {/* 页面标题和操作栏 */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-gray-900">素材库</h1>
-          <div className="relative">
-            <input
-              type="file"
-              id="file-upload"
-              className="hidden"
-              multiple
-              accept=".pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg"
-              onChange={handleFileUpload}
-            />
-            <Button 
-              className="bg-sky-600 hover:bg-sky-700"
-              onClick={() => document.getElementById('file-upload')?.click()}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              上传素材
-            </Button>
-          </div>
-        </div>
-      </div>
-
       <div className="flex flex-1 overflow-hidden">
         {/* 左侧素材库列表 */}
         <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
@@ -362,9 +337,34 @@ const PersonalKnowledge: React.FC = () => {
         <div className="flex-1 bg-white flex flex-col">
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">
-                {selectedFolder?.name || '素材管理'}
-              </h2>
+              <div className="flex items-center space-x-4">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList>
+                    <TabsTrigger value="all">全部</TabsTrigger>
+                    <TabsTrigger value="documents">文档</TabsTrigger>
+                    <TabsTrigger value="images">图片</TabsTrigger>
+                    <TabsTrigger value="tables">表格</TabsTrigger>
+                    <TabsTrigger value="others">其他</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                <div className="relative">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    multiple
+                    accept=".pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg"
+                    onChange={handleFileUpload}
+                  />
+                  <Button 
+                    className="bg-sky-600 hover:bg-sky-700"
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    上传素材
+                  </Button>
+                </div>
+              </div>
               <div className="flex items-center space-x-2">
                 <div className="relative">
                   <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -381,16 +381,6 @@ const PersonalKnowledge: React.FC = () => {
                 </Button>
               </div>
             </div>
-            
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList>
-                <TabsTrigger value="all">全部</TabsTrigger>
-                <TabsTrigger value="documents">文档</TabsTrigger>
-                <TabsTrigger value="images">图片</TabsTrigger>
-                <TabsTrigger value="tables">表格</TabsTrigger>
-                <TabsTrigger value="others">其他</TabsTrigger>
-              </TabsList>
-            </Tabs>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">
