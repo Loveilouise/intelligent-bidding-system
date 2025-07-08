@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Filter, MoreHorizontal, Trash2, Download, FileText, Image, Table as TableIcon, Edit, FolderPlus } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Trash2, Download, FileText, Image, Table as TableIcon, Edit, FolderPlus, X, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface KnowledgeFile {
   id: string;
@@ -39,6 +43,11 @@ const PersonalKnowledge: React.FC = () => {
   const [newFolderName, setNewFolderName] = useState('');
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [editingFolderName, setEditingFolderName] = useState('');
+  const [uploadSheetOpen, setUploadSheetOpen] = useState(false);
+  const [createMethod, setCreateMethod] = useState<'single' | 'batch'>('single');
+  const [materialName, setMaterialName] = useState('');
+  const [materialFormat, setMaterialFormat] = useState<string>('');
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const [folders, setFolders] = useState<MaterialFolder[]>([
     { id: '1', name: '新建文件夹' },
@@ -132,7 +141,12 @@ const PersonalKnowledge: React.FC = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      console.log('上传文件:', Array.from(files).map(f => f.name));
+      const fileArray = Array.from(files);
+      if (createMethod === 'batch' && fileArray.length > 10) {
+        alert('批量上传最多支持10个文件');
+        return;
+      }
+      setUploadedFiles(fileArray);
     }
   };
 
@@ -209,12 +223,50 @@ const PersonalKnowledge: React.FC = () => {
     setEditingFolderName('');
   };
 
+  const handleSaveUpload = () => {
+    console.log('保存上传:', {
+      createMethod,
+      materialName,
+      materialFormat,
+      uploadedFiles
+    });
+    setUploadSheetOpen(false);
+    // 重置表单
+    setCreateMethod('single');
+    setMaterialName('');
+    setMaterialFormat('');
+    setUploadedFiles([]);
+  };
+
+  const handleCancelUpload = () => {
+    setUploadSheetOpen(false);
+    // 重置表单
+    setCreateMethod('single');
+    setMaterialName('');
+    setMaterialFormat('');
+    setUploadedFiles([]);
+  };
+
+  const getFileFormatText = (format: string) => {
+    switch (format) {
+      case 'pdf':
+        return '支持PDF格式，大小不超过50MB';
+      case 'doc':
+        return '支持DOC/DOCX格式，大小不超过30MB';
+      case 'image':
+        return '支持PNG/JPG/JPEG格式，大小不超过10MB';
+      case 'excel':
+        return '支持XLS/XLSX格式，大小不超过20MB';
+      default:
+        return '请选择文件格式';
+    }
+  };
+
   const selectedFolder = folders.find(f => f.id === selectedFolderId);
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-50">
       <div className="flex flex-1 overflow-hidden">
-        {/* 左侧素材库列表 */}
         <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
           <div className="p-3 border-b border-gray-200">
             <div className="flex items-center justify-between mb-3">
@@ -333,7 +385,6 @@ const PersonalKnowledge: React.FC = () => {
           </div>
         </div>
 
-        {/* 右侧文件管理 */}
         <div className="flex-1 bg-white flex flex-col">
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-4">
@@ -347,23 +398,6 @@ const PersonalKnowledge: React.FC = () => {
                     <TabsTrigger value="others">其他</TabsTrigger>
                   </TabsList>
                 </Tabs>
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="file-upload"
-                    className="hidden"
-                    multiple
-                    accept=".pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg"
-                    onChange={handleFileUpload}
-                  />
-                  <Button 
-                    className="bg-sky-600 hover:bg-sky-700"
-                    onClick={() => document.getElementById('file-upload')?.click()}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    上传素材
-                  </Button>
-                </div>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="relative">
@@ -375,10 +409,126 @@ const PersonalKnowledge: React.FC = () => {
                     className="pl-10 w-64"
                   />
                 </div>
-                <Button variant="outline" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
-                  筛选
-                </Button>
+                <Sheet open={uploadSheetOpen} onOpenChange={setUploadSheetOpen}>
+                  <SheetTrigger asChild>
+                    <Button className="bg-sky-600 hover:bg-sky-700">
+                      <Plus className="w-4 h-4 mr-2" />
+                      上传素材
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="w-[400px] sm:w-[540px]">
+                    <SheetHeader>
+                      <SheetTitle>上传素材</SheetTitle>
+                    </SheetHeader>
+                    <div className="py-4 space-y-6">
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">创建方式</Label>
+                        <RadioGroup value={createMethod} onValueChange={(value: 'single' | 'batch') => setCreateMethod(value)}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="single" id="single" />
+                            <Label htmlFor="single">单个创建</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="batch" id="batch" />
+                            <Label htmlFor="batch">批量创建</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      {createMethod === 'single' && (
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">素材名称</Label>
+                          <Input
+                            placeholder="请输入素材名称"
+                            value={materialName}
+                            onChange={(e) => setMaterialName(e.target.value)}
+                          />
+                        </div>
+                      )}
+
+                      {createMethod === 'single' && (
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">素材格式</Label>
+                          <Select value={materialFormat} onValueChange={setMaterialFormat}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="选择素材格式" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pdf">PDF文档</SelectItem>
+                              <SelectItem value="doc">Word文档</SelectItem>
+                              <SelectItem value="image">图片</SelectItem>
+                              <SelectItem value="excel">Excel表格</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {(createMethod === 'batch' || (createMethod === 'single' && materialFormat)) && (
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">上传文件</Label>
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                            <input
+                              type="file"
+                              id="material-upload"
+                              className="hidden"
+                              multiple={createMethod === 'batch'}
+                              accept={createMethod === 'batch' ? '.pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg' : 
+                                materialFormat === 'pdf' ? '.pdf' :
+                                materialFormat === 'doc' ? '.doc,.docx' :
+                                materialFormat === 'image' ? '.png,.jpg,.jpeg' :
+                                materialFormat === 'excel' ? '.xls,.xlsx' : '*'
+                              }
+                              onChange={handleFileUpload}
+                            />
+                            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm text-gray-600 mb-1">点击或拖拽上传文件</p>
+                            <p className="text-xs text-gray-500">
+                              {createMethod === 'batch' 
+                                ? '支持PDF、DOC、DOCX、XLS、XLSX、PNG、JPG、JPEG格式，最多10个文件'
+                                : getFileFormatText(materialFormat)
+                              }
+                            </p>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="mt-2"
+                              onClick={() => document.getElementById('material-upload')?.click()}
+                            >
+                              选择文件
+                            </Button>
+                          </div>
+                          
+                          {uploadedFiles.length > 0 && (
+                            <div className="space-y-2">
+                              <Label className="text-sm font-medium">已选择文件</Label>
+                              <div className="space-y-1 max-h-32 overflow-y-auto">
+                                {uploadedFiles.map((file, index) => (
+                                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                    <span className="text-sm truncate">{file.name}</span>
+                                    <span className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)}MB</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="absolute bottom-6 right-6 flex space-x-2">
+                      <Button variant="outline" onClick={handleCancelUpload}>
+                        取消
+                      </Button>
+                      <Button 
+                        onClick={handleSaveUpload}
+                        disabled={createMethod === 'single' && (!materialName || !materialFormat || uploadedFiles.length === 0)}
+                        className="bg-sky-600 hover:bg-sky-700"
+                      >
+                        保存
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
             </div>
           </div>
@@ -444,7 +594,6 @@ const PersonalKnowledge: React.FC = () => {
         </div>
       </div>
 
-      {/* 删除文件确认对话框 */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -462,7 +611,6 @@ const PersonalKnowledge: React.FC = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 删除文件夹确认对话框 */}
       <AlertDialog open={deleteFolderDialogOpen} onOpenChange={setDeleteFolderDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
