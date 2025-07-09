@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Label } from '@/components/ui/label';
 
 interface Template {
@@ -71,10 +70,60 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
       category: '水利工程',
       description: '水库、河道治理等水利工程专用模板',
       catalogContent: '1. 投标文件\n   1.1 投标函\n   1.2 投标保证金\n2. 技术标书\n   2.1 施工方案\n   2.2 质量控制\n3. 商务标书\n   3.1 工程报价\n   3.2 资质材料'
+    },
+    // Add more templates to test pagination
+    {
+      id: 'template6',
+      name: '机电安装工程模板',
+      category: '机电工程',
+      description: '机电设备安装及维护工程模板',
+      catalogContent: '1. 安装方案\n2. 设备清单\n3. 技术规范'
+    },
+    {
+      id: 'template7',
+      name: '园林绿化工程模板',
+      category: '园林工程',
+      description: '园林景观设计与施工模板',
+      catalogContent: '1. 设计方案\n2. 植物配置\n3. 养护计划'
+    },
+    {
+      id: 'template8',
+      name: '环保治理工程模板',
+      category: '环保工程',
+      description: '环境治理与污染控制工程模板',
+      catalogContent: '1. 治理方案\n2. 环保措施\n3. 监测计划'
+    },
+    {
+      id: 'template9',
+      name: '电力工程施工模板',
+      category: '电力工程',
+      description: '电力设施建设与改造工程模板',
+      catalogContent: '1. 施工方案\n2. 安全措施\n3. 调试方案'
+    },
+    {
+      id: 'template10',
+      name: '通信工程建设模板',
+      category: '通信工程',
+      description: '通信基础设施建设工程模板',
+      catalogContent: '1. 网络设计\n2. 设备安装\n3. 测试验收'
+    },
+    {
+      id: 'template11',
+      name: '软件开发项目模板',
+      category: '软件工程',
+      description: '软件系统开发与实施模板',
+      catalogContent: '1. 需求分析\n2. 系统设计\n3. 开发实施'
+    },
+    {
+      id: 'template12',
+      name: '咨询服务项目模板',
+      category: '咨询服务',
+      description: '管理咨询与技术服务模板',
+      catalogContent: '1. 服务方案\n2. 实施计划\n3. 成果交付'
     }
   ];
 
-  const categories = ['市政工程', '装修工程', '系统集成', '通用', '水利工程', '建筑工程'];
+  const categories = ['市政工程', '装修工程', '系统集成', '通用', '水利工程', '机电工程', '园林工程', '环保工程', '电力工程', '通信工程', '软件工程', '咨询服务'];
 
   // Filter templates based on search term and category
   const filteredTemplates = allTemplates.filter(template => {
@@ -110,17 +159,69 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
     }
   };
 
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex items-center justify-center space-x-2 mt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </Button>
+        
+        {pages.map((page) => (
+          <Button
+            key={page}
+            variant={page === currentPage ? "default" : "outline"}
+            size="sm"
+            onClick={() => handlePageChange(page)}
+            className={page === currentPage ? "bg-sky-600 hover:bg-sky-700" : ""}
+          >
+            {page}
+          </Button>
+        ))}
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[800px] max-h-[80vh]">
+        <DialogContent className="sm:max-w-[700px] max-h-[70vh]">
           <DialogHeader>
             <DialogTitle>选择投标模板</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
             {/* Search and Filter */}
-            <div className="flex space-x-4">
+            <div className="flex space-x-3">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -132,10 +233,10 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                   />
                 </div>
               </div>
-              <div className="w-48">
+              <div className="w-40">
                 <Select value={selectedCategory} onValueChange={(value) => setSelectedCategory(value === 'all' ? '' : value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="按分类筛选" />
+                    <SelectValue placeholder="分类筛选" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全部分类</SelectItem>
@@ -150,37 +251,38 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
             </div>
 
             {/* Template List */}
-            <div className="border rounded-lg">
+            <div className="border rounded-lg max-h-[300px] overflow-y-auto">
               {paginatedTemplates.length > 0 ? (
                 <div className="divide-y">
                   {paginatedTemplates.map((template) => (
-                    <div key={template.id} className="p-4 hover:bg-gray-50">
+                    <div key={template.id} className="p-3 hover:bg-gray-50">
                       <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <FileText className="w-5 h-5 text-sky-600" />
-                            <h3 className="font-medium text-gray-900">{template.name}</h3>
-                            <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <FileText className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                            <h3 className="font-medium text-gray-900 text-sm truncate">{template.name}</h3>
+                            <span className="inline-flex px-2 py-0.5 text-xs font-medium text-sky-700 bg-sky-100 rounded-full flex-shrink-0">
                               {template.category}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">{template.description}</p>
+                          <p className="text-xs text-gray-600 truncate">{template.description}</p>
                         </div>
-                        <div className="flex items-center space-x-2 ml-4">
+                        <div className="flex items-center space-x-1 ml-3 flex-shrink-0">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handlePreview(template)}
+                            className="text-xs px-2 py-1"
                           >
-                            <Eye className="w-4 h-4 mr-1" />
+                            <Eye className="w-3 h-3 mr-1" />
                             预览
                           </Button>
                           <Button
                             size="sm"
                             onClick={() => handleSelect(template)}
-                            className="bg-sky-600 hover:bg-sky-700"
+                            className="bg-sky-600 hover:bg-sky-700 text-xs px-2 py-1"
                           >
-                            <Check className="w-4 h-4 mr-1" />
+                            <Check className="w-3 h-3 mr-1" />
                             选择
                           </Button>
                         </div>
@@ -189,73 +291,28 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center">
-                  <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">暂无模板</h3>
-                  <p className="text-gray-500">没有找到匹配的模板</p>
+                <div className="p-6 text-center">
+                  <FileText className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-medium text-gray-900 mb-1">暂无模板</h3>
+                  <p className="text-xs text-gray-500">没有找到匹配的模板</p>
                 </div>
               )}
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      />
-                    </PaginationItem>
-                    
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-                      
-                      return (
-                        <PaginationItem key={pageNum}>
-                          <PaginationLink
-                            onClick={() => handlePageChange(pageNum)}
-                            isActive={currentPage === pageNum}
-                            className="cursor-pointer"
-                          >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    })}
-                    
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            )}
+            {renderPagination()}
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Template Preview Dialog */}
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>模板预览 - {previewTemplate?.name}</DialogTitle>
           </DialogHeader>
           {previewTemplate && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full">
                   {previewTemplate.category}
@@ -267,14 +324,14 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
               </div>
               <div>
                 <Label className="text-sm font-medium text-gray-700">目录结构</Label>
-                <div className="mt-2 p-4 bg-gray-50 rounded-lg">
-                  <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono leading-relaxed">
+                <div className="mt-2 p-3 bg-gray-50 rounded-lg max-h-[200px] overflow-y-auto">
+                  <pre className="text-xs text-gray-800 whitespace-pre-wrap font-mono leading-relaxed">
                     {previewTemplate.catalogContent}
                   </pre>
                 </div>
               </div>
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button variant="outline" onClick={() => setPreviewDialogOpen(false)}>
+              <div className="flex justify-end space-x-2 pt-3">
+                <Button variant="outline" onClick={() => setPreviewDialogOpen(false)} size="sm">
                   关闭
                 </Button>
                 <Button 
@@ -283,6 +340,7 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                     setPreviewDialogOpen(false);
                   }}
                   className="bg-sky-600 hover:bg-sky-700"
+                  size="sm"
                 >
                   使用此模板
                 </Button>
