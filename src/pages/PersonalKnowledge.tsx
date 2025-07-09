@@ -428,7 +428,7 @@ const PersonalKnowledge: React.FC = () => {
                       <div className="space-y-3">
                         <Label className="text-sm font-medium">素材格式</Label>
                         <RadioGroup value={materialFormat} onValueChange={setMaterialFormat}>
-                          <div className="grid grid-cols-1 gap-3">
+                          <div className="grid grid-cols-3 gap-3">
                             <div 
                               className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
                                 materialFormat === 'document' 
@@ -437,20 +437,14 @@ const PersonalKnowledge: React.FC = () => {
                               }`}
                               onClick={() => setMaterialFormat('document')}
                             >
-                              <div className="flex items-center space-x-3">
-                                <div className="flex-shrink-0">
-                                  <FileText className="w-6 h-6 text-red-500" />
-                                </div>
-                                <div className="flex-1">
-                                  <h3 className="font-medium text-gray-900">文档</h3>
-                                  <p className="text-sm text-gray-500">支持PDF、DOC、DOCX格式</p>
-                                </div>
-                                <div className="flex-shrink-0">
-                                  <RadioGroupItem 
-                                    value="document" 
-                                    className="text-sky-600"
-                                  />
-                                </div>
+                              <div className="flex flex-col items-center space-y-2">
+                                <FileText className="w-8 h-8 text-red-500" />
+                                <h3 className="font-medium text-gray-900 text-sm">文档</h3>
+                                <p className="text-xs text-gray-500 text-center">PDF、DOC、DOCX</p>
+                                <RadioGroupItem 
+                                  value="document" 
+                                  className="text-sky-600"
+                                />
                               </div>
                             </div>
 
@@ -462,20 +456,14 @@ const PersonalKnowledge: React.FC = () => {
                               }`}
                               onClick={() => setMaterialFormat('image')}
                             >
-                              <div className="flex items-center space-x-3">
-                                <div className="flex-shrink-0">
-                                  <Image className="w-6 h-6 text-green-500" />
-                                </div>
-                                <div className="flex-1">
-                                  <h3 className="font-medium text-gray-900">图片</h3>
-                                  <p className="text-sm text-gray-500">支持PNG、JPG、JPEG格式</p>
-                                </div>
-                                <div className="flex-shrink-0">
-                                  <RadioGroupItem 
-                                    value="image" 
-                                    className="text-sky-600"
-                                  />
-                                </div>
+                              <div className="flex flex-col items-center space-y-2">
+                                <Image className="w-8 h-8 text-green-500" />
+                                <h3 className="font-medium text-gray-900 text-sm">图片</h3>
+                                <p className="text-xs text-gray-500 text-center">PNG、JPG、JPEG</p>
+                                <RadioGroupItem 
+                                  value="image" 
+                                  className="text-sky-600"
+                                />
                               </div>
                             </div>
 
@@ -487,20 +475,14 @@ const PersonalKnowledge: React.FC = () => {
                               }`}
                               onClick={() => setMaterialFormat('table')}
                             >
-                              <div className="flex items-center space-x-3">
-                                <div className="flex-shrink-0">
-                                  <TableIcon className="w-6 h-6 text-blue-500" />
-                                </div>
-                                <div className="flex-1">
-                                  <h3 className="font-medium text-gray-900">表格</h3>
-                                  <p className="text-sm text-gray-500">支持XLS、XLSX格式</p>
-                                </div>
-                                <div className="flex-shrink-0">
-                                  <RadioGroupItem 
-                                    value="table" 
-                                    className="text-sky-600"
-                                  />
-                                </div>
+                              <div className="flex flex-col items-center space-y-2">
+                                <TableIcon className="w-8 h-8 text-blue-500" />
+                                <h3 className="font-medium text-gray-900 text-sm">表格</h3>
+                                <p className="text-xs text-gray-500 text-center">XLS、XLSX</p>
+                                <RadioGroupItem 
+                                  value="table" 
+                                  className="text-sky-600"
+                                />
                               </div>
                             </div>
                           </div>
