@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Upload, FileText, Settings, Plus, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -287,15 +288,14 @@ const BidSetup: React.FC<BidSetupProps> = ({
 
       {/* Enhanced template-based mode with dialog */}
       {settingsMode === 'template-based' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h3 className="text-base font-semibold text-gray-900 mb-3">选择投标模板</h3>
-          <div className="text-center py-4">
-            <FileText className="w-8 h-8 text-sky-600 mx-auto mb-2" />
-            <p className="text-sm text-gray-600 mb-3">从模板库中选择适合的投标模板</p>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">选择投标模板</h3>
+          <div className="text-center py-8">
+            <FileText className="w-12 h-12 text-sky-600 mx-auto mb-4" />
+            <p className="text-gray-600 mb-4">从模板库中选择适合的投标模板</p>
             <Button 
               onClick={handleOpenTemplateDialog}
               className="bg-sky-600 hover:bg-sky-700"
-              size="sm"
             >
               <Settings className="w-4 h-4 mr-2" />
               选择模板
@@ -303,22 +303,21 @@ const BidSetup: React.FC<BidSetupProps> = ({
           </div>
           
           {selectedTemplateInfo && (
-            <div className="mt-4 p-3 bg-sky-50 rounded-lg border border-sky-200">
+            <div className="mt-6 p-4 bg-sky-50 rounded-lg border border-sky-200">
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-1 text-sm">已选择模板：{selectedTemplateInfo.name}</h4>
+                  <h4 className="font-medium text-gray-900 mb-1">已选择模板：{selectedTemplateInfo.name}</h4>
                   <div className="flex items-center space-x-2 mb-2">
                     <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full">
                       {selectedTemplateInfo.category}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-600">{selectedTemplateInfo.description}</p>
+                  <p className="text-sm text-gray-600">{selectedTemplateInfo.description}</p>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleOpenTemplateDialog}
-                  className="text-xs"
                 >
                   更换模板
                 </Button>
