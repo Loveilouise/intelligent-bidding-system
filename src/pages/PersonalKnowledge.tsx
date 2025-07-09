@@ -44,7 +44,6 @@ const PersonalKnowledge: React.FC = () => {
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [editingFolderName, setEditingFolderName] = useState('');
   const [uploadSheetOpen, setUploadSheetOpen] = useState(false);
-  const [createMethod, setCreateMethod] = useState<'single' | 'batch'>('single');
   const [materialName, setMaterialName] = useState('');
   const [materialFormat, setMaterialFormat] = useState<string>('document');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -142,10 +141,6 @@ const PersonalKnowledge: React.FC = () => {
     const files = event.target.files;
     if (files) {
       const fileArray = Array.from(files);
-      if (createMethod === 'batch' && fileArray.length > 10) {
-        alert('批量上传最多支持10个文件');
-        return;
-      }
       setUploadedFiles(fileArray);
     }
   };
@@ -230,14 +225,12 @@ const PersonalKnowledge: React.FC = () => {
 
   const handleSaveUpload = () => {
     console.log('保存上传:', {
-      createMethod,
       materialName,
       materialFormat,
       uploadedFiles
     });
     setUploadSheetOpen(false);
     // 重置表单
-    setCreateMethod('single');
     setMaterialName('');
     setMaterialFormat('document');
     setUploadedFiles([]);
@@ -246,7 +239,6 @@ const PersonalKnowledge: React.FC = () => {
   const handleCancelUpload = () => {
     setUploadSheetOpen(false);
     // 重置表单
-    setCreateMethod('single');
     setMaterialName('');
     setMaterialFormat('document');
     setUploadedFiles([]);
@@ -424,47 +416,96 @@ const PersonalKnowledge: React.FC = () => {
                       <SheetTitle>上传素材</SheetTitle>
                     </SheetHeader>
                     <div className="py-4 space-y-6">
-                      <div className="space-y-3">
-                        <Label className="text-sm font-medium">创建方式</Label>
-                        <RadioGroup value={createMethod} onValueChange={(value: 'single' | 'batch') => setCreateMethod(value)}>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="single" id="single" />
-                            <Label htmlFor="single">单个创建</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="batch" id="batch" />
-                            <Label htmlFor="batch">批量创建</Label>
-                          </div>
-                        </RadioGroup>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">素材名称</Label>
+                        <Input
+                          placeholder="请输入素材名称"
+                          value={materialName}
+                          onChange={(e) => setMaterialName(e.target.value)}
+                        />
                       </div>
 
-                      {createMethod === 'single' && (
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium">素材名称</Label>
-                          <Input
-                            placeholder="请输入素材名称"
-                            value={materialName}
-                            onChange={(e) => setMaterialName(e.target.value)}
-                          />
-                        </div>
-                      )}
-
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <Label className="text-sm font-medium">素材格式</Label>
-                        <RadioGroup value={materialFormat} onValueChange={setMaterialFormat}>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="document" id="document" />
-                            <Label htmlFor="document">文档</Label>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div 
+                            className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                              materialFormat === 'document' 
+                                ? 'border-sky-500 bg-sky-50' 
+                                : 'border-gray-200 hover:bg-gray-50'
+                            }`}
+                            onClick={() => setMaterialFormat('document')}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="flex-shrink-0">
+                                <FileText className="w-6 h-6 text-red-500" />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-medium text-gray-900">文档</h3>
+                                <p className="text-sm text-gray-500">支持PDF、DOC、DOCX格式</p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <RadioGroupItem 
+                                  value="document" 
+                                  checked={materialFormat === 'document'}
+                                  className="text-sky-600"
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="image" id="image" />
-                            <Label htmlFor="image">图片</Label>
+
+                          <div 
+                            className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                              materialFormat === 'image' 
+                                ? 'border-sky-500 bg-sky-50' 
+                                : 'border-gray-200 hover:bg-gray-50'
+                            }`}
+                            onClick={() => setMaterialFormat('image')}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="flex-shrink-0">
+                                <Image className="w-6 h-6 text-green-500" />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-medium text-gray-900">图片</h3>
+                                <p className="text-sm text-gray-500">支持PNG、JPG、JPEG格式</p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <RadioGroupItem 
+                                  value="image" 
+                                  checked={materialFormat === 'image'}
+                                  className="text-sky-600"
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="table" id="table" />
-                            <Label htmlFor="table">表格</Label>
+
+                          <div 
+                            className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                              materialFormat === 'table' 
+                                ? 'border-sky-500 bg-sky-50' 
+                                : 'border-gray-200 hover:bg-gray-50'
+                            }`}
+                            onClick={() => setMaterialFormat('table')}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="flex-shrink-0">
+                                <TableIcon className="w-6 h-6 text-blue-500" />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-medium text-gray-900">表格</h3>
+                                <p className="text-sm text-gray-500">支持XLS、XLSX格式</p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <RadioGroupItem 
+                                  value="table" 
+                                  checked={materialFormat === 'table'}
+                                  className="text-sky-600"
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </RadioGroup>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
@@ -474,8 +515,7 @@ const PersonalKnowledge: React.FC = () => {
                             type="file"
                             id="material-upload"
                             className="hidden"
-                            multiple={createMethod === 'batch'}
-                            accept={createMethod === 'batch' ? '.pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg' : 
+                            accept={
                               materialFormat === 'document' ? '.pdf,.doc,.docx' :
                               materialFormat === 'image' ? '.png,.jpg,.jpeg' :
                               materialFormat === 'table' ? '.xls,.xlsx' : '*'
@@ -485,10 +525,7 @@ const PersonalKnowledge: React.FC = () => {
                           <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                           <p className="text-sm text-gray-600 mb-1">点击或拖拽上传文件</p>
                           <p className="text-xs text-gray-500">
-                            {createMethod === 'batch' 
-                              ? '支持PDF、DOC、DOCX、XLS、XLSX、PNG、JPG、JPEG格式，最多10个文件'
-                              : getFileFormatText(materialFormat)
-                            }
+                            {getFileFormatText(materialFormat)}
                           </p>
                           <Button
                             type="button"
@@ -522,7 +559,7 @@ const PersonalKnowledge: React.FC = () => {
                       </Button>
                       <Button 
                         onClick={handleSaveUpload}
-                        disabled={createMethod === 'single' && (!materialName || !materialFormat || uploadedFiles.length === 0)}
+                        disabled={!materialName || !materialFormat || uploadedFiles.length === 0}
                         className="bg-sky-600 hover:bg-sky-700"
                       >
                         保存
