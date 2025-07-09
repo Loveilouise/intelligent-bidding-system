@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Plus, Search, Edit, Trash2, Copy, FileText, Calendar, Upload, FolderTree } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -90,7 +91,7 @@ const TemplateManagement: React.FC = () => {
         name: template.name,
         category: template.category,
         description: template.description,
-        catalogDisplay: template.catalogDisplay || ''
+        catalogDisplay: template.catalogDisplay ? 'true' : 'false'
       });
       setEditDialogOpen(true);
     }
@@ -135,7 +136,7 @@ const TemplateManagement: React.FC = () => {
         updateDate: new Date().toISOString().split('T')[0],
         usageCount: 0,
         uploadedFile: uploadedFile?.name,
-        catalogDisplay: formData.catalogDisplay
+        catalogDisplay: formData.catalogDisplay === 'true'
       };
       setTemplates([...templates, newTemplate]);
       setAddDialogOpen(false);
@@ -155,7 +156,7 @@ const TemplateManagement: React.FC = () => {
               category: formData.category,
               description: formData.description,
               updateDate: new Date().toISOString().split('T')[0],
-              catalogDisplay: formData.catalogDisplay
+              catalogDisplay: formData.catalogDisplay === 'true'
             }
           : t
       ));
@@ -463,8 +464,8 @@ const TemplateManagement: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox 
                   id="edit-catalog-display"
-                  checked={formData.catalogDisplay}
-                  onCheckedChange={(checked) => setFormData({ ...formData, catalogDisplay: checked as boolean })}
+                  checked={formData.catalogDisplay === 'true'}
+                  onCheckedChange={(checked) => setFormData({ ...formData, catalogDisplay: checked ? 'true' : 'false' })}
                 />
                 <Label htmlFor="edit-catalog-display" className="flex items-center space-x-1">
                   <FolderTree className="w-4 h-4" />
