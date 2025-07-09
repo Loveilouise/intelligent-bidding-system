@@ -428,9 +428,9 @@ const PersonalKnowledge: React.FC = () => {
                       <div className="space-y-3">
                         <Label className="text-sm font-medium">素材格式</Label>
                         <RadioGroup value={materialFormat} onValueChange={setMaterialFormat}>
-                          <div className="grid grid-cols-3 gap-3">
+                          <div className="flex gap-4">
                             <div 
-                              className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                              className={`flex-1 p-3 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
                                 materialFormat === 'document' 
                                   ? 'border-sky-500 bg-sky-50' 
                                   : 'border-gray-200 hover:bg-gray-50'
@@ -438,9 +438,8 @@ const PersonalKnowledge: React.FC = () => {
                               onClick={() => setMaterialFormat('document')}
                             >
                               <div className="flex flex-col items-center space-y-2">
-                                <FileText className="w-8 h-8 text-red-500" />
+                                <FileText className="w-6 h-6 text-sky-600" />
                                 <h3 className="font-medium text-gray-900 text-sm">文档</h3>
-                                <p className="text-xs text-gray-500 text-center">PDF、DOC、DOCX</p>
                                 <RadioGroupItem 
                                   value="document" 
                                   className="text-sky-600"
@@ -449,7 +448,7 @@ const PersonalKnowledge: React.FC = () => {
                             </div>
 
                             <div 
-                              className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                              className={`flex-1 p-3 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
                                 materialFormat === 'image' 
                                   ? 'border-sky-500 bg-sky-50' 
                                   : 'border-gray-200 hover:bg-gray-50'
@@ -457,9 +456,8 @@ const PersonalKnowledge: React.FC = () => {
                               onClick={() => setMaterialFormat('image')}
                             >
                               <div className="flex flex-col items-center space-y-2">
-                                <Image className="w-8 h-8 text-green-500" />
+                                <Image className="w-6 h-6 text-sky-600" />
                                 <h3 className="font-medium text-gray-900 text-sm">图片</h3>
-                                <p className="text-xs text-gray-500 text-center">PNG、JPG、JPEG</p>
                                 <RadioGroupItem 
                                   value="image" 
                                   className="text-sky-600"
@@ -468,7 +466,7 @@ const PersonalKnowledge: React.FC = () => {
                             </div>
 
                             <div 
-                              className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                              className={`flex-1 p-3 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
                                 materialFormat === 'table' 
                                   ? 'border-sky-500 bg-sky-50' 
                                   : 'border-gray-200 hover:bg-gray-50'
@@ -476,9 +474,8 @@ const PersonalKnowledge: React.FC = () => {
                               onClick={() => setMaterialFormat('table')}
                             >
                               <div className="flex flex-col items-center space-y-2">
-                                <TableIcon className="w-8 h-8 text-blue-500" />
+                                <TableIcon className="w-6 h-6 text-sky-600" />
                                 <h3 className="font-medium text-gray-900 text-sm">表格</h3>
-                                <p className="text-xs text-gray-500 text-center">XLS、XLSX</p>
                                 <RadioGroupItem 
                                   value="table" 
                                   className="text-sky-600"

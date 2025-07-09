@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Search, Edit, Trash2, Copy, FileText, Calendar, Upload, FolderTree } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface BidTemplate {
   id: string;
@@ -61,12 +61,13 @@ const TemplateManagement: React.FC = () => {
   const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
   const [editingTemplate, setEditingTemplate] = useState<BidTemplate | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [templateCreateMethod, setTemplateCreateMethod] = useState<string>('file-analysis');
   
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     description: '',
-    catalogDisplay: false
+    catalogDisplay: ''
   });
 
   const filteredTemplates = templates.filter(template =>
@@ -75,8 +76,9 @@ const TemplateManagement: React.FC = () => {
   );
 
   const handleAdd = () => {
-    setFormData({ name: '', category: '', description: '', catalogDisplay: false });
+    setFormData({ name: '', category: '', description: '', catalogDisplay: '' });
     setUploadedFile(null);
+    setTemplateCreateMethod('file-analysis');
     setAddDialogOpen(true);
   };
 
@@ -88,7 +90,7 @@ const TemplateManagement: React.FC = () => {
         name: template.name,
         category: template.category,
         description: template.description,
-        catalogDisplay: template.catalogDisplay || false
+        catalogDisplay: template.catalogDisplay || ''
       });
       setEditDialogOpen(true);
     }
@@ -123,7 +125,7 @@ const TemplateManagement: React.FC = () => {
   };
 
   const handleSaveAdd = () => {
-    if (formData.name && formData.category && formData.description) {
+    if (formData.name && formData.category && formData.description && formData.catalogDisplay) {
       const newTemplate: BidTemplate = {
         id: Date.now().toString(),
         name: formData.name,
@@ -137,8 +139,9 @@ const TemplateManagement: React.FC = () => {
       };
       setTemplates([...templates, newTemplate]);
       setAddDialogOpen(false);
-      setFormData({ name: '', category: '', description: '', catalogDisplay: false });
+      setFormData({ name: '', category: '', description: '', catalogDisplay: '' });
       setUploadedFile(null);
+      setTemplateCreateMethod('file-analysis');
     }
   };
 
@@ -340,45 +343,61 @@ const TemplateManagement: React.FC = () => {
                   rows={3}
                 />
               </div>
+
+              <div className="space-y-3">
+                <Label>模板创建方式</Label>
+                <RadioGroup value={templateCreateMethod} onValueChange={setTemplateCreateMethod}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="file-analysis" id="file-analysis" />
+                    <Label htmlFor="file-analysis">基于投标文件解析</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="paste-catalog" id="paste-catalog" />
+                    <Label htmlFor="paste-catalog">粘贴标书目录</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {templateCreateMethod === 'file-analysis' && (
+                <div className="space-y-2">
+                  <Label htmlFor="template-file">上传文件</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+                    <input
+                      type="file"
+                      id="template-file"
+                      className="hidden"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileUpload}
+                    />
+                    <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-600 mb-2">点击上传投标文件</p>
+                    <p className="text-xs text-gray-500 mb-2">支持PDF、DOC、DOCX格式</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('template-file')?.click()}
+                    >
+                      选择文件
+                    </Button>
+                    {uploadedFile && (
+                      <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                        已选择：{uploadedFile.name}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               
               <div className="space-y-2">
-                <Label htmlFor="template-file">上传文件</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
-                  <input
-                    type="file"
-                    id="template-file"
-                    className="hidden"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleFileUpload}
-                  />
-                  <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-2">点击上传投标文件</p>
-                  <p className="text-xs text-gray-500 mb-2">支持PDF、DOC、DOCX格式</p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => document.getElementById('template-file')?.click()}
-                  >
-                    选择文件
-                  </Button>
-                  {uploadedFile && (
-                    <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
-                      已选择：{uploadedFile.name}
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
+                <Label htmlFor="catalog-display">目录显示</Label>
+                <Textarea
                   id="catalog-display"
-                  checked={formData.catalogDisplay}
-                  onCheckedChange={(checked) => setFormData({ ...formData, catalogDisplay: checked as boolean })}
+                  placeholder={templateCreateMethod === 'file-analysis' ? "系统将自动提取文件目录..." : "请粘贴标书目录内容"}
+                  value={formData.catalogDisplay}
+                  onChange={(e) => setFormData({ ...formData, catalogDisplay: e.target.value })}
+                  rows={6}
+                  className="font-mono text-sm"
                 />
-                <Label htmlFor="catalog-display" className="flex items-center space-x-1">
-                  <FolderTree className="w-4 h-4" />
-                  <span>目录显示（根据投标文件提取投标模板）</span>
-                </Label>
               </div>
             </div>
             
@@ -388,7 +407,7 @@ const TemplateManagement: React.FC = () => {
               </Button>
               <Button 
                 onClick={handleSaveAdd}
-                disabled={!formData.name || !formData.category || !formData.description}
+                disabled={!formData.name || !formData.category || !formData.description || !formData.catalogDisplay}
                 className="bg-sky-600 hover:bg-sky-700"
               >
                 保存
