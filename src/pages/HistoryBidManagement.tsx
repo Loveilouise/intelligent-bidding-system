@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check, Plus } from 'lucide-react';
+import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check, Plus, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,14 +10,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { 
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -165,6 +157,105 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
       default:
         return 'text-gray-600 bg-gray-50';
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+
+    // 确保显示5个页码（如果可能）
+    if (endPage - startPage < 4) {
+      if (startPage === 1) {
+        endPage = Math.min(totalPages, startPage + 4);
+      } else if (endPage === totalPages) {
+        startPage = Math.max(1, endPage - 4);
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex items-center space-x-1">
+        {/* 上一页 */}
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        {/* 页码 */}
+        {pages.map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`w-8 h-8 flex items-center justify-center text-sm font-medium rounded ${
+              currentPage === page
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        {/* 省略号和总页数 */}
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && (
+              <span className="w-8 h-8 flex items-center justify-center text-gray-400">
+                <MoreHorizontal className="w-4 h-4" />
+              </span>
+            )}
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              className="w-8 h-8 flex items-center justify-center text-sm font-medium text-gray-700 hover:bg-gray-100 rounded"
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        {/* 下一页 */}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+
+        {/* 前往 */}
+        <span className="ml-4 text-sm text-gray-500">前往</span>
+        <input
+          type="number"
+          min="1"
+          max={totalPages}
+          value=""
+          placeholder="1"
+          onChange={(e) => {
+            const page = parseInt(e.target.value);
+            if (page >= 1 && page <= totalPages) {
+              handlePageChange(page);
+            }
+          }}
+          className="w-12 h-8 px-2 text-sm border border-gray-300 rounded text-center"
+        />
+        <span className="text-sm text-gray-500">页</span>
+      </div>
+    );
   };
 
   return (
@@ -389,41 +480,7 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
                 显示 {startIndex + 1}-{Math.min(startIndex + pageSize, filteredAndSortedProjects.length)} 条，共 {filteredAndSortedProjects.length} 条
               </span>
               
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-                    if (pageNum <= totalPages) {
-                      return (
-                        <PaginationItem key={pageNum}>
-                          <PaginationLink
-                            onClick={() => setCurrentPage(pageNum)}
-                            isActive={currentPage === pageNum}
-                            className="cursor-pointer"
-                          >
-                            {pageNum}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    }
-                    return null;
-                  })}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+              {renderPagination()}
             </div>
           </div>
         </div>

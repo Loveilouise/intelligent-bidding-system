@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, FileText, Eye, Check } from 'lucide-react';
+import { Search, FileText, Eye, Check, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Label } from '@/components/ui/label';
 
 interface Template {
@@ -133,12 +132,10 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
     return matchesSearch && matchesCategory;
   });
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredTemplates.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedTemplates = filteredTemplates.slice(startIndex, startIndex + itemsPerPage);
 
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory]);
@@ -157,6 +154,99 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+
+    // 确保显示5个页码（如果可能）
+    if (endPage - startPage < 4) {
+      if (startPage === 1) {
+        endPage = Math.min(totalPages, startPage + 4);
+      } else if (endPage === totalPages) {
+        startPage = Math.max(1, endPage - 4);
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex items-center space-x-1">
+        {/* 上一页 */}
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        {/* 页码 */}
+        {pages.map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`w-8 h-8 flex items-center justify-center text-sm font-medium rounded ${
+              currentPage === page
+                ? 'bg-blue-500 text-white'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        {/* 省略号和总页数 */}
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && (
+              <span className="w-8 h-8 flex items-center justify-center text-gray-400">
+                <MoreHorizontal className="w-4 h-4" />
+              </span>
+            )}
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              className="w-8 h-8 flex items-center justify-center text-sm font-medium text-gray-700 hover:bg-gray-100 rounded"
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        {/* 下一页 */}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+
+        {/* 前往 */}
+        <span className="ml-4 text-sm text-gray-500">前往</span>
+        <input
+          type="number"
+          min="1"
+          max={totalPages}
+          value=""
+          placeholder="1"
+          onChange={(e) => {
+            const page = parseInt(e.target.value);
+            if (page >= 1 && page <= totalPages) {
+              handlePageChange(page);
+            }
+          }}
+          className="w-12 h-8 px-2 text-sm border border-gray-300 rounded text-center"
+        />
+        <span className="text-sm text-gray-500">页</span>
+      </div>
+    );
   };
 
   return (
@@ -199,7 +289,7 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
             </div>
 
             {/* Template List */}
-            <div className="border rounded-lg flex-1 flex flex-col min-h-0">
+            <div className="border rounded-lg flex-1 flex flex-col min-h-0 relative">
               {paginatedTemplates.length > 0 ? (
                 <>
                   <div className="divide-y overflow-y-auto flex-1">
@@ -239,51 +329,10 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                     ))}
                   </div>
                   
-                  {/* Pagination - Always show when there are templates */}
+                  {/* 翻页器 - 右下角 */}
                   {totalPages > 1 && (
-                    <div className="flex justify-center py-4 border-t bg-gray-50/50 flex-shrink-0">
-                      <Pagination>
-                        <PaginationContent>
-                          <PaginationItem>
-                            <PaginationPrevious 
-                              onClick={() => handlePageChange(currentPage - 1)}
-                              className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                            />
-                          </PaginationItem>
-                          
-                          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                            let pageNum;
-                            if (totalPages <= 5) {
-                              pageNum = i + 1;
-                            } else if (currentPage <= 3) {
-                              pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 2) {
-                              pageNum = totalPages - 4 + i;
-                            } else {
-                              pageNum = currentPage - 2 + i;
-                            }
-                            
-                            return (
-                              <PaginationItem key={pageNum}>
-                                <PaginationLink
-                                  onClick={() => handlePageChange(pageNum)}
-                                  isActive={currentPage === pageNum}
-                                  className="cursor-pointer"
-                                >
-                                  {pageNum}
-                                </PaginationLink>
-                              </PaginationItem>
-                            );
-                          })}
-                          
-                          <PaginationItem>
-                            <PaginationNext 
-                              onClick={() => handlePageChange(currentPage + 1)}
-                              className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                            />
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
+                    <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg border p-2">
+                      {renderPagination()}
                     </div>
                   )}
                 </>
