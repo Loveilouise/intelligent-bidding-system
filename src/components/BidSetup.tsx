@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Upload, FileText, Settings, Plus, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ProjectInfo, UploadedFile } from '@/types/bid';
+import TemplateSelectionDialog from './TemplateSelectionDialog';
 
 interface BidSetupProps {
   projectInfo: ProjectInfo;
@@ -20,6 +22,14 @@ interface BidSetupProps {
   setSelectedTemplate: (template: string) => void;
   selectedKnowledgeBase: string;
   setSelectedKnowledgeBase: (kb: string) => void;
+}
+
+interface Template {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  catalogContent: string;
 }
 
 const BidSetup: React.FC<BidSetupProps> = ({
@@ -37,6 +47,8 @@ const BidSetup: React.FC<BidSetupProps> = ({
 }) => {
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+  const [selectedTemplateInfo, setSelectedTemplateInfo] = useState<Template | null>(null);
 
   const businessTypes = [
     { value: 'construction', label: '建筑工程' },
@@ -111,6 +123,32 @@ const BidSetup: React.FC<BidSetupProps> = ({
     if (template) {
       setCustomCatalog(template.catalogContent);
     }
+  };
+
+  const handleOpenTemplateDialog = () => {
+    setTemplateDialogOpen(true);
+  };
+
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplateInfo(template);
+    setSelectedTemplate(template.id);
+    setCustomCatalog(template.catalogContent);
+    
+    // Auto-fill project information based on template
+    const businessTypeMapping: { [key: string]: string } = {
+      '市政工程': 'construction',
+      '装修工程': 'construction',
+      '系统集成': 'equipment',
+      '通用': 'construction',
+      '水利工程': 'construction'
+    };
+
+    setProjectInfo({
+      ...projectInfo,
+      name: template.name.replace('模板', ''),
+      type: businessTypeMapping[template.category] || 'construction',
+      description: template.description
+    });
   };
 
   return (
@@ -248,60 +286,44 @@ const BidSetup: React.FC<BidSetupProps> = ({
         </div>
       )}
 
-      {/* Enhanced template-based mode with preview */}
+      {/* Enhanced template-based mode with dialog */}
       {settingsMode === 'template-based' && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">选择投标模板</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {templates.map((template) => (
-              <div 
-                key={template.id}
-                className={`border-2 rounded-lg p-4 transition-all ${
-                  selectedTemplate === template.id
-                    ? 'border-sky-600 bg-sky-50'
-                    : 'border-gray-200 hover:border-sky-400'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center">
-                    <FileText className="w-5 h-5 text-sky-600 mr-3" />
-                    <div>
-                      <h4 className="font-medium text-gray-900">{template.name}</h4>
-                      <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full mt-1">
-                        {template.category}
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handlePreviewTemplate(template)}
-                    className="text-gray-500 hover:text-sky-600"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">{template.description}</p>
-                <div className="flex space-x-2">
-                  <Button
-                    variant={selectedTemplate === template.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleSelectTemplate(template.id)}
-                    className={selectedTemplate === template.id ? "bg-sky-600 hover:bg-sky-700" : ""}
-                  >
-                    {selectedTemplate === template.id ? '已选择' : '选择'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePreviewTemplate(template)}
-                  >
-                    预览
-                  </Button>
-                </div>
-              </div>
-            ))}
+          <div className="text-center py-8">
+            <FileText className="w-12 h-12 text-sky-600 mx-auto mb-4" />
+            <p className="text-gray-600 mb-4">从模板库中选择适合的投标模板</p>
+            <Button 
+              onClick={handleOpenTemplateDialog}
+              className="bg-sky-600 hover:bg-sky-700"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              选择模板
+            </Button>
           </div>
+          
+          {selectedTemplateInfo && (
+            <div className="mt-6 p-4 bg-sky-50 rounded-lg border border-sky-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-1">已选择模板：{selectedTemplateInfo.name}</h4>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full">
+                      {selectedTemplateInfo.category}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">{selectedTemplateInfo.description}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleOpenTemplateDialog}
+                >
+                  更换模板
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -318,6 +340,28 @@ const BidSetup: React.FC<BidSetupProps> = ({
               }}
               placeholder={catalogReference}
               className="min-h-[400px] resize-none text-sm leading-relaxed border-sky-200 focus:border-sky-600"
+              style={{ maxHeight: '400px', overflowY: 'auto' }}
+            />
+            <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+              {customCatalog.length}/10000
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Display catalog for template-based mode */}
+      {settingsMode === 'template-based' && selectedTemplateInfo && customCatalog && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">目录显示</h3>
+          <div className="relative">
+            <Textarea
+              value={customCatalog}
+              onChange={(e) => {
+                if (e.target.value.length <= 10000) {
+                  setCustomCatalog(e.target.value);
+                }
+              }}
+              className="min-h-[400px] resize-none text-sm leading-relaxed border-sky-200 focus:border-sky-600 font-mono"
               style={{ maxHeight: '400px', overflowY: 'auto' }}
             />
             <div className="absolute bottom-2 right-2 text-xs text-gray-400">
@@ -370,6 +414,13 @@ const BidSetup: React.FC<BidSetupProps> = ({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Template Selection Dialog */}
+      <TemplateSelectionDialog
+        open={templateDialogOpen}
+        onOpenChange={setTemplateDialogOpen}
+        onTemplateSelect={handleTemplateSelect}
+      />
     </div>
   );
 };
