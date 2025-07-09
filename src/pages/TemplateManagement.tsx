@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Plus, Search, Edit, Trash2, Copy, FileText, Calendar, Upload, FolderTree } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,6 +21,8 @@ interface BidTemplate {
   usageCount: number;
   uploadedFile?: string;
   catalogDisplay?: boolean;
+  templateCreateMethod?: string;
+  catalogContent?: string;
 }
 
 const TemplateManagement: React.FC = () => {
@@ -34,7 +35,9 @@ const TemplateManagement: React.FC = () => {
       createDate: '2024-01-10',
       updateDate: '2024-02-15',
       description: '适用于城市道路、桥梁等市政基础设施建设项目',
-      usageCount: 12
+      usageCount: 12,
+      templateCreateMethod: 'file-analysis',
+      catalogContent: '1. 投标函\n1.1 投标函\n1.2 法定代表人身份证明\n2. 商务标书\n2.1 公司资质证明\n2.2 财务状况报告'
     },
     {
       id: '2',
@@ -43,7 +46,9 @@ const TemplateManagement: React.FC = () => {
       createDate: '2024-01-20',
       updateDate: '2024-02-10',
       description: '包含室内外装修、水电安装等完整施工方案',
-      usageCount: 8
+      usageCount: 8,
+      templateCreateMethod: 'paste-catalog',
+      catalogContent: '1. 技术标书\n1.1 技术方案\n1.2 项目组织架构\n2. 商务标书\n2.1 报价清单\n2.2 资质证明'
     },
     {
       id: '3',
@@ -52,7 +57,9 @@ const TemplateManagement: React.FC = () => {
       createDate: '2024-02-01',
       updateDate: '2024-02-20',
       description: '智能监控、消防、安防等系统集成标准方案',
-      usageCount: 5
+      usageCount: 5,
+      templateCreateMethod: 'file-analysis',
+      catalogContent: '1. 系统设计方案\n1.1 系统架构\n1.2 设备清单\n2. 实施方案\n2.1 安装计划\n2.2 调试方案'
     }
   ]);
 
@@ -63,12 +70,14 @@ const TemplateManagement: React.FC = () => {
   const [editingTemplate, setEditingTemplate] = useState<BidTemplate | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [templateCreateMethod, setTemplateCreateMethod] = useState<string>('file-analysis');
+  const [editTemplateCreateMethod, setEditTemplateCreateMethod] = useState<string>('file-analysis');
   
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     description: '',
-    catalogDisplay: ''
+    catalogDisplay: '',
+    catalogContent: ''
   });
 
   const filteredTemplates = templates.filter(template =>
@@ -77,7 +86,7 @@ const TemplateManagement: React.FC = () => {
   );
 
   const handleAdd = () => {
-    setFormData({ name: '', category: '', description: '', catalogDisplay: '' });
+    setFormData({ name: '', category: '', description: '', catalogDisplay: '', catalogContent: '' });
     setUploadedFile(null);
     setTemplateCreateMethod('file-analysis');
     setAddDialogOpen(true);
@@ -91,8 +100,10 @@ const TemplateManagement: React.FC = () => {
         name: template.name,
         category: template.category,
         description: template.description,
-        catalogDisplay: template.catalogDisplay ? 'true' : 'false'
+        catalogDisplay: template.catalogDisplay ? 'true' : 'false',
+        catalogContent: template.catalogContent || ''
       });
+      setEditTemplateCreateMethod(template.templateCreateMethod || 'file-analysis');
       setEditDialogOpen(true);
     }
   };
@@ -126,7 +137,7 @@ const TemplateManagement: React.FC = () => {
   };
 
   const handleSaveAdd = () => {
-    if (formData.name && formData.category && formData.description && formData.catalogDisplay) {
+    if (formData.name && formData.category && formData.description && formData.catalogContent) {
       const newTemplate: BidTemplate = {
         id: Date.now().toString(),
         name: formData.name,
@@ -136,18 +147,20 @@ const TemplateManagement: React.FC = () => {
         updateDate: new Date().toISOString().split('T')[0],
         usageCount: 0,
         uploadedFile: uploadedFile?.name,
-        catalogDisplay: formData.catalogDisplay === 'true'
+        catalogDisplay: formData.catalogDisplay === 'true',
+        templateCreateMethod: templateCreateMethod,
+        catalogContent: formData.catalogContent
       };
       setTemplates([...templates, newTemplate]);
       setAddDialogOpen(false);
-      setFormData({ name: '', category: '', description: '', catalogDisplay: '' });
+      setFormData({ name: '', category: '', description: '', catalogDisplay: '', catalogContent: '' });
       setUploadedFile(null);
       setTemplateCreateMethod('file-analysis');
     }
   };
 
   const handleSaveEdit = () => {
-    if (editingTemplate && formData.name && formData.category && formData.description) {
+    if (editingTemplate && formData.name && formData.category && formData.description && formData.catalogContent) {
       setTemplates(templates.map(t => 
         t.id === editingTemplate.id 
           ? {
@@ -156,7 +169,9 @@ const TemplateManagement: React.FC = () => {
               category: formData.category,
               description: formData.description,
               updateDate: new Date().toISOString().split('T')[0],
-              catalogDisplay: formData.catalogDisplay === 'true'
+              catalogDisplay: formData.catalogDisplay === 'true',
+              templateCreateMethod: editTemplateCreateMethod,
+              catalogContent: formData.catalogContent
             }
           : t
       ));
@@ -394,8 +409,8 @@ const TemplateManagement: React.FC = () => {
                 <Textarea
                   id="catalog-display"
                   placeholder={templateCreateMethod === 'file-analysis' ? "系统将自动提取文件目录..." : "请粘贴标书目录内容"}
-                  value={formData.catalogDisplay}
-                  onChange={(e) => setFormData({ ...formData, catalogDisplay: e.target.value })}
+                  value={formData.catalogContent}
+                  onChange={(e) => setFormData({ ...formData, catalogContent: e.target.value })}
                   rows={6}
                   className="font-mono text-sm"
                 />
@@ -408,7 +423,7 @@ const TemplateManagement: React.FC = () => {
               </Button>
               <Button 
                 onClick={handleSaveAdd}
-                disabled={!formData.name || !formData.category || !formData.description || !formData.catalogDisplay}
+                disabled={!formData.name || !formData.category || !formData.description || !formData.catalogContent}
                 className="bg-sky-600 hover:bg-sky-700"
               >
                 保存
@@ -460,17 +475,61 @@ const TemplateManagement: React.FC = () => {
                   rows={3}
                 />
               </div>
+
+              <div className="space-y-3">
+                <Label>模板创建方式</Label>
+                <RadioGroup value={editTemplateCreateMethod} onValueChange={setEditTemplateCreateMethod}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="file-analysis" id="edit-file-analysis" />
+                    <Label htmlFor="edit-file-analysis">基于投标文件解析</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="paste-catalog" id="edit-paste-catalog" />
+                    <Label htmlFor="edit-paste-catalog">粘贴标书目录</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {editTemplateCreateMethod === 'file-analysis' && (
+                <div className="space-y-2">
+                  <Label htmlFor="edit-template-file">上传文件</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+                    <input
+                      type="file"
+                      id="edit-template-file"
+                      className="hidden"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileUpload}
+                    />
+                    <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-gray-600 mb-2">点击上传投标文件</p>
+                    <p className="text-xs text-gray-500 mb-2">支持PDF、DOC、DOCX格式</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('edit-template-file')?.click()}
+                    >
+                      选择文件
+                    </Button>
+                    {uploadedFile && (
+                      <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                        已选择：{uploadedFile.name}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               
-              <div className="flex items-center space-x-2">
-                <Checkbox 
+              <div className="space-y-2">
+                <Label htmlFor="edit-catalog-display">目录显示</Label>
+                <Textarea
                   id="edit-catalog-display"
-                  checked={formData.catalogDisplay === 'true'}
-                  onCheckedChange={(checked) => setFormData({ ...formData, catalogDisplay: checked ? 'true' : 'false' })}
+                  placeholder={editTemplateCreateMethod === 'file-analysis' ? "系统将自动提取文件目录..." : "请粘贴标书目录内容"}
+                  value={formData.catalogContent}
+                  onChange={(e) => setFormData({ ...formData, catalogContent: e.target.value })}
+                  rows={6}
+                  className="font-mono text-sm"
                 />
-                <Label htmlFor="edit-catalog-display" className="flex items-center space-x-1">
-                  <FolderTree className="w-4 h-4" />
-                  <span>目录显示</span>
-                </Label>
               </div>
             </div>
             
@@ -480,7 +539,7 @@ const TemplateManagement: React.FC = () => {
               </Button>
               <Button 
                 onClick={handleSaveEdit}
-                disabled={!formData.name || !formData.category || !formData.description}
+                disabled={!formData.name || !formData.category || !formData.description || !formData.catalogContent}
                 className="bg-sky-600 hover:bg-sky-700"
               >
                 保存
