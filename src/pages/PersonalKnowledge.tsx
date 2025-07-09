@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, MoreHorizontal, Trash2, Download, FileText, Image, Table as TableIcon, Edit, FolderPlus, X, Upload } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Trash2, Eye, FileText, Image, Table as TableIcon, Edit, FolderPlus, X, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ interface KnowledgeFile {
   type: 'pdf' | 'docx' | 'doc' | 'image' | 'table' | 'other';
   size: string;
   uploadTime: string;
-  status: 'processing' | 'completed' | 'failed';
+  status: 'parsing' | 'success' | 'failed';
   folderId: string;
 }
 
@@ -46,7 +46,7 @@ const PersonalKnowledge: React.FC = () => {
   const [uploadSheetOpen, setUploadSheetOpen] = useState(false);
   const [createMethod, setCreateMethod] = useState<'single' | 'batch'>('single');
   const [materialName, setMaterialName] = useState('');
-  const [materialFormat, setMaterialFormat] = useState<string>('');
+  const [materialFormat, setMaterialFormat] = useState<string>('document');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const [folders, setFolders] = useState<MaterialFolder[]>([
@@ -63,7 +63,7 @@ const PersonalKnowledge: React.FC = () => {
       type: 'pdf',
       size: '2.4 MB',
       uploadTime: '2024-03-15 14:30',
-      status: 'completed',
+      status: 'success',
       folderId: '1'
     },
     {
@@ -72,7 +72,7 @@ const PersonalKnowledge: React.FC = () => {
       type: 'docx',
       size: '1.8 MB',
       uploadTime: '2024-03-14 16:20',
-      status: 'completed',
+      status: 'success',
       folderId: '2'
     },
     {
@@ -81,7 +81,7 @@ const PersonalKnowledge: React.FC = () => {
       type: 'table',
       size: '856 KB',
       uploadTime: '2024-03-13 10:15',
-      status: 'processing',
+      status: 'parsing',
       folderId: '4'
     },
     {
@@ -90,7 +90,7 @@ const PersonalKnowledge: React.FC = () => {
       type: 'image',
       size: '324 KB',
       uploadTime: '2024-03-12 09:45',
-      status: 'completed',
+      status: 'failed',
       folderId: '3'
     }
   ]);
@@ -112,12 +112,12 @@ const PersonalKnowledge: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'completed':
-        return <Badge className="bg-green-100 text-green-800">已完成</Badge>;
-      case 'processing':
-        return <Badge className="bg-yellow-100 text-yellow-800">处理中</Badge>;
+      case 'success':
+        return <Badge className="bg-green-100 text-green-800">解析成功</Badge>;
+      case 'parsing':
+        return <Badge className="bg-yellow-100 text-yellow-800">解析中</Badge>;
       case 'failed':
-        return <Badge className="bg-red-100 text-red-800">失败</Badge>;
+        return <Badge className="bg-red-100 text-red-800">解析失败</Badge>;
       default:
         return <Badge variant="secondary">未知</Badge>;
     }
@@ -153,6 +153,11 @@ const PersonalKnowledge: React.FC = () => {
   const handleDeleteFile = (fileId: string) => {
     setFileToDelete(fileId);
     setDeleteDialogOpen(true);
+  };
+
+  const handleViewFile = (fileId: string) => {
+    console.log('查看文件:', fileId);
+    // 这里可以实现文件查看逻辑
   };
 
   const handleDeleteFolder = (folderId: string) => {
@@ -234,7 +239,7 @@ const PersonalKnowledge: React.FC = () => {
     // 重置表单
     setCreateMethod('single');
     setMaterialName('');
-    setMaterialFormat('');
+    setMaterialFormat('document');
     setUploadedFiles([]);
   };
 
@@ -243,20 +248,18 @@ const PersonalKnowledge: React.FC = () => {
     // 重置表单
     setCreateMethod('single');
     setMaterialName('');
-    setMaterialFormat('');
+    setMaterialFormat('document');
     setUploadedFiles([]);
   };
 
   const getFileFormatText = (format: string) => {
     switch (format) {
-      case 'pdf':
-        return '支持PDF格式，大小不超过50MB';
-      case 'doc':
-        return '支持DOC/DOCX格式，大小不超过30MB';
+      case 'document':
+        return '支持PDF、DOC、DOCX格式，大小不超过50MB';
       case 'image':
-        return '支持PNG/JPG/JPEG格式，大小不超过10MB';
-      case 'excel':
-        return '支持XLS/XLSX格式，大小不超过20MB';
+        return '支持PNG、JPG、JPEG格式，大小不超过10MB';
+      case 'table':
+        return '支持XLS、XLSX格式，大小不超过20MB';
       default:
         return '请选择文件格式';
     }
@@ -446,73 +449,71 @@ const PersonalKnowledge: React.FC = () => {
                         </div>
                       )}
 
-                      {createMethod === 'single' && (
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium">素材格式</Label>
-                          <Select value={materialFormat} onValueChange={setMaterialFormat}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="选择素材格式" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pdf">PDF文档</SelectItem>
-                              <SelectItem value="doc">Word文档</SelectItem>
-                              <SelectItem value="image">图片</SelectItem>
-                              <SelectItem value="excel">Excel表格</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
-
-                      {(createMethod === 'batch' || (createMethod === 'single' && materialFormat)) && (
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium">上传文件</Label>
-                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                            <input
-                              type="file"
-                              id="material-upload"
-                              className="hidden"
-                              multiple={createMethod === 'batch'}
-                              accept={createMethod === 'batch' ? '.pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg' : 
-                                materialFormat === 'pdf' ? '.pdf' :
-                                materialFormat === 'doc' ? '.doc,.docx' :
-                                materialFormat === 'image' ? '.png,.jpg,.jpeg' :
-                                materialFormat === 'excel' ? '.xls,.xlsx' : '*'
-                              }
-                              onChange={handleFileUpload}
-                            />
-                            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                            <p className="text-sm text-gray-600 mb-1">点击或拖拽上传文件</p>
-                            <p className="text-xs text-gray-500">
-                              {createMethod === 'batch' 
-                                ? '支持PDF、DOC、DOCX、XLS、XLSX、PNG、JPG、JPEG格式，最多10个文件'
-                                : getFileFormatText(materialFormat)
-                              }
-                            </p>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="mt-2"
-                              onClick={() => document.getElementById('material-upload')?.click()}
-                            >
-                              选择文件
-                            </Button>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">素材格式</Label>
+                        <RadioGroup value={materialFormat} onValueChange={setMaterialFormat}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="document" id="document" />
+                            <Label htmlFor="document">文档</Label>
                           </div>
-                          
-                          {uploadedFiles.length > 0 && (
-                            <div className="space-y-2">
-                              <Label className="text-sm font-medium">已选择文件</Label>
-                              <div className="space-y-1 max-h-32 overflow-y-auto">
-                                {uploadedFiles.map((file, index) => (
-                                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                                    <span className="text-sm truncate">{file.name}</span>
-                                    <span className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)}MB</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="image" id="image" />
+                            <Label htmlFor="image">图片</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="table" id="table" />
+                            <Label htmlFor="table">表格</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">上传文件</Label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                          <input
+                            type="file"
+                            id="material-upload"
+                            className="hidden"
+                            multiple={createMethod === 'batch'}
+                            accept={createMethod === 'batch' ? '.pdf,.docx,.doc,.xlsx,.xls,.png,.jpg,.jpeg' : 
+                              materialFormat === 'document' ? '.pdf,.doc,.docx' :
+                              materialFormat === 'image' ? '.png,.jpg,.jpeg' :
+                              materialFormat === 'table' ? '.xls,.xlsx' : '*'
+                            }
+                            onChange={handleFileUpload}
+                          />
+                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600 mb-1">点击或拖拽上传文件</p>
+                          <p className="text-xs text-gray-500">
+                            {createMethod === 'batch' 
+                              ? '支持PDF、DOC、DOCX、XLS、XLSX、PNG、JPG、JPEG格式，最多10个文件'
+                              : getFileFormatText(materialFormat)
+                            }
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="mt-2"
+                            onClick={() => document.getElementById('material-upload')?.click()}
+                          >
+                            选择文件
+                          </Button>
                         </div>
-                      )}
+                        
+                        {uploadedFiles.length > 0 && (
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">已选择文件</Label>
+                            <div className="space-y-1 max-h-32 overflow-y-auto">
+                              {uploadedFiles.map((file, index) => (
+                                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                  <span className="text-sm truncate">{file.name}</span>
+                                  <span className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)}MB</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="absolute bottom-6 right-6 flex space-x-2">
@@ -564,26 +565,26 @@ const PersonalKnowledge: React.FC = () => {
                       <TableCell>{file.uploadTime}</TableCell>
                       <TableCell>{getStatusBadge(file.status)}</TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem>
-                              <Download className="w-4 h-4 mr-2" />
-                              下载
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              className="text-red-600"
-                              onClick={() => handleDeleteFile(file.id)}
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              删除
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex items-center space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleViewFile(file.id)}
+                            className="text-sky-600 hover:text-sky-700"
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            查看
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleDeleteFile(file.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            删除
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
