@@ -29,8 +29,7 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, onWorkspaceManagement }) => {
   const [user] = useState({
-    name: '李雯雯',
-    email: 'liwenwen@gmail.com'
+    name: '15106126658'
   });
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -58,7 +57,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
           </div>
           <div className="text-left">
             <div className="text-sm font-medium text-gray-900">{user.name}</div>
-            <div className="text-xs text-gray-500">{user.email}</div>
           </div>
           <ChevronDown className="w-4 h-4 text-gray-400" />
         </div>
@@ -71,7 +69,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ onLogout, onPersonalCenter, o
       >
         <div className="px-3 py-2">
           <p className="text-sm font-medium text-foreground">{user.name}</p>
-          <p className="text-xs text-muted-foreground">{user.email}</p>
         </div>
         <DropdownMenuSeparator />
         

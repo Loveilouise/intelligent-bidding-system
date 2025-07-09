@@ -4,30 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface LoginFormProps {
   onLogin: (username: string, password: string) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [smsCode, setSmsCode] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSendingSms, setIsSendingSms] = useState(false);
-
-  const handleAccountLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    // 模拟登录延迟
-    setTimeout(() => {
-      onLogin(username, password);
-      setIsLoading(false);
-    }, 1000);
-  };
 
   const handleSmsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +24,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     // 模拟短信登录延迟
     setTimeout(() => {
       onLogin(phone, smsCode);
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  const handleAccountLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // 模拟登录延迟
+    setTimeout(() => {
+      onLogin(username, password);
       setIsLoading(false);
     }, 1000);
   };
@@ -54,7 +53,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 via-sky-100 to-sky-200">
       <div className="absolute inset-0 bg-gradient-to-br from-sky-400/10 via-sky-500/10 to-sky-600/10"></div>
-      <Card className="w-full max-w-md relative z-10 shadow-xl border-0 bg-white/95 backdrop-blur-sm">
+      <Card className="w-full max-w-4xl relative z-10 shadow-xl border-0 bg-white/95 backdrop-blur-sm">
         <CardHeader className="text-center pb-8">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-gradient-to-br from-sky-100 to-sky-200 rounded-2xl flex items-center justify-center shadow-lg">
@@ -71,59 +70,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           <p className="text-gray-600 mt-3 text-base">欢迎使用智能标书管理平台</p>
         </CardHeader>
         <CardContent className="px-8 pb-8">
-          <Tabs defaultValue="account" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-sky-50 border border-sky-100">
-              <TabsTrigger 
-                value="account" 
-                className="data-[state=active]:bg-white data-[state=active]:text-sky-600 data-[state=active]:shadow-sm"
-              >
-                账号登录
-              </TabsTrigger>
-              <TabsTrigger 
-                value="sms"
-                className="data-[state=active]:bg-white data-[state=active]:text-sky-600 data-[state=active]:shadow-sm"
-              >
-                短信登录
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="account" className="mt-6">
-              <form onSubmit={handleAccountLogin} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-gray-700 font-medium">用户名</Label>
-                  <Input
-                    id="username"
-                    type="text"
-                    placeholder="请输入用户名"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                    className="h-12 border-gray-200 focus:border-sky-400 focus:ring-sky-400/20"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-gray-700 font-medium">密码</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="请输入密码"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="h-12 border-gray-200 focus:border-sky-400 focus:ring-sky-400/20"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-12 bg-sky-600 hover:bg-sky-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
-                  disabled={isLoading}
-                >
-                  {isLoading ? '登录中...' : '登录'}
-                </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="sms" className="mt-6">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* 左侧 - 短信登录 */}
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">短信登录</h3>
+                <p className="text-gray-600 text-sm">使用手机号码快速登录</p>
+              </div>
               <form onSubmit={handleSmsLogin} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-gray-700 font-medium">手机号</Label>
@@ -168,8 +121,54 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                   {isLoading ? '登录中...' : '登录'}
                 </Button>
               </form>
-            </TabsContent>
-          </Tabs>
+            </div>
+
+            {/* 中间分隔线 */}
+            <div className="hidden md:flex items-center justify-center">
+              <div className="w-px h-64 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
+            </div>
+
+            {/* 右侧 - 密码登录 */}
+            <div className="space-y-6">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">密码登录</h3>
+                <p className="text-gray-600 text-sm">使用账号密码登录</p>
+              </div>
+              <form onSubmit={handleAccountLogin} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-gray-700 font-medium">用户名</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="请输入用户名"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    className="h-12 border-gray-200 focus:border-sky-400 focus:ring-sky-400/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-gray-700 font-medium">密码</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="请输入密码"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="h-12 border-gray-200 focus:border-sky-400 focus:ring-sky-400/20"
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 bg-sky-600 hover:bg-sky-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? '登录中...' : '登录'}
+                </Button>
+              </form>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

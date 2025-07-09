@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { 
-  FileText, 
   Database,
   FolderOpen,
   Archive
@@ -21,13 +20,8 @@ interface MenuItem {
 const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
   const menuItems: MenuItem[] = [
     {
-      id: 'ai-bid-generation',
-      title: 'AI生标',
-      icon: <FileText className="w-5 h-5" />
-    },
-    {
       id: 'history-bid-management',
-      title: '历史标书',
+      title: '我的标书',
       icon: <Archive className="w-5 h-5" />
     },
     {

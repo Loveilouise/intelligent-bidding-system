@@ -5,18 +5,18 @@ import UserProfile from '../components/UserProfile';
 import LoginForm from '../components/LoginForm';
 import HistoryBidManagement from './HistoryBidManagement';
 import TemplateManagement from './TemplateManagement';
-import AIBidGeneration from './AIBidGeneration';
 import PersonalKnowledge from './PersonalKnowledge';
 import PersonalCenter from './PersonalCenter';
+import CreateBidFlow from '../components/CreateBidFlow';
 
 const Index = () => {
-  const [activeModule, setActiveModule] = useState('ai-bid-generation');
+  const [activeModule, setActiveModule] = useState('history-bid-management');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPersonalCenter, setShowPersonalCenter] = useState(false);
+  const [showCreateBid, setShowCreateBid] = useState(false);
   const [activePersonalTab, setActivePersonalTab] = useState('account');
 
   const handleLogin = (username: string, password: string) => {
-    // 简单的登录验证（实际项目中应该调用API）
     if (username && password) {
       setIsLoggedIn(true);
     }
@@ -25,23 +25,41 @@ const Index = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setShowPersonalCenter(false);
+    setShowCreateBid(false);
   };
 
   const handlePersonalCenter = () => {
     setShowPersonalCenter(true);
+    setShowCreateBid(false);
   };
 
   const handleWorkspaceManagement = () => {
     setShowPersonalCenter(true);
+    setShowCreateBid(false);
     setActivePersonalTab('workspace');
   };
 
   const handleBackToMain = () => {
     setShowPersonalCenter(false);
+    setShowCreateBid(false);
+  };
+
+  const handleCreateBid = () => {
+    setShowCreateBid(true);
+    setShowPersonalCenter(false);
+  };
+
+  const handleBackFromCreateBid = () => {
+    setShowCreateBid(false);
   };
 
   if (!isLoggedIn) {
     return <LoginForm onLogin={handleLogin} />;
+  }
+
+  // 如果在创建标书流程中，显示创建标书页面（无侧边栏）
+  if (showCreateBid) {
+    return <CreateBidFlow onBack={handleBackFromCreateBid} />;
   }
 
   return (
@@ -65,11 +83,10 @@ const Index = () => {
             <PersonalCenter onBack={handleBackToMain} activeTab={activePersonalTab} />
           ) : (
             <>
-              {activeModule === 'ai-bid-generation' && <AIBidGeneration />}
-              {activeModule === 'history-bid-management' && <HistoryBidManagement />}
+              {activeModule === 'history-bid-management' && <HistoryBidManagement onCreateBid={handleCreateBid} />}
               {activeModule === 'template-management' && <TemplateManagement />}
               {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
-              {!['ai-bid-generation', 'history-bid-management', 'template-management', 'personal-knowledge'].includes(activeModule) && (
+              {!['history-bid-management', 'template-management', 'personal-knowledge'].includes(activeModule) && (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
                     <h2 className="text-2xl font-semibold text-gray-700 mb-2">
@@ -89,8 +106,7 @@ const Index = () => {
 
 function getModuleTitle(module: string): string {
   const titles: Record<string, string> = {
-    'ai-bid-generation': 'AI生标',
-    'history-bid-management': '历史标书',
+    'history-bid-management': '我的标书',
     'template-management': '模板库',
     'personal-knowledge': '素材库'
   };

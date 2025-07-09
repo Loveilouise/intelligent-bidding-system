@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check } from 'lucide-react';
+import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -40,7 +40,11 @@ interface BidProject {
   description: string;
 }
 
-const HistoryBidManagement: React.FC = () => {
+interface HistoryBidManagementProps {
+  onCreateBid: () => void;
+}
+
+const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
@@ -94,7 +98,6 @@ const HistoryBidManagement: React.FC = () => {
   const bidTypes = ['施工投标', '装修投标', '技术投标', '采购投标'];
   const bidStatuses = ['已完成', '进行中', '已提交'];
 
-  // 筛选和排序逻辑
   const filteredAndSortedProjects = projects
     .filter(project => {
       const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -108,7 +111,6 @@ const HistoryBidManagement: React.FC = () => {
       return sortOrder === 'desc' ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime();
     });
 
-  // 分页逻辑
   const totalPages = Math.ceil(filteredAndSortedProjects.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedProjects = filteredAndSortedProjects.slice(startIndex, startIndex + pageSize);
@@ -168,12 +170,18 @@ const HistoryBidManagement: React.FC = () => {
   return (
     <div className="flex-1 p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">历史生标管理</h1>
-        </div>
-
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <div></div>
+              <Button 
+                onClick={onCreateBid}
+                className="bg-sky-600 hover:bg-sky-700 text-white px-6"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                创建标书
+              </Button>
+            </div>
             <div className="flex items-center space-x-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -194,7 +202,6 @@ const HistoryBidManagement: React.FC = () => {
                 搜索
               </Button>
 
-              {/* 投标类型筛选 */}
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="min-w-[120px] justify-between">
@@ -225,7 +232,6 @@ const HistoryBidManagement: React.FC = () => {
                 </PopoverContent>
               </Popover>
 
-              {/* 状态筛选 */}
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="min-w-[100px] justify-between">
@@ -359,7 +365,6 @@ const HistoryBidManagement: React.FC = () => {
             </Table>
           </div>
 
-          {/* 分页器 */}
           <div className="p-4 border-t border-gray-200 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600">每页显示</span>
