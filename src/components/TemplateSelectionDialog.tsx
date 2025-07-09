@@ -289,7 +289,7 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
             </div>
 
             {/* Template List */}
-            <div className="border rounded-lg flex-1 flex flex-col min-h-0 relative">
+            <div className="border rounded-lg flex-1 flex flex-col min-h-0 pb-16 relative">
               {paginatedTemplates.length > 0 ? (
                 <>
                   <div className="divide-y overflow-y-auto flex-1">
@@ -329,9 +329,9 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                     ))}
                   </div>
                   
-                  {/* 翻页器 - 右下角 */}
+                  {/* 翻页器 - 绝对定位在右下角，不遮挡内容 */}
                   {totalPages > 1 && (
-                    <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg border p-2">
+                    <div className="absolute bottom-2 right-2 bg-white rounded-lg shadow-lg border px-3 py-2 z-10">
                       {renderPagination()}
                     </div>
                   )}
