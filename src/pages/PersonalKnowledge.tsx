@@ -427,85 +427,84 @@ const PersonalKnowledge: React.FC = () => {
 
                       <div className="space-y-3">
                         <Label className="text-sm font-medium">素材格式</Label>
-                        <div className="grid grid-cols-1 gap-3">
-                          <div 
-                            className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
-                              materialFormat === 'document' 
-                                ? 'border-sky-500 bg-sky-50' 
-                                : 'border-gray-200 hover:bg-gray-50'
-                            }`}
-                            onClick={() => setMaterialFormat('document')}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <div className="flex-shrink-0">
-                                <FileText className="w-6 h-6 text-red-500" />
-                              </div>
-                              <div className="flex-1">
-                                <h3 className="font-medium text-gray-900">文档</h3>
-                                <p className="text-sm text-gray-500">支持PDF、DOC、DOCX格式</p>
-                              </div>
-                              <div className="flex-shrink-0">
-                                <RadioGroupItem 
-                                  value="document" 
-                                  checked={materialFormat === 'document'}
-                                  className="text-sky-600"
-                                />
+                        <RadioGroup value={materialFormat} onValueChange={setMaterialFormat}>
+                          <div className="grid grid-cols-1 gap-3">
+                            <div 
+                              className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                                materialFormat === 'document' 
+                                  ? 'border-sky-500 bg-sky-50' 
+                                  : 'border-gray-200 hover:bg-gray-50'
+                              }`}
+                              onClick={() => setMaterialFormat('document')}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div className="flex-shrink-0">
+                                  <FileText className="w-6 h-6 text-red-500" />
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-medium text-gray-900">文档</h3>
+                                  <p className="text-sm text-gray-500">支持PDF、DOC、DOCX格式</p>
+                                </div>
+                                <div className="flex-shrink-0">
+                                  <RadioGroupItem 
+                                    value="document" 
+                                    className="text-sky-600"
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <div 
-                            className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
-                              materialFormat === 'image' 
-                                ? 'border-sky-500 bg-sky-50' 
-                                : 'border-gray-200 hover:bg-gray-50'
-                            }`}
-                            onClick={() => setMaterialFormat('image')}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <div className="flex-shrink-0">
-                                <Image className="w-6 h-6 text-green-500" />
-                              </div>
-                              <div className="flex-1">
-                                <h3 className="font-medium text-gray-900">图片</h3>
-                                <p className="text-sm text-gray-500">支持PNG、JPG、JPEG格式</p>
-                              </div>
-                              <div className="flex-shrink-0">
-                                <RadioGroupItem 
-                                  value="image" 
-                                  checked={materialFormat === 'image'}
-                                  className="text-sky-600"
-                                />
+                            <div 
+                              className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                                materialFormat === 'image' 
+                                  ? 'border-sky-500 bg-sky-50' 
+                                  : 'border-gray-200 hover:bg-gray-50'
+                              }`}
+                              onClick={() => setMaterialFormat('image')}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div className="flex-shrink-0">
+                                  <Image className="w-6 h-6 text-green-500" />
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-medium text-gray-900">图片</h3>
+                                  <p className="text-sm text-gray-500">支持PNG、JPG、JPEG格式</p>
+                                </div>
+                                <div className="flex-shrink-0">
+                                  <RadioGroupItem 
+                                    value="image" 
+                                    className="text-sky-600"
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <div 
-                            className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
-                              materialFormat === 'table' 
-                                ? 'border-sky-500 bg-sky-50' 
-                                : 'border-gray-200 hover:bg-gray-50'
-                            }`}
-                            onClick={() => setMaterialFormat('table')}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <div className="flex-shrink-0">
-                                <TableIcon className="w-6 h-6 text-blue-500" />
-                              </div>
-                              <div className="flex-1">
-                                <h3 className="font-medium text-gray-900">表格</h3>
-                                <p className="text-sm text-gray-500">支持XLS、XLSX格式</p>
-                              </div>
-                              <div className="flex-shrink-0">
-                                <RadioGroupItem 
-                                  value="table" 
-                                  checked={materialFormat === 'table'}
-                                  className="text-sky-600"
-                                />
+                            <div 
+                              className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-sky-300 ${
+                                materialFormat === 'table' 
+                                  ? 'border-sky-500 bg-sky-50' 
+                                  : 'border-gray-200 hover:bg-gray-50'
+                              }`}
+                              onClick={() => setMaterialFormat('table')}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div className="flex-shrink-0">
+                                  <TableIcon className="w-6 h-6 text-blue-500" />
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-medium text-gray-900">表格</h3>
+                                  <p className="text-sm text-gray-500">支持XLS、XLSX格式</p>
+                                </div>
+                                <div className="flex-shrink-0">
+                                  <RadioGroupItem 
+                                    value="table" 
+                                    className="text-sky-600"
+                                  />
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </RadioGroup>
                       </div>
 
                       <div className="space-y-2">
