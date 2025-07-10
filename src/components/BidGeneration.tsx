@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
+import { RefreshCw, TreePine, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -285,7 +284,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                   size="sm" 
                   onClick={() => setBusinessExpanded(!businessExpanded)}
                 >
-                  {businessExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  <TreePine className="w-4 h-4" />
                 </Button>
               </div>
               
@@ -386,7 +385,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                   size="sm" 
                   onClick={() => setTechnicalExpanded(!technicalExpanded)}
                 >
-                  {technicalExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  <TreePine className="w-4 h-4" />
                 </Button>
                 <span className="text-sm text-gray-600">
                   预计生成字数：{calculateTotalWordCount(technicalCatalogItems)}
