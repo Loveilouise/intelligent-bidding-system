@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Upload, FileText, Settings, Plus, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -58,11 +57,11 @@ const BidSetup: React.FC<BidSetupProps> = ({
     { value: 'consulting', label: '咨询类' }
   ];
 
-  const knowledgeBases = [
-    { value: 'kb1', label: '建筑工程知识库' },
-    { value: 'kb2', label: '设备采购知识库' },
-    { value: 'kb3', label: '服务类知识库' },
-    { value: 'kb4', label: '通用知识库' }
+  const materialLibraries = [
+    { value: 'folder1', label: '建筑工程素材' },
+    { value: 'folder2', label: '设备采购素材' },
+    { value: 'folder3', label: '服务类素材' },
+    { value: 'folder4', label: '通用素材库' }
   ];
 
   const catalogReference = `参考格式：
@@ -148,15 +147,15 @@ const BidSetup: React.FC<BidSetupProps> = ({
             </Select>
           </div>
           <div>
-            <Label htmlFor="knowledgeBase">知识库</Label>
+            <Label htmlFor="materialLibrary">素材库</Label>
             <Select value={selectedKnowledgeBase} onValueChange={setSelectedKnowledgeBase}>
               <SelectTrigger>
-                <SelectValue placeholder="选择知识库" />
+                <SelectValue placeholder="选择素材库" />
               </SelectTrigger>
               <SelectContent>
-                {knowledgeBases.map((kb) => (
-                  <SelectItem key={kb.value} value={kb.value}>
-                    {kb.label}
+                {materialLibraries.map((lib) => (
+                  <SelectItem key={lib.value} value={lib.value}>
+                    {lib.label}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -1,10 +1,11 @@
 
 import React from 'react';
-import { ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Trash2, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { CatalogItem as CatalogItemType } from '@/types/bid';
 
 interface CatalogItemProps {
@@ -17,6 +18,13 @@ interface CatalogItemProps {
   onAddSameLevel: (parentId: string | null, afterId: string) => void;
   onAddSubLevel: (parentId: string) => void;
   onDelete: (itemId: string) => void;
+  onDoubleClick?: (itemId: string, title: string) => void;
+  onWordCountSetting?: (itemId: string, currentCount: number) => void;
+  editingItem?: string | null;
+  editingText?: string;
+  setEditingText?: (text: string) => void;
+  onSaveEdit?: () => void;
+  showWordCount?: boolean;
 }
 
 const CatalogItem: React.FC<CatalogItemProps> = ({
@@ -28,8 +36,21 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
   onToggleExpansion,
   onAddSameLevel,
   onAddSubLevel,
-  onDelete
+  onDelete,
+  onDoubleClick,
+  onWordCountSetting,
+  editingItem,
+  editingText,
+  setEditingText,
+  onSaveEdit,
+  showWordCount = false
 }) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && onSaveEdit) {
+      onSaveEdit();
+    }
+  };
+
   return (
     <div className="group">
       <div 
@@ -41,7 +62,7 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
             <Checkbox
               checked={isSelected}
               onCheckedChange={(checked) => onToggleSelect(item.id, checked as boolean)}
-              className="mr-2 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+              className="mr-2 data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
             />
           )}
           
@@ -57,11 +78,54 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
               )}
             </button>
           )}
-          <span className="text-sm">{item.title}</span>
+          
+          {editingItem === item.id ? (
+            <Input
+              value={editingText}
+              onChange={(e) => setEditingText && setEditingText(e.target.value)}
+              onKeyPress={handleKeyPress}
+              onBlur={onSaveEdit}
+              className="h-6 text-sm border-sky-600 focus:border-sky-600"
+              autoFocus
+            />
+          ) : (
+            <span 
+              className="text-sm flex-1"
+              onDoubleClick={() => onDoubleClick && onDoubleClick(item.id, item.title)}
+            >
+              {item.title}
+            </span>
+          )}
+          
+          {showWordCount && (
+            <span className="text-xs text-gray-500 ml-2">
+              {item.wordCount || 1000}字
+            </span>
+          )}
         </div>
         
         {!batchMode && (
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {showWordCount && onWordCountSetting && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-gray-100"
+                      onClick={() => onWordCountSetting(item.id, item.wordCount || 1000)}
+                    >
+                      <Settings2 className="h-3 w-3 text-black" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>字数设置</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            
             <div className="relative">
               <TooltipProvider>
                 <Tooltip>
@@ -128,6 +192,13 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
           onAddSameLevel={onAddSameLevel}
           onAddSubLevel={onAddSubLevel}
           onDelete={onDelete}
+          onDoubleClick={onDoubleClick}
+          onWordCountSetting={onWordCountSetting}
+          editingItem={editingItem}
+          editingText={editingText}
+          setEditingText={setEditingText}
+          onSaveEdit={onSaveEdit}
+          showWordCount={showWordCount}
         />
       ))}
     </div>

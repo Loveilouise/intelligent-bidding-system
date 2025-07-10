@@ -28,5 +28,6 @@ export interface CatalogItem {
   title: string;
   level: number;
   expanded?: boolean;
+  wordCount?: number;
   children?: CatalogItem[];
 }
