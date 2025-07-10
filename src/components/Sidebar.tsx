@@ -44,8 +44,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
         <div
           className={`flex items-center px-4 py-3 cursor-pointer transition-all duration-200 ${
             isActive 
-              ? 'bg-sky-50 border-r-4 border-sky-500 text-sky-700' 
-              : 'text-gray-700 hover:bg-sky-50'
+              ? 'bg-primary/10 border-r-4 border-primary text-primary' 
+              : 'text-gray-700 hover:bg-primary/5 hover:text-primary'
           }`}
           onClick={() => setActiveModule(item.id)}
         >
@@ -65,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeModule, setActiveModule }) => {
             alt="智能标书系统" 
             className="w-8 h-8"
           />
-          <h1 className="text-xl font-bold bg-gradient-to-r from-sky-600 to-sky-500 bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
             智能标书系统
           </h1>
         </div>
