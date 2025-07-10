@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, FileText, Eye, Check, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -124,7 +123,6 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
 
   const categories = ['市政工程', '装修工程', '系统集成', '通用', '水利工程', '电力工程', '园林工程', '环保工程', '交通工程', '通信工程', '化工工程', '医疗工程'];
 
-  // Filter templates based on search term and category
   const filteredTemplates = allTemplates.filter(template => {
     const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -163,7 +161,6 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
 
-    // 确保显示5个页码（如果可能）
     if (endPage - startPage < 4) {
       if (startPage === 1) {
         endPage = Math.min(totalPages, startPage + 4);
@@ -178,73 +175,73 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
 
     return (
       <div className="flex items-center space-x-1">
-        {/* 上一页 */}
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-6 w-6 p-0"
         >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+          <ChevronLeft className="h-3 w-3" />
+        </Button>
 
-        {/* 页码 */}
         {pages.map((page) => (
-          <button
+          <Button
             key={page}
+            variant={currentPage === page ? "default" : "ghost"}
+            size="sm"
             onClick={() => handlePageChange(page)}
-            className={`w-8 h-8 flex items-center justify-center text-sm font-medium rounded ${
-              currentPage === page
-                ? 'bg-blue-500 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
+            className="h-6 w-6 p-0 text-xs"
           >
             {page}
-          </button>
+          </Button>
         ))}
 
-        {/* 省略号和总页数 */}
         {endPage < totalPages && (
           <>
             {endPage < totalPages - 1 && (
-              <span className="w-8 h-8 flex items-center justify-center text-gray-400">
-                <MoreHorizontal className="w-4 h-4" />
+              <span className="flex h-6 w-6 items-center justify-center">
+                <MoreHorizontal className="h-3 w-3 text-muted-foreground" />
               </span>
             )}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => handlePageChange(totalPages)}
-              className="w-8 h-8 flex items-center justify-center text-sm font-medium text-gray-700 hover:bg-gray-100 rounded"
+              className="h-6 w-6 p-0 text-xs"
             >
               {totalPages}
-            </button>
+            </Button>
           </>
         )}
 
-        {/* 下一页 */}
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-6 w-6 p-0"
         >
-          <ChevronRight className="w-4 h-4" />
-        </button>
+          <ChevronRight className="h-3 w-3" />
+        </Button>
 
-        {/* 前往 */}
-        <span className="ml-4 text-sm text-gray-500">前往</span>
-        <input
-          type="number"
-          min="1"
-          max={totalPages}
-          value=""
-          placeholder="1"
-          onChange={(e) => {
-            const page = parseInt(e.target.value);
-            if (page >= 1 && page <= totalPages) {
-              handlePageChange(page);
-            }
-          }}
-          className="w-12 h-8 px-2 text-sm border border-gray-300 rounded text-center"
-        />
-        <span className="text-sm text-gray-500">页</span>
+        <div className="flex items-center space-x-1 ml-2">
+          <span className="text-xs text-muted-foreground">前往</span>
+          <Input
+            type="number"
+            min="1"
+            max={totalPages}
+            placeholder="1"
+            onChange={(e) => {
+              const page = parseInt(e.target.value);
+              if (page >= 1 && page <= totalPages) {
+                handlePageChange(page);
+              }
+            }}
+            className="h-6 w-8 px-1 text-xs text-center"
+          />
+          <span className="text-xs text-muted-foreground">页</span>
+        </div>
       </div>
     );
   };
@@ -252,7 +249,7 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[900px] max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>选择投标模板</DialogTitle>
           </DialogHeader>
@@ -264,7 +261,7 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    placeholder="搜索模板名称或描述..."
+                    placeholder="搜索模板名称..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -288,39 +285,41 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
               </div>
             </div>
 
-            {/* Template List */}
-            <div className="border rounded-lg flex-1 flex flex-col min-h-0 pb-16 relative">
+            {/* Template List with Pagination */}
+            <div className="border rounded-lg flex-1 flex flex-col min-h-0">
               {paginatedTemplates.length > 0 ? (
-                <>
+                <div className="flex flex-col h-full">
                   <div className="divide-y overflow-y-auto flex-1">
                     {paginatedTemplates.map((template) => (
-                      <div key={template.id} className="p-4 hover:bg-gray-50">
+                      <div key={template.id} className="p-3 hover:bg-gray-50">
                         <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <FileText className="w-5 h-5 text-sky-600" />
-                              <h3 className="font-medium text-gray-900">{template.name}</h3>
-                              <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full">
-                                {template.category}
-                              </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-3">
+                              <FileText className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                              <div className="min-w-0 flex-1">
+                                <h3 className="font-medium text-gray-900 truncate">{template.name}</h3>
+                                <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full mt-1">
+                                  {template.category}
+                                </span>
+                              </div>
                             </div>
-                            <p className="text-sm text-gray-600">{template.description}</p>
                           </div>
-                          <div className="flex items-center space-x-2 ml-4">
+                          <div className="flex items-center space-x-1 ml-4 flex-shrink-0">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handlePreview(template)}
+                              className="h-7 px-2 text-xs"
                             >
-                              <Eye className="w-4 h-4 mr-1" />
+                              <Eye className="w-3 h-3 mr-1" />
                               预览
                             </Button>
                             <Button
                               size="sm"
                               onClick={() => handleSelect(template)}
-                              className="bg-sky-600 hover:bg-sky-700"
+                              className="h-7 px-2 text-xs bg-sky-600 hover:bg-sky-700"
                             >
-                              <Check className="w-4 h-4 mr-1" />
+                              <Check className="w-3 h-3 mr-1" />
                               选择
                             </Button>
                           </div>
@@ -329,13 +328,20 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                     ))}
                   </div>
                   
-                  {/* 翻页器 - 绝对定位在右下角，不遮挡内容 */}
+                  {/* Pagination at bottom */}
                   {totalPages > 1 && (
-                    <div className="absolute bottom-2 right-2 bg-white rounded-lg shadow-lg border px-3 py-2 z-10">
-                      {renderPagination()}
+                    <div className="border-t p-3 bg-gray-50/50">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-muted-foreground">
+                          共 {filteredTemplates.length} 个模板，第 {currentPage} 页，共 {totalPages} 页
+                        </div>
+                        <div className="flex-shrink-0">
+                          {renderPagination()}
+                        </div>
+                      </div>
                     </div>
                   )}
-                </>
+                </div>
               ) : (
                 <div className="p-8 text-center flex-1 flex flex-col justify-center">
                   <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -343,11 +349,6 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                   <p className="text-gray-500">没有找到匹配的模板</p>
                 </div>
               )}
-            </div>
-
-            {/* Results info */}
-            <div className="text-sm text-gray-500 text-center flex-shrink-0">
-              共 {filteredTemplates.length} 个模板，当前第 {currentPage} 页，共 {totalPages} 页
             </div>
           </div>
         </DialogContent>

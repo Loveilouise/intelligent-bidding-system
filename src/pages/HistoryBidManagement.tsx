@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check, Plus, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -172,7 +173,6 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
 
-    // 确保显示5个页码（如果可能）
     if (endPage - startPage < 4) {
       if (startPage === 1) {
         endPage = Math.min(totalPages, startPage + 4);
@@ -186,74 +186,74 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
     }
 
     return (
-      <div className="flex items-center space-x-1">
-        {/* 上一页 */}
-        <button
+      <div className="flex items-center space-x-2">
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-8 w-8 p-0"
         >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
 
-        {/* 页码 */}
         {pages.map((page) => (
-          <button
+          <Button
             key={page}
+            variant={currentPage === page ? "default" : "ghost"}
+            size="sm"
             onClick={() => handlePageChange(page)}
-            className={`w-8 h-8 flex items-center justify-center text-sm font-medium rounded ${
-              currentPage === page
-                ? 'bg-blue-500 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
+            className="h-8 w-8 p-0"
           >
             {page}
-          </button>
+          </Button>
         ))}
 
-        {/* 省略号和总页数 */}
         {endPage < totalPages && (
           <>
             {endPage < totalPages - 1 && (
-              <span className="w-8 h-8 flex items-center justify-center text-gray-400">
-                <MoreHorizontal className="w-4 h-4" />
+              <span className="flex h-8 w-8 items-center justify-center">
+                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
               </span>
             )}
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => handlePageChange(totalPages)}
-              className="w-8 h-8 flex items-center justify-center text-sm font-medium text-gray-700 hover:bg-gray-100 rounded"
+              className="h-8 w-8 p-0"
             >
               {totalPages}
-            </button>
+            </Button>
           </>
         )}
 
-        {/* 下一页 */}
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="h-8 w-8 p-0"
         >
-          <ChevronRight className="w-4 h-4" />
-        </button>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
 
-        {/* 前往 */}
-        <span className="ml-4 text-sm text-gray-500">前往</span>
-        <input
-          type="number"
-          min="1"
-          max={totalPages}
-          value=""
-          placeholder="1"
-          onChange={(e) => {
-            const page = parseInt(e.target.value);
-            if (page >= 1 && page <= totalPages) {
-              handlePageChange(page);
-            }
-          }}
-          className="w-12 h-8 px-2 text-sm border border-gray-300 rounded text-center"
-        />
-        <span className="text-sm text-gray-500">页</span>
+        <div className="flex items-center space-x-2 ml-4">
+          <span className="text-sm text-muted-foreground">前往</span>
+          <Input
+            type="number"
+            min="1"
+            max={totalPages}
+            placeholder="1"
+            onChange={(e) => {
+              const page = parseInt(e.target.value);
+              if (page >= 1 && page <= totalPages) {
+                handlePageChange(page);
+              }
+            }}
+            className="h-8 w-12 text-center"
+          />
+          <span className="text-sm text-muted-foreground">页</span>
+        </div>
       </div>
     );
   };
@@ -475,7 +475,7 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
               <span className="text-sm text-gray-600">条记录</span>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
                 显示 {startIndex + 1}-{Math.min(startIndex + pageSize, filteredAndSortedProjects.length)} 条，共 {filteredAndSortedProjects.length} 条
               </span>
