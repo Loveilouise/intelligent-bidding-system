@@ -21,7 +21,7 @@ const FeatureButtons: React.FC = () => {
         <button
           key={feature.id}
           onClick={() => handleFeatureClick(feature.id)}
-          className="px-3 py-2 text-sm text-gray-700 bg-gray-50 rounded-lg hover:bg-sky-50 hover:text-sky-600 transition-colors duration-200"
+          className="px-3 py-2 text-sm text-gray-700 bg-gray-50 rounded-lg hover:bg-primary/5 hover:text-primary transition-colors duration-200"
         >
           {feature.name}
         </button>
