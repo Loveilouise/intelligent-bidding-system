@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, FileText, Eye, Check, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -290,38 +289,37 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
             <div className="flex-1 min-h-0 space-y-4">
               {paginatedTemplates.length > 0 ? (
                 <>
-                  <div className="grid gap-3 max-h-[400px] overflow-y-auto">
+                  <div className="grid gap-2 max-h-[450px] overflow-y-auto">
                     {paginatedTemplates.map((template) => (
-                      <div key={template.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <FileText className="w-5 h-5 text-sky-600 flex-shrink-0" />
-                              <div className="min-w-0 flex-1">
-                                <h3 className="font-medium text-gray-900 text-base">{template.name}</h3>
-                                <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full mt-1">
+                      <div key={template.id} className="border rounded-lg p-3 hover:bg-gray-50">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
+                            <FileText className="w-5 h-5 text-sky-600 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center space-x-3">
+                                <h3 className="font-medium text-gray-900 text-sm truncate">{template.name}</h3>
+                                <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full flex-shrink-0">
                                   {template.category}
                                 </span>
                               </div>
                             </div>
-                            <p className="text-sm text-gray-600 line-clamp-2">{template.description}</p>
                           </div>
                           <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handlePreview(template)}
-                              className="h-8 px-3 text-sm"
+                              className="h-7 px-2 text-xs"
                             >
-                              <Eye className="w-4 h-4 mr-1" />
+                              <Eye className="w-3 h-3 mr-1" />
                               预览
                             </Button>
                             <Button
                               size="sm"
                               onClick={() => handleSelect(template)}
-                              className="h-8 px-3 text-sm bg-sky-600 hover:bg-sky-700"
+                              className="h-7 px-2 text-xs bg-sky-600 hover:bg-sky-700"
                             >
-                              <Check className="w-4 h-4 mr-1" />
+                              <Check className="w-3 h-3 mr-1" />
                               选择
                             </Button>
                           </div>

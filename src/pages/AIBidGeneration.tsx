@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,6 @@ import BidSetup from '@/components/BidSetup';
 import BidGeneration from '@/components/BidGeneration';
 import BidEditing from '@/components/BidEditing';
 import DownloadSettingsDialog from '@/components/DownloadSettingsDialog';
-import WordCounter from '@/components/WordCounter';
 import { ProjectInfo, UploadedFile, CatalogItem } from '@/types/bid';
 
 const AIBidGeneration: React.FC = () => {
@@ -136,7 +136,6 @@ const AIBidGeneration: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <WordCounter />
               <Button variant="outline" onClick={handlePrevStep}>
                 上一步
               </Button>
@@ -201,7 +200,6 @@ const AIBidGeneration: React.FC = () => {
 
           {/* 操作按钮 */}
           <div className="flex items-center space-x-4">
-            <WordCounter />
             <div className="flex items-center space-x-2">
               {activeTab !== 'setup' && (
                 <Button variant="outline" onClick={handlePrevStep}>

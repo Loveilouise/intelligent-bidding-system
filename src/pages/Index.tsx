@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import UserProfile from '../components/UserProfile';
+import WordCounter from '../components/WordCounter';
 import LoginForm from '../components/LoginForm';
 import HistoryBidManagement from './HistoryBidManagement';
 import TemplateManagement from './TemplateManagement';
@@ -71,11 +72,14 @@ const Index = () => {
           <h1 className="text-xl font-semibold text-gray-900">
             {getModuleTitle(activeModule)}
           </h1>
-          <UserProfile 
-            onLogout={handleLogout} 
-            onPersonalCenter={handlePersonalCenter}
-            onWorkspaceManagement={handleWorkspaceManagement}
-          />
+          <div className="flex items-center space-x-4">
+            <WordCounter />
+            <UserProfile 
+              onLogout={handleLogout} 
+              onPersonalCenter={handlePersonalCenter}
+              onWorkspaceManagement={handleWorkspaceManagement}
+            />
+          </div>
         </div>
         
         <div className="flex-1 overflow-hidden">
