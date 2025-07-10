@@ -63,12 +63,12 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex">
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
       
       <div className="flex-1 flex flex-col">
-        <div className="bg-white border-b border-gray-200 px-4 py-2 flex justify-between items-center">
-          <h1 className="text-xl font-semibold text-gray-900">
+        <div className="bg-white/95 backdrop-blur-sm border-b border-blue-200 px-4 py-2 flex justify-between items-center">
+          <h1 className="text-xl font-semibold text-blue-900">
             {getModuleTitle(activeModule)}
           </h1>
           <UserProfile 
@@ -88,11 +88,11 @@ const Index = () => {
               {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
               {!['history-bid-management', 'template-management', 'personal-knowledge'].includes(activeModule) && (
                 <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+                  <div className="text-center bg-white/90 backdrop-blur-sm rounded-lg p-8 shadow-lg">
+                    <h2 className="text-2xl font-semibold text-blue-800 mb-2">
                       {getModuleTitle(activeModule)}
                     </h2>
-                    <p className="text-gray-500">功能开发中，敬请期待...</p>
+                    <p className="text-blue-600">功能开发中，敬请期待...</p>
                   </div>
                 </div>
               )}
