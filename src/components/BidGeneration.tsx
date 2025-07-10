@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { RefreshCw, ChevronDown, ChevronRight, Trash2, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -258,7 +257,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                 <Checkbox
                   id="business-select-all"
                   checked={businessSelectAll}
-                  onCheckedChange={setBusinessSelectAll}
+                  onCheckedChange={(checked) => setBusinessSelectAll(checked === true)}
                   className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
                 />
                 <label htmlFor="business-select-all" className="text-sm">全选</label>
@@ -359,7 +358,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                 <Checkbox
                   id="technical-select-all"
                   checked={technicalSelectAll}
-                  onCheckedChange={setTechnicalSelectAll}
+                  onCheckedChange={(checked) => setTechnicalSelectAll(checked === true)}
                   className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
                 />
                 <label htmlFor="technical-select-all" className="text-sm">全选</label>
