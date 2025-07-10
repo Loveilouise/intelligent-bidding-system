@@ -5,6 +5,7 @@ import BidSetup from '@/components/BidSetup';
 import BidGeneration from '@/components/BidGeneration';
 import BidEditing from '@/components/BidEditing';
 import DownloadSettingsDialog from '@/components/DownloadSettingsDialog';
+import WordCounter from '@/components/WordCounter';
 import { ProjectInfo, UploadedFile, CatalogItem } from '@/types/bid';
 
 const AIBidGeneration: React.FC = () => {
@@ -134,7 +135,8 @@ const AIBidGeneration: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
+              <WordCounter />
               <Button variant="outline" onClick={handlePrevStep}>
                 上一步
               </Button>
@@ -198,32 +200,35 @@ const AIBidGeneration: React.FC = () => {
           </div>
 
           {/* 操作按钮 */}
-          <div className="flex items-center space-x-2">
-            {activeTab !== 'setup' && (
-              <Button variant="outline" onClick={handlePrevStep}>
-                上一步
-              </Button>
-            )}
-            {activeTab === 'editing' && (
-              <>
-                <Button variant="outline" onClick={handleSave}>
-                  保存
+          <div className="flex items-center space-x-4">
+            <WordCounter />
+            <div className="flex items-center space-x-2">
+              {activeTab !== 'setup' && (
+                <Button variant="outline" onClick={handlePrevStep}>
+                  上一步
                 </Button>
-                <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
-                  下载标书
+              )}
+              {activeTab === 'editing' && (
+                <>
+                  <Button variant="outline" onClick={handleSave}>
+                    保存
+                  </Button>
+                  <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
+                    下载标书
+                  </Button>
+                </>
+              )}
+              {activeTab === 'setup' && (
+                <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
+                  下一步
                 </Button>
-              </>
-            )}
-            {activeTab === 'setup' && (
-              <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
-                下一步
-              </Button>
-            )}
-            {activeTab === 'generation' && (
-              <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
-                下一步
-              </Button>
-            )}
+              )}
+              {activeTab === 'generation' && (
+                <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
+                  下一步
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 

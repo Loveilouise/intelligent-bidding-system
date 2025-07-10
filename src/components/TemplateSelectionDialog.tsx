@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, FileText, Eye, Check, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -176,22 +177,40 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
     return (
       <div className="flex items-center space-x-1">
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="h-6 w-6 p-0"
+          className="h-8 w-8 p-0"
         >
-          <ChevronLeft className="h-3 w-3" />
+          <ChevronLeft className="h-4 w-4" />
         </Button>
+
+        {startPage > 1 && (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(1)}
+              className="h-8 w-8 p-0"
+            >
+              1
+            </Button>
+            {startPage > 2 && (
+              <span className="flex h-8 w-8 items-center justify-center">
+                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+              </span>
+            )}
+          </>
+        )}
 
         {pages.map((page) => (
           <Button
             key={page}
-            variant={currentPage === page ? "default" : "ghost"}
+            variant={currentPage === page ? "default" : "outline"}
             size="sm"
             onClick={() => handlePageChange(page)}
-            className="h-6 w-6 p-0 text-xs"
+            className="h-8 w-8 p-0"
           >
             {page}
           </Button>
@@ -200,15 +219,15 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
         {endPage < totalPages && (
           <>
             {endPage < totalPages - 1 && (
-              <span className="flex h-6 w-6 items-center justify-center">
-                <MoreHorizontal className="h-3 w-3 text-muted-foreground" />
+              <span className="flex h-8 w-8 items-center justify-center">
+                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
               </span>
             )}
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => handlePageChange(totalPages)}
-              className="h-6 w-6 p-0 text-xs"
+              className="h-8 w-8 p-0"
             >
               {totalPages}
             </Button>
@@ -216,32 +235,14 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
         )}
 
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="h-6 w-6 p-0"
+          className="h-8 w-8 p-0"
         >
-          <ChevronRight className="h-3 w-3" />
+          <ChevronRight className="h-4 w-4" />
         </Button>
-
-        <div className="flex items-center space-x-1 ml-2">
-          <span className="text-xs text-muted-foreground">前往</span>
-          <Input
-            type="number"
-            min="1"
-            max={totalPages}
-            placeholder="1"
-            onChange={(e) => {
-              const page = parseInt(e.target.value);
-              if (page >= 1 && page <= totalPages) {
-                handlePageChange(page);
-              }
-            }}
-            className="h-6 w-8 px-1 text-xs text-center"
-          />
-          <span className="text-xs text-muted-foreground">页</span>
-        </div>
       </div>
     );
   };
@@ -249,7 +250,7 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="sm:max-w-[900px] max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>选择投标模板</DialogTitle>
           </DialogHeader>
@@ -285,41 +286,42 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
               </div>
             </div>
 
-            {/* Template List with Pagination */}
-            <div className="border rounded-lg flex-1 flex flex-col min-h-0">
+            {/* Template List */}
+            <div className="flex-1 min-h-0 space-y-4">
               {paginatedTemplates.length > 0 ? (
-                <div className="flex flex-col h-full">
-                  <div className="divide-y overflow-y-auto flex-1">
+                <>
+                  <div className="grid gap-3 max-h-[400px] overflow-y-auto">
                     {paginatedTemplates.map((template) => (
-                      <div key={template.id} className="p-3 hover:bg-gray-50">
-                        <div className="flex items-center justify-between">
+                      <div key={template.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center space-x-3">
-                              <FileText className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                            <div className="flex items-center space-x-3 mb-2">
+                              <FileText className="w-5 h-5 text-sky-600 flex-shrink-0" />
                               <div className="min-w-0 flex-1">
-                                <h3 className="font-medium text-gray-900 truncate">{template.name}</h3>
+                                <h3 className="font-medium text-gray-900 text-base">{template.name}</h3>
                                 <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full mt-1">
                                   {template.category}
                                 </span>
                               </div>
                             </div>
+                            <p className="text-sm text-gray-600 line-clamp-2">{template.description}</p>
                           </div>
-                          <div className="flex items-center space-x-1 ml-4 flex-shrink-0">
+                          <div className="flex items-center space-x-2 ml-4 flex-shrink-0">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handlePreview(template)}
-                              className="h-7 px-2 text-xs"
+                              className="h-8 px-3 text-sm"
                             >
-                              <Eye className="w-3 h-3 mr-1" />
+                              <Eye className="w-4 h-4 mr-1" />
                               预览
                             </Button>
                             <Button
                               size="sm"
                               onClick={() => handleSelect(template)}
-                              className="h-7 px-2 text-xs bg-sky-600 hover:bg-sky-700"
+                              className="h-8 px-3 text-sm bg-sky-600 hover:bg-sky-700"
                             >
-                              <Check className="w-3 h-3 mr-1" />
+                              <Check className="w-4 h-4 mr-1" />
                               选择
                             </Button>
                           </div>
@@ -328,25 +330,23 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
                     ))}
                   </div>
                   
-                  {/* Pagination at bottom */}
+                  {/* Pagination */}
                   {totalPages > 1 && (
-                    <div className="border-t p-3 bg-gray-50/50">
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs text-muted-foreground">
-                          共 {filteredTemplates.length} 个模板，第 {currentPage} 页，共 {totalPages} 页
-                        </div>
-                        <div className="flex-shrink-0">
-                          {renderPagination()}
-                        </div>
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="text-sm text-gray-500">
+                        显示 {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredTemplates.length)} 条，共 {filteredTemplates.length} 条
                       </div>
+                      {renderPagination()}
                     </div>
                   )}
-                </div>
+                </>
               ) : (
-                <div className="p-8 text-center flex-1 flex flex-col justify-center">
-                  <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">暂无模板</h3>
-                  <p className="text-gray-500">没有找到匹配的模板</p>
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">暂无模板</h3>
+                    <p className="text-gray-500">没有找到匹配的模板</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -373,7 +373,7 @@ const TemplateSelectionDialog: React.FC<TemplateSelectionDialogProps> = ({
               </div>
               <div>
                 <Label className="text-sm font-medium text-gray-700">目录结构</Label>
-                <div className="mt-2 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-2 p-4 bg-gray-50 rounded-lg max-h-60 overflow-y-auto">
                   <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono leading-relaxed">
                     {previewTemplate.catalogContent}
                   </pre>

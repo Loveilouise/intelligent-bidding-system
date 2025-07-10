@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { RefreshCw, ChevronDown, ChevronRight, Trash2, Settings2 } from 'lucide-react';
+import { RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -44,7 +44,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
   const [editingWordCount, setEditingWordCount] = useState('');
   const [currentWordCountItem, setCurrentWordCountItem] = useState<string | null>(null);
 
-  // Sample data - separate catalogs for business and technical
+  // Sample data - separate catalogs for business and technical with default 1000 words
   const [businessCatalogItems, setBusinessCatalogItems] = useState<CatalogItemType[]>([
     { 
       id: 'b1', 
@@ -53,13 +53,13 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
       expanded: true,
       wordCount: 1000,
       children: [
-        { id: 'b1-1', title: '投标函', level: 2, wordCount: 500 },
-        { id: 'b1-2', title: '法定代表人身份证明', level: 2, wordCount: 300 },
-        { id: 'b1-3', title: '授权委托书', level: 2, wordCount: 200 }
+        { id: 'b1-1', title: '投标函', level: 2, wordCount: 1000 },
+        { id: 'b1-2', title: '法定代表人身份证明', level: 2, wordCount: 1000 },
+        { id: 'b1-3', title: '授权委托书', level: 2, wordCount: 1000 }
       ]
     },
-    { id: 'b2', title: '资质证明文件', level: 1, expanded: true, wordCount: 800 },
-    { id: 'b3', title: '财务状况报告', level: 1, expanded: true, wordCount: 1200 }
+    { id: 'b2', title: '资质证明文件', level: 1, expanded: true, wordCount: 1000 },
+    { id: 'b3', title: '财务状况报告', level: 1, expanded: true, wordCount: 1000 }
   ]);
 
   const [technicalCatalogItems, setTechnicalCatalogItems] = useState<CatalogItemType[]>([
@@ -68,16 +68,16 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
       title: '技术方案', 
       level: 1,
       expanded: true,
-      wordCount: 2000,
+      wordCount: 1000,
       children: [
         { id: 't1-1', title: '总体技术方案', level: 2, wordCount: 1000 },
-        { id: 't1-2', title: '技术路线', level: 2, wordCount: 800 },
-        { id: 't1-3', title: '关键技术', level: 2, wordCount: 1200 }
+        { id: 't1-2', title: '技术路线', level: 2, wordCount: 1000 },
+        { id: 't1-3', title: '关键技术', level: 2, wordCount: 1000 }
       ]
     },
-    { id: 't2', title: '项目组织架构', level: 1, expanded: true, wordCount: 1500 },
+    { id: 't2', title: '项目组织架构', level: 1, expanded: true, wordCount: 1000 },
     { id: 't3', title: '进度计划', level: 1, expanded: true, wordCount: 1000 },
-    { id: 't4', title: '质量保证措施', level: 1, expanded: true, wordCount: 1800 }
+    { id: 't4', title: '质量保证措施', level: 1, expanded: true, wordCount: 1000 }
   ]);
 
   const calculateTotalWordCount = (items: CatalogItemType[]): number => {
@@ -88,6 +88,17 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
       }
       return total + itemTotal;
     }, 0);
+  };
+
+  const getAllItemIds = (items: CatalogItemType[]): string[] => {
+    const ids: string[] = [];
+    items.forEach(item => {
+      ids.push(item.id);
+      if (item.children) {
+        ids.push(...getAllItemIds(item.children));
+      }
+    });
+    return ids;
   };
 
   const handleBusinessBatchMode = () => {
@@ -112,6 +123,52 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
     setTechnicalBatchMode(false);
     setTechnicalSelectedItems(new Set());
     setTechnicalSelectAll(false);
+  };
+
+  const handleBusinessSelectAll = (checked: boolean) => {
+    setBusinessSelectAll(checked);
+    if (checked) {
+      const allIds = getAllItemIds(businessCatalogItems);
+      setBusinessSelectedItems(new Set(allIds));
+    } else {
+      setBusinessSelectedItems(new Set());
+    }
+  };
+
+  const handleTechnicalSelectAll = (checked: boolean) => {
+    setTechnicalSelectAll(checked);
+    if (checked) {
+      const allIds = getAllItemIds(technicalCatalogItems);
+      setTechnicalSelectedItems(new Set(allIds));
+    } else {
+      setTechnicalSelectedItems(new Set());
+    }
+  };
+
+  const handleBusinessItemSelect = (itemId: string, checked: boolean) => {
+    const newSelected = new Set(businessSelectedItems);
+    if (checked) {
+      newSelected.add(itemId);
+    } else {
+      newSelected.delete(itemId);
+    }
+    setBusinessSelectedItems(newSelected);
+    
+    const allIds = getAllItemIds(businessCatalogItems);
+    setBusinessSelectAll(newSelected.size === allIds.length);
+  };
+
+  const handleTechnicalItemSelect = (itemId: string, checked: boolean) => {
+    const newSelected = new Set(technicalSelectedItems);
+    if (checked) {
+      newSelected.add(itemId);
+    } else {
+      newSelected.delete(itemId);
+    }
+    setTechnicalSelectedItems(newSelected);
+    
+    const allIds = getAllItemIds(technicalCatalogItems);
+    setTechnicalSelectAll(newSelected.size === allIds.length);
   };
 
   const handleDoubleClick = (itemId: string, title: string) => {
@@ -265,7 +322,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                     <Checkbox
                       id="business-select-all"
                       checked={businessSelectAll}
-                      onCheckedChange={(checked) => setBusinessSelectAll(checked === true)}
+                      onCheckedChange={(checked) => handleBusinessSelectAll(checked === true)}
                       className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
                     />
                     <label htmlFor="business-select-all" className="text-sm">全选</label>
@@ -287,7 +344,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                       item={item}
                       batchMode={businessBatchMode}
                       isSelected={businessSelectedItems.has(item.id)}
-                      onToggleSelect={() => {}}
+                      onToggleSelect={handleBusinessItemSelect}
                       onToggleExpansion={(itemId) => {
                         const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
                           return items.map(item => {
@@ -369,7 +426,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                     <Checkbox
                       id="technical-select-all"
                       checked={technicalSelectAll}
-                      onCheckedChange={(checked) => setTechnicalSelectAll(checked === true)}
+                      onCheckedChange={(checked) => handleTechnicalSelectAll(checked === true)}
                       className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
                     />
                     <label htmlFor="technical-select-all" className="text-sm">全选</label>
@@ -391,7 +448,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                       item={item}
                       batchMode={technicalBatchMode}
                       isSelected={technicalSelectedItems.has(item.id)}
-                      onToggleSelect={() => {}}
+                      onToggleSelect={handleTechnicalItemSelect}
                       onToggleExpansion={(itemId) => {
                         const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
                           return items.map(item => {
