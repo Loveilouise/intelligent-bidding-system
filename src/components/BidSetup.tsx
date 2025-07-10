@@ -65,38 +65,6 @@ const BidSetup: React.FC<BidSetupProps> = ({
     { value: 'kb4', label: '通用知识库' }
   ];
 
-  // Mock template data - in real app, this would come from the template management
-  const templates = [
-    { 
-      id: 'template1', 
-      name: '市政道路施工方案模板',
-      category: '市政工程',
-      description: '适用于城市道路、桥梁等市政基础设施建设项目',
-      catalogContent: '1. 投标函\n   1.1 投标函\n   1.2 法定代表人身份证明\n   1.3 授权委托书\n2. 商务标书\n   2.1 公司资质证明\n   2.2 财务状况报告\n   2.3 项目业绩证明\n3. 技术标书\n   3.1 技术方案\n   3.2 项目组织架构\n   3.3 进度计划\n   3.4 质量保证措施'
-    },
-    { 
-      id: 'template2', 
-      name: '建筑装修工程方案模板',
-      category: '装修工程',
-      description: '包含室内外装修、水电安装等完整施工方案',
-      catalogContent: '1. 技术标书\n   1.1 技术方案\n   1.2 项目组织架构\n   1.3 施工工艺\n2. 商务标书\n   2.1 报价清单\n   2.2 资质证明\n   2.3 业绩证明\n3. 投标函\n   3.1 投标函\n   3.2 法人授权书'
-    },
-    { 
-      id: 'template3', 
-      name: '智能化系统集成方案模板',
-      category: '系统集成',
-      description: '智能监控、消防、安防等系统集成标准方案',
-      catalogContent: '1. 系统设计方案\n   1.1 系统架构\n   1.2 设备清单\n   1.3 技术规格\n2. 实施方案\n   2.1 安装计划\n   2.2 调试方案\n   2.3 验收标准\n3. 商务标书\n   3.1 报价明细\n   3.2 公司资质'
-    },
-    { 
-      id: 'template4', 
-      name: '通用投标模板',
-      category: '通用',
-      description: '适用于多种类型项目的通用投标模板',
-      catalogContent: '1. 投标函及投标函附录\n2. 法定代表人身份证明\n3. 授权委托书\n4. 投标保证金\n5. 已标价工程量清单\n6. 技术标书\n7. 商务标书\n8. 资格审查资料'
-    }
-  ];
-
   const catalogReference = `参考格式：
 1. 投标函
    1.1 投标函
@@ -119,10 +87,6 @@ const BidSetup: React.FC<BidSetupProps> = ({
 
   const handleSelectTemplate = (templateId: string) => {
     setSelectedTemplate(templateId);
-    const template = templates.find(t => t.id === templateId);
-    if (template) {
-      setCustomCatalog(template.catalogContent);
-    }
   };
 
   const handleOpenTemplateDialog = () => {
@@ -149,6 +113,8 @@ const BidSetup: React.FC<BidSetupProps> = ({
       type: businessTypeMapping[template.category] || 'construction',
       description: template.description
     });
+
+    setTemplateDialogOpen(false);
   };
 
   return (
@@ -209,10 +175,10 @@ const BidSetup: React.FC<BidSetupProps> = ({
         </div>
       </div>
 
-      {/* 生标设置 */}
+      {/* 编写方式 */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">生标设置</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">编写方式</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div 
             className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
               settingsMode === 'auto-parse' 
@@ -223,24 +189,9 @@ const BidSetup: React.FC<BidSetupProps> = ({
           >
             <div className="flex items-center mb-2">
               <FileText className="w-5 h-5 text-sky-600 mr-2" />
-              <h4 className="font-medium">基于招标文件解析</h4>
+              <h4 className="font-medium">按招标文件生成</h4>
             </div>
             <p className="text-sm text-gray-600">自动解析招标文件，智能生成投标文件目录</p>
-          </div>
-          
-          <div 
-            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-              settingsMode === 'template-based' 
-                ? 'border-sky-600 bg-sky-50' 
-                : 'border-gray-200 hover:border-sky-400'
-            }`}
-            onClick={() => setSettingsMode('template-based')}
-          >
-            <div className="flex items-center mb-2">
-              <Settings className="w-5 h-5 text-sky-600 mr-2" />
-              <h4 className="font-medium">基于投标模板</h4>
-            </div>
-            <p className="text-sm text-gray-600">使用现有模板快速创建投标文件结构</p>
           </div>
           
           <div 
@@ -253,9 +204,9 @@ const BidSetup: React.FC<BidSetupProps> = ({
           >
             <div className="flex items-center mb-2">
               <Plus className="w-5 h-5 text-sky-600 mr-2" />
-              <h4 className="font-medium">自定义创建</h4>
+              <h4 className="font-medium">按目录定制生成</h4>
             </div>
-            <p className="text-sm text-gray-600">完全自定义投标文件目录和结构</p>
+            <p className="text-sm text-gray-600">自定义投标文件目录和结构</p>
           </div>
         </div>
       </div>
@@ -286,50 +237,19 @@ const BidSetup: React.FC<BidSetupProps> = ({
         </div>
       )}
 
-      {/* Enhanced template-based mode with dialog */}
-      {settingsMode === 'template-based' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">选择投标模板</h3>
-          <div className="text-center py-8">
-            <FileText className="w-12 h-12 text-sky-600 mx-auto mb-4" />
-            <p className="text-gray-600 mb-4">从模板库中选择适合的投标模板</p>
-            <Button 
-              onClick={handleOpenTemplateDialog}
-              className="bg-sky-600 hover:bg-sky-700"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              选择模板
-            </Button>
-          </div>
-          
-          {selectedTemplateInfo && (
-            <div className="mt-6 p-4 bg-sky-50 rounded-lg border border-sky-200">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-1">已选择模板：{selectedTemplateInfo.name}</h4>
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="inline-flex px-2 py-1 text-xs font-medium text-sky-700 bg-sky-100 rounded-full">
-                      {selectedTemplateInfo.category}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600">{selectedTemplateInfo.description}</p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleOpenTemplateDialog}
-                >
-                  更换模板
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {settingsMode === 'custom-create' && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">手动输入目录</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">手动输入目录</h3>
+            <Button 
+              variant="outline"
+              onClick={handleOpenTemplateDialog}
+              className="border-sky-600 text-sky-600 hover:bg-sky-50"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              使用模板
+            </Button>
+          </div>
           <div className="relative">
             <Textarea
               value={customCatalog}
@@ -340,28 +260,6 @@ const BidSetup: React.FC<BidSetupProps> = ({
               }}
               placeholder={catalogReference}
               className="min-h-[400px] resize-none text-sm leading-relaxed border-sky-200 focus:border-sky-600"
-              style={{ maxHeight: '400px', overflowY: 'auto' }}
-            />
-            <div className="absolute bottom-2 right-2 text-xs text-gray-400">
-              {customCatalog.length}/10000
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Display catalog for template-based mode */}
-      {settingsMode === 'template-based' && selectedTemplateInfo && customCatalog && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">目录显示</h3>
-          <div className="relative">
-            <Textarea
-              value={customCatalog}
-              onChange={(e) => {
-                if (e.target.value.length <= 10000) {
-                  setCustomCatalog(e.target.value);
-                }
-              }}
-              className="min-h-[400px] resize-none text-sm leading-relaxed border-sky-200 focus:border-sky-600 font-mono"
               style={{ maxHeight: '400px', overflowY: 'auto' }}
             />
             <div className="absolute bottom-2 right-2 text-xs text-gray-400">
