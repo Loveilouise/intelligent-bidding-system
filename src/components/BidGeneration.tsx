@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import { RefreshCw, ChevronDown, ChevronRight, Trash2, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,8 +26,8 @@ interface BidGenerationProps {
 
 const BidGeneration: React.FC<BidGenerationProps> = ({
   generationStatus,
-  catalogItems,
-  setCatalogItems,
+  catalogType,
+  setCatalogType,
   onRegenerateCatalog
 }) => {
   const [businessBatchMode, setBusinessBatchMode] = useState(false);
@@ -210,205 +212,218 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-6 h-[600px]">
-      {/* 商务标 */}
-      <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
-        <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-900">商务标</h3>
-        </div>
+    <div className="h-[600px]">
+      <Tabs value={catalogType} onValueChange={(value) => setCatalogType(value as 'business' | 'technical')} className="h-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="business">商务标</TabsTrigger>
+          <TabsTrigger value="technical">技术标</TabsTrigger>
+        </TabsList>
 
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={() => setBusinessExpanded(!businessExpanded)}>
-              {businessExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </Button>
-          </div>
-          
-          {!businessBatchMode ? (
-            <div className="flex items-center space-x-2">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-sky-600 text-sky-600 hover:bg-sky-50">
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    重新生成
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>确认重新生成</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      重新生成将覆盖当前目录，确定要继续吗？
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>取消</AlertDialogCancel>
-                    <AlertDialogAction onClick={onRegenerateCatalog} className="bg-sky-600 hover:bg-sky-700">确认</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-              
-              <Button variant="outline" size="sm" onClick={handleBusinessBatchMode}>
-                批量操作
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-2">
+        <TabsContent value="business" className="h-[calc(100%-3rem)]">
+          <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="business-select-all"
-                  checked={businessSelectAll}
-                  onCheckedChange={(checked) => setBusinessSelectAll(checked === true)}
-                  className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
-                />
-                <label htmlFor="business-select-all" className="text-sm">全选</label>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setBusinessExpanded(!businessExpanded)}
+                >
+                  {businessExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </Button>
               </div>
               
-              <Button variant="outline" size="sm" onClick={handleBusinessCancelBatch}>
-                取消
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-1">
-            {businessCatalogItems.map(item => (
-              <CatalogItem
-                key={item.id}
-                item={item}
-                batchMode={businessBatchMode}
-                isSelected={businessSelectedItems.has(item.id)}
-                onToggleSelect={() => {}}
-                onToggleExpansion={(itemId) => {
-                  const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
-                    return items.map(item => {
-                      if (item.id === itemId) {
-                        return { ...item, expanded: !item.expanded };
-                      }
-                      if (item.children) {
-                        return { ...item, children: updateItems(item.children) };
-                      }
-                      return item;
-                    });
-                  };
-                  setBusinessCatalogItems(updateItems(businessCatalogItems));
-                }}
-                onAddSameLevel={() => {}}
-                onAddSubLevel={() => {}}
-                onDelete={() => {}}
-                onDoubleClick={handleDoubleClick}
-                onWordCountSetting={handleWordCountSetting}
-                editingItem={editingItem}
-                editingText={editingText}
-                setEditingText={setEditingText}
-                onSaveEdit={handleSaveEdit}
-                showWordCount={false}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 技术标 */}
-      <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
-        <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-900">技术标</h3>
-        </div>
-
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={() => setTechnicalExpanded(!technicalExpanded)}>
-              {technicalExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </Button>
-            <span className="text-sm text-gray-600">
-              预计生成字数：{calculateTotalWordCount(technicalCatalogItems)}
-            </span>
-          </div>
-          
-          {!technicalBatchMode ? (
-            <div className="flex items-center space-x-2">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-sky-600 text-sky-600 hover:bg-sky-50">
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    重新生成
+              {!businessBatchMode ? (
+                <div className="flex items-center space-x-2">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-sky-600 text-sky-600 hover:bg-sky-50">
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        重新生成
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>确认重新生成</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          重新生成将覆盖当前目录，确定要继续吗？
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={onRegenerateCatalog} className="bg-sky-600 hover:bg-sky-700">确认</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  
+                  <Button variant="outline" size="sm" onClick={handleBusinessBatchMode}>
+                    批量操作
                   </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>确认重新生成</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      重新生成将覆盖当前目录，确定要继续吗？
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>取消</AlertDialogCancel>
-                    <AlertDialogAction onClick={onRegenerateCatalog} className="bg-sky-600 hover:bg-sky-700">确认</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-              
-              <Button variant="outline" size="sm" onClick={handleTechnicalBatchMode}>
-                批量操作
-              </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="business-select-all"
+                      checked={businessSelectAll}
+                      onCheckedChange={(checked) => setBusinessSelectAll(checked === true)}
+                      className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                    />
+                    <label htmlFor="business-select-all" className="text-sm">全选</label>
+                  </div>
+                  
+                  <Button variant="outline" size="sm" onClick={handleBusinessCancelBatch}>
+                    取消
+                  </Button>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="flex items-center space-x-2">
+
+            {businessExpanded && (
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-1">
+                  {businessCatalogItems.map(item => (
+                    <CatalogItem
+                      key={item.id}
+                      item={item}
+                      batchMode={businessBatchMode}
+                      isSelected={businessSelectedItems.has(item.id)}
+                      onToggleSelect={() => {}}
+                      onToggleExpansion={(itemId) => {
+                        const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
+                          return items.map(item => {
+                            if (item.id === itemId) {
+                              return { ...item, expanded: !item.expanded };
+                            }
+                            if (item.children) {
+                              return { ...item, children: updateItems(item.children) };
+                            }
+                            return item;
+                          });
+                        };
+                        setBusinessCatalogItems(updateItems(businessCatalogItems));
+                      }}
+                      onAddSameLevel={() => {}}
+                      onAddSubLevel={() => {}}
+                      onDelete={() => {}}
+                      onDoubleClick={handleDoubleClick}
+                      onWordCountSetting={handleWordCountSetting}
+                      editingItem={editingItem}
+                      editingText={editingText}
+                      setEditingText={setEditingText}
+                      onSaveEdit={handleSaveEdit}
+                      showWordCount={false}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="technical" className="h-[calc(100%-3rem)]">
+          <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="technical-select-all"
-                  checked={technicalSelectAll}
-                  onCheckedChange={(checked) => setTechnicalSelectAll(checked === true)}
-                  className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
-                />
-                <label htmlFor="technical-select-all" className="text-sm">全选</label>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setTechnicalExpanded(!technicalExpanded)}
+                >
+                  {technicalExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </Button>
+                <span className="text-sm text-gray-600">
+                  预计生成字数：{calculateTotalWordCount(technicalCatalogItems)}
+                </span>
               </div>
               
-              <Button variant="outline" size="sm" onClick={handleTechnicalCancelBatch}>
-                取消
-              </Button>
+              {!technicalBatchMode ? (
+                <div className="flex items-center space-x-2">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-sky-600 text-sky-600 hover:bg-sky-50">
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        重新生成
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>确认重新生成</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          重新生成将覆盖当前目录，确定要继续吗？
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={onRegenerateCatalog} className="bg-sky-600 hover:bg-sky-700">确认</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  
+                  <Button variant="outline" size="sm" onClick={handleTechnicalBatchMode}>
+                    批量操作
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="technical-select-all"
+                      checked={technicalSelectAll}
+                      onCheckedChange={(checked) => setTechnicalSelectAll(checked === true)}
+                      className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                    />
+                    <label htmlFor="technical-select-all" className="text-sm">全选</label>
+                  </div>
+                  
+                  <Button variant="outline" size="sm" onClick={handleTechnicalCancelBatch}>
+                    取消
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-1">
-            {technicalCatalogItems.map(item => (
-              <CatalogItem
-                key={item.id}
-                item={item}
-                batchMode={technicalBatchMode}
-                isSelected={technicalSelectedItems.has(item.id)}
-                onToggleSelect={() => {}}
-                onToggleExpansion={(itemId) => {
-                  const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
-                    return items.map(item => {
-                      if (item.id === itemId) {
-                        return { ...item, expanded: !item.expanded };
-                      }
-                      if (item.children) {
-                        return { ...item, children: updateItems(item.children) };
-                      }
-                      return item;
-                    });
-                  };
-                  setTechnicalCatalogItems(updateItems(technicalCatalogItems));
-                }}
-                onAddSameLevel={() => {}}
-                onAddSubLevel={() => {}}
-                onDelete={() => {}}
-                onDoubleClick={handleDoubleClick}
-                onWordCountSetting={handleWordCountSetting}
-                editingItem={editingItem}
-                editingText={editingText}
-                setEditingText={setEditingText}
-                onSaveEdit={handleSaveEdit}
-                showWordCount={true}
-              />
-            ))}
+            {technicalExpanded && (
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-1">
+                  {technicalCatalogItems.map(item => (
+                    <CatalogItem
+                      key={item.id}
+                      item={item}
+                      batchMode={technicalBatchMode}
+                      isSelected={technicalSelectedItems.has(item.id)}
+                      onToggleSelect={() => {}}
+                      onToggleExpansion={(itemId) => {
+                        const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
+                          return items.map(item => {
+                            if (item.id === itemId) {
+                              return { ...item, expanded: !item.expanded };
+                            }
+                            if (item.children) {
+                              return { ...item, children: updateItems(item.children) };
+                            }
+                            return item;
+                          });
+                        };
+                        setTechnicalCatalogItems(updateItems(technicalCatalogItems));
+                      }}
+                      onAddSameLevel={() => {}}
+                      onAddSubLevel={() => {}}
+                      onDelete={() => {}}
+                      onDoubleClick={handleDoubleClick}
+                      onWordCountSetting={handleWordCountSetting}
+                      editingItem={editingItem}
+                      editingText={editingText}
+                      setEditingText={setEditingText}
+                      onSaveEdit={handleSaveEdit}
+                      showWordCount={true}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Word Count Setting Dialog */}
       <Dialog open={wordCountDialogOpen} onOpenChange={setWordCountDialogOpen}>
