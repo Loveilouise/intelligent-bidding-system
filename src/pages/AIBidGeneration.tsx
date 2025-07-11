@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { Clock, CheckCircle } from 'lucide-react';
+import { Clock, CheckCircle, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BidSetup from '@/components/BidSetup';
 import BidGeneration from '@/components/BidGeneration';
 import BidEditing from '@/components/BidEditing';
 import DownloadSettingsDialog from '@/components/DownloadSettingsDialog';
 import { ProjectInfo, UploadedFile, CatalogItem } from '@/types/bid';
+import { useToast } from '@/hooks/use-toast';
 
 const AIBidGeneration: React.FC = () => {
   const [activeTab, setActiveTab] = useState('setup');
@@ -43,6 +44,8 @@ const AIBidGeneration: React.FC = () => {
     { id: '3', title: '财务状况报告', level: 1, expanded: true }
   ]);
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
+  const [currentWordCount, setCurrentWordCount] = useState(0);
+  const { toast } = useToast();
 
   const tabs = [
     { id: 'setup', title: '创建标书' },
@@ -62,6 +65,8 @@ const AIBidGeneration: React.FC = () => {
       setTimeout(() => {
         setFullTextGenerationStatus('completed');
         setActiveTab('editing');
+        // 模拟生成的全文字数
+        setCurrentWordCount(8543);
       }, 3000);
     }
   };
@@ -82,10 +87,6 @@ const AIBidGeneration: React.FC = () => {
     }, 1500);
   };
 
-  const handleSave = () => {
-    console.log('保存标书');
-  };
-
   const handleDownload = () => {
     setDownloadDialogOpen(true);
   };
@@ -93,6 +94,13 @@ const AIBidGeneration: React.FC = () => {
   const handleActualDownload = () => {
     console.log('执行下载操作');
     setDownloadDialogOpen(false);
+  };
+
+  const handleAutoSave = () => {
+    toast({
+      title: "文档保存成功",
+      description: "您的标书内容已自动保存",
+    });
   };
 
   // 生成全文动画页面
@@ -163,7 +171,22 @@ const AIBidGeneration: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* 页面标题和流程指示器 */}
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
+          <div className="flex items-center">
+            <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
+            {activeTab === 'editing' && (
+              <div className="flex items-center ml-6">
+                <span className="text-sm text-gray-600 mr-2">已自动保存</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAutoSave}
+                  className="h-6 w-6 p-0"
+                >
+                  <Save className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
           
           {/* 流程步骤指示器 */}
           <div className="flex items-center space-x-6">
@@ -201,20 +224,20 @@ const AIBidGeneration: React.FC = () => {
           {/* 操作按钮 */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
+              {activeTab === 'editing' && (
+                <span className="text-sm text-gray-600">
+                  当前字数：{currentWordCount.toLocaleString()}
+                </span>
+              )}
               {activeTab !== 'setup' && (
                 <Button variant="outline" onClick={handlePrevStep}>
                   上一步
                 </Button>
               )}
               {activeTab === 'editing' && (
-                <>
-                  <Button variant="outline" onClick={handleSave}>
-                    保存
-                  </Button>
-                  <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
-                    下载标书
-                  </Button>
-                </>
+                <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
+                  下载标书
+                </Button>
               )}
               {activeTab === 'setup' && (
                 <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
@@ -267,6 +290,8 @@ const AIBidGeneration: React.FC = () => {
               setEditingTab={setEditingTab}
               editingContent={editingContent}
               setEditingContent={setEditingContent}
+              catalogItems={catalogItems}
+              setCatalogItems={setCatalogItems}
             />
           )}
         </div>

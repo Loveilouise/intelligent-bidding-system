@@ -1,139 +1,229 @@
 
 import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type } from 'lucide-react';
+import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import CatalogItem from '@/components/CatalogItem';
+import { CatalogItem as CatalogItemType } from '@/types/bid';
 
 interface BidEditingProps {
   editingTab: 'cover' | 'business' | 'technical';
   setEditingTab: (tab: 'cover' | 'business' | 'technical') => void;
   editingContent: string;
   setEditingContent: (content: string) => void;
+  catalogItems: CatalogItemType[];
+  setCatalogItems: (items: CatalogItemType[]) => void;
 }
 
-interface OutlineItem {
+interface MaterialItem {
   id: string;
-  title: string;
-  level: number;
-  expanded?: boolean;
-  children?: OutlineItem[];
+  name: string;
+  type: 'document' | 'image' | 'table';
+  folder: string;
+  content?: string;
 }
 
 const BidEditing: React.FC<BidEditingProps> = ({
   editingTab,
   setEditingTab,
   editingContent,
-  setEditingContent
+  setEditingContent,
+  catalogItems,
+  setCatalogItems
 }) => {
   const [selectedOutlineItem, setSelectedOutlineItem] = useState<string>('');
   const [knowledgeTab, setKnowledgeTab] = useState<'materials' | 'charts' | 'templates'>('materials');
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [materialFilter, setMaterialFilter] = useState<'all' | 'document' | 'image' | 'table'>('all');
+  const [currentFolder, setCurrentFolder] = useState<string>('root');
+  const [editingItem, setEditingItem] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState('');
 
-  // Mock outline data
-  const [businessOutline] = useState<OutlineItem[]>([
-    {
-      id: '1',
-      title: '投标函',
-      level: 1,
-      expanded: true,
-      children: [
-        { id: '1-1', title: '投标承诺', level: 2 },
-        { id: '1-2', title: '投标报价', level: 2 }
-      ]
-    },
-    {
-      id: '2',
-      title: '法定代表人身份证明',
-      level: 1
-    },
-    {
-      id: '3',
-      title: '授权委托书',
-      level: 1
-    },
-    {
-      id: '4',
-      title: '企业资质证明',
-      level: 1,
-      expanded: true,
-      children: [
-        { id: '4-1', title: '营业执照', level: 2 },
-        { id: '4-2', title: '资质证书', level: 2 }
-      ]
-    }
+  // Mock 素材库数据
+  const [materialFolders] = useState([
+    { id: 'company', name: '公司介绍', count: 15 },
+    { id: 'technical', name: '技术方案', count: 23 },
+    { id: 'cases', name: '项目案例', count: 18 },
+    { id: 'certificates', name: '资质证书', count: 12 }
   ]);
 
-  const [technicalOutline] = useState<OutlineItem[]>([
-    {
-      id: 't1',
-      title: '技术方案概述',
-      level: 1,
-      expanded: true,
-      children: [
-        { id: 't1-1', title: '项目理解', level: 2 },
-        { id: 't1-2', title: '技术路线', level: 2 }
-      ]
-    },
-    {
-      id: 't2',
-      title: '系统架构设计',
-      level: 1
-    },
-    {
-      id: 't3',
-      title: '实施方案',
-      level: 1,
-      expanded: true,
-      children: [
-        { id: 't3-1', title: '实施计划', level: 2 },
-        { id: 't3-2', title: '风险控制', level: 2 }
-      ]
-    }
+  const [materials] = useState<MaterialItem[]>([
+    { id: '1', name: '公司简介模板', type: 'document', folder: 'company', content: '这是公司简介的详细内容...' },
+    { id: '2', name: '组织架构图', type: 'image', folder: 'company' },
+    { id: '3', name: '技术架构图', type: 'image', folder: 'technical' },
+    { id: '4', name: '项目经验表', type: 'table', folder: 'cases' },
+    { id: '5', name: '资质证书扫描件', type: 'image', folder: 'certificates' },
+    { id: '6', name: '类似项目案例', type: 'document', folder: 'cases', content: '项目案例详细描述...' }
   ]);
 
-  const renderOutlineItem = (item: OutlineItem, outline: OutlineItem[], setOutline: (outline: OutlineItem[]) => void) => {
-    const toggleExpand = () => {
-      const updateItem = (items: OutlineItem[]): OutlineItem[] => {
-        return items.map(i => {
-          if (i.id === item.id) {
-            return { ...i, expanded: !i.expanded };
-          }
-          if (i.children) {
-            return { ...i, children: updateItem(i.children) };
-          }
-          return i;
-        });
-      };
-      setOutline(updateItem(outline));
+  const handleToggleExpansion = (itemId: string) => {
+    const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
+      return items.map(item => {
+        if (item.id === itemId) {
+          return { ...item, expanded: !item.expanded };
+        }
+        if (item.children) {
+          return { ...item, children: updateItems(item.children) };
+        }
+        return item;
+      });
+    };
+    setCatalogItems(updateItems(catalogItems));
+  };
+
+  const handleAddSameLevel = (parentId: string | null, afterId: string) => {
+    const newId = Date.now().toString();
+    const newItem: CatalogItemType = {
+      id: newId,
+      title: '新章节',
+      level: getItemLevel(afterId) || 1
     };
 
-    return (
-      <div key={item.id}>
-        <div
-          className={`flex items-center py-1 px-2 cursor-pointer hover:bg-gray-100 rounded text-sm ${
-            selectedOutlineItem === item.id ? 'bg-primary/10 text-primary' : 'text-gray-700'
-          }`}
-          style={{ paddingLeft: `${item.level * 12 + 8}px` }}
-          onClick={() => setSelectedOutlineItem(item.id)}
-        >
-          {item.children && item.children.length > 0 && (
-            <button onClick={(e) => { e.stopPropagation(); toggleExpand(); }} className="mr-1">
-              {item.expanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-            </button>
-          )}
-          <span className="flex-1">{item.title}</span>
-        </div>
-        {item.expanded && item.children && (
-          <div>
-            {item.children.map(child => renderOutlineItem(child, outline, setOutline))}
-          </div>
-        )}
-      </div>
-    );
+    const addItem = (items: CatalogItemType[]): CatalogItemType[] => {
+      if (!parentId) {
+        const index = items.findIndex(item => item.id === afterId);
+        return [...items.slice(0, index + 1), newItem, ...items.slice(index + 1)];
+      }
+      
+      return items.map(item => {
+        if (item.id === parentId && item.children) {
+          const index = item.children.findIndex(child => child.id === afterId);
+          const newChildren = [...item.children.slice(0, index + 1), newItem, ...item.children.slice(index + 1)];
+          return { ...item, children: newChildren };
+        }
+        if (item.children) {
+          return { ...item, children: addItem(item.children) };
+        }
+        return item;
+      });
+    };
+
+    setCatalogItems(addItem(catalogItems));
+  };
+
+  const handleAddSubLevel = (parentId: string) => {
+    const newId = Date.now().toString();
+    const parentLevel = getItemLevel(parentId) || 1;
+    const newItem: CatalogItemType = {
+      id: newId,
+      title: '新子章节',
+      level: parentLevel + 1
+    };
+
+    const addSubItem = (items: CatalogItemType[]): CatalogItemType[] => {
+      return items.map(item => {
+        if (item.id === parentId) {
+          return {
+            ...item,
+            expanded: true,
+            children: [...(item.children || []), newItem]
+          };
+        }
+        if (item.children) {
+          return { ...item, children: addSubItem(item.children) };
+        }
+        return item;
+      });
+    };
+
+    setCatalogItems(addSubItem(catalogItems));
+  };
+
+  const handleDelete = (itemId: string) => {
+    const removeItem = (items: CatalogItemType[]): CatalogItemType[] => {
+      return items.filter(item => {
+        if (item.id === itemId) return false;
+        if (item.children) {
+          item.children = removeItem(item.children);
+        }
+        return true;
+      });
+    };
+    setCatalogItems(removeItem(catalogItems));
+  };
+
+  const handleDoubleClick = (itemId: string, title: string) => {
+    setEditingItem(itemId);
+    setEditingText(title);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingItem || !editingText.trim()) return;
+    
+    const updateItem = (items: CatalogItemType[]): CatalogItemType[] => {
+      return items.map(item => {
+        if (item.id === editingItem) {
+          return { ...item, title: editingText.trim() };
+        }
+        if (item.children) {
+          return { ...item, children: updateItem(item.children) };
+        }
+        return item;
+      });
+    };
+    
+    setCatalogItems(updateItem(catalogItems));
+    setEditingItem(null);
+    setEditingText('');
+  };
+
+  const getItemLevel = (itemId: string): number | null => {
+    const findItem = (items: CatalogItemType[]): CatalogItemType | null => {
+      for (const item of items) {
+        if (item.id === itemId) return item;
+        if (item.children) {
+          const found = findItem(item.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    
+    const item = findItem(catalogItems);
+    return item?.level || null;
+  };
+
+  const getFilteredMaterials = () => {
+    let filtered = materials.filter(material => material.folder === currentFolder);
+    
+    if (materialFilter !== 'all') {
+      filtered = filtered.filter(material => material.type === materialFilter);
+    }
+    
+    if (searchKeyword) {
+      filtered = filtered.filter(material => 
+        material.name.toLowerCase().includes(searchKeyword.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  };
+
+  const handleInsertMaterial = (material: MaterialItem) => {
+    if (material.content) {
+      setEditingContent(editingContent + '\n\n' + material.content);
+    }
+  };
+
+  const renderMaterialIcon = (type: string) => {
+    switch (type) {
+      case 'document':
+        return <FileText className="w-4 h-4" />;
+      case 'image':
+        return <Image className="w-4 h-4" />;
+      case 'table':
+        return <BarChart3 className="w-4 h-4" />;
+      default:
+        return <FileText className="w-4 h-4" />;
+    }
   };
 
   const getCurrentOutline = () => {
-    return editingTab === 'business' ? businessOutline : technicalOutline;
+    return catalogItems;
   };
 
   return (
@@ -141,6 +231,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
       {/* 左侧大纲目录 - 固定宽度 */}
       <div className="w-80 border-r border-gray-200 flex flex-col">
         <div className="p-3 border-b border-gray-200">
+          <h4 className="font-medium text-gray-900 mb-3">目录</h4>
           <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="business" className="text-xs">商务标</TabsTrigger>
@@ -151,14 +242,29 @@ const BidEditing: React.FC<BidEditingProps> = ({
         
         <ScrollArea className="flex-1 p-2">
           <div className="space-y-1">
-            {getCurrentOutline().map(item => renderOutlineItem(item, getCurrentOutline(), () => {}))}
+            {getCurrentOutline().map(item => (
+              <CatalogItem
+                key={item.id}
+                item={item}
+                parentId={null}
+                onToggleExpansion={handleToggleExpansion}
+                onAddSameLevel={handleAddSameLevel}
+                onAddSubLevel={handleAddSubLevel}
+                onDelete={handleDelete}
+                onDoubleClick={handleDoubleClick}
+                editingItem={editingItem}
+                editingText={editingText}
+                setEditingText={setEditingText}
+                onSaveEdit={handleSaveEdit}
+              />
+            ))}
           </div>
         </ScrollArea>
       </div>
 
       {/* 中间可编辑区域 - 占据剩余空间 */}
       <div className="flex-1 flex flex-col">
-        {/* Word样式工具栏 - 移除AI润色和AI美化按钮 */}
+        {/* Word样式工具栏 */}
         <div className="flex items-center p-3 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center space-x-1">
             {/* 文本格式工具 */}
@@ -220,98 +326,93 @@ const BidEditing: React.FC<BidEditingProps> = ({
         </div>
       </div>
 
-      {/* 右侧知识库 - 固定宽度 */}
+      {/* 右侧素材库 - 固定宽度 */}
       <div className="w-80 border-l border-gray-200 flex flex-col">
         <div className="p-3 border-b border-gray-200">
           <h4 className="font-medium text-gray-900 mb-3 flex items-center">
             <FileText className="w-4 h-4 mr-2" />
-            投标文库
+            素材库
           </h4>
-          <Tabs value={knowledgeTab} onValueChange={(value) => setKnowledgeTab(value as 'materials' | 'charts' | 'templates')}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="materials" className="text-xs">素材</TabsTrigger>
-              <TabsTrigger value="charts" className="text-xs">图表</TabsTrigger>
-              <TabsTrigger value="templates" className="text-xs">模板</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="materials" className="p-3 m-0">
-              <div className="space-y-2">
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="text-sm">公司简介模板</span>
+          
+          {currentFolder === 'root' ? (
+            // 显示文件夹列表
+            <div className="space-y-2">
+              {materialFolders.map(folder => (
+                <div
+                  key={folder.id}
+                  className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setCurrentFolder(folder.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{folder.name}</span>
+                    <span className="text-xs text-gray-500">{folder.count}个</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">标准公司介绍文本</p>
                 </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-green-500" />
-                    <span className="text-sm">项目经验说明</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">类似项目经验描述</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-purple-500" />
-                    <span className="text-sm">技术方案框架</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">通用技术实施方案</p>
-                </div>
+              ))}
+            </div>
+          ) : (
+            // 显示文件夹内容
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentFolder('root')}
+                  className="text-xs"
+                >
+                  返回
+                </Button>
+                <span className="text-sm text-gray-600">
+                  {materialFolders.find(f => f.id === currentFolder)?.name}
+                </span>
               </div>
-            </TabsContent>
-
-            <TabsContent value="charts" className="p-3 m-0">
+              
+              {/* 搜索和筛选 */}
               <div className="space-y-2">
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <BarChart3 className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="text-sm">项目进度图</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">甘特图模板</p>
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="搜索素材..."
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    className="pl-8 h-8 text-xs"
+                  />
                 </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <Image className="w-4 h-4 mr-2 text-green-500" />
-                    <span className="text-sm">系统架构图</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">技术架构示意图</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <BarChart3 className="w-4 h-4 mr-2 text-orange-500" />
-                    <span className="text-sm">成本分析表</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">预算分析图表</p>
-                </div>
+                
+                <Select value={materialFilter} onValueChange={(value) => setMaterialFilter(value as any)}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="筛选类型" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部类型</SelectItem>
+                    <SelectItem value="document">文档</SelectItem>
+                    <SelectItem value="image">图片</SelectItem>
+                    <SelectItem value="table">表格</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </TabsContent>
-
-            <TabsContent value="templates" className="p-3 m-0">
-              <div className="space-y-2">
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-red-500" />
-                    <span className="text-sm">投标函模板</span>
+              
+              {/* 素材列表 */}
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {getFilteredMaterials().map(material => (
+                  <div
+                    key={material.id}
+                    className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    onClick={() => handleInsertMaterial(material)}
+                  >
+                    <div className="flex items-center">
+                      {renderMaterialIcon(material.type)}
+                      <span className="text-sm ml-2">{material.name}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {material.type === 'document' ? '文档' : 
+                       material.type === 'image' ? '图片' : '表格'}
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">标准投标函格式</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="text-sm">技术方案模板</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">技术实施方案框架</p>
-                </div>
-                <div className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-purple-500" />
-                    <span className="text-sm">商务方案模板</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">商务条款标准格式</p>
-                </div>
+                ))}
               </div>
-            </TabsContent>
-          </Tabs>
+            </div>
+          )}
         </div>
       </div>
     </div>
