@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -240,9 +239,8 @@ const BidEditing: React.FC<BidEditingProps> = ({
         description: `"${title}"的内容已生成完成`,
       });
       // 这里可以更新编辑内容
-      setEditingContent(prevContent => 
-        prevContent + `\n\n# ${title}\n\n这是为"${title}"生成的内容。此内容基于技术要求和最佳实践生成，包含了详细的技术方案说明。`
-      );
+      const newContent = editingContent + `\n\n# ${title}\n\n这是为"${title}"生成的内容。此内容基于技术要求和最佳实践生成，包含了详细的技术方案说明。`;
+      setEditingContent(newContent);
     }, 2000);
   };
 
