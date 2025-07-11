@@ -29,7 +29,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
   });
   const [contentSettings, setContentSettings] = useState({
     numbering: { level1: '一、', level2: '(一)', level3: '1.', level4: '(1)' },
-    table: { font: '宋体', size: '10', spacing: '1.0' }
+    table: { font: '宋体', size: '三号', spacing: '1.0' }
   });
   const [pageSettings, setPageSettings] = useState({
     topMargin: '2.54',
