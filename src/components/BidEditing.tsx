@@ -137,8 +137,8 @@ const BidEditing: React.FC<BidEditingProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 h-full flex">
-      {/* 左侧大纲目录 - 固定宽度 */}
+    <div className="bg-white h-full flex w-full">
+      {/* 左侧大纲目录 - 固定宽度，无边距 */}
       <div className="w-80 border-r border-gray-200 flex flex-col">
         <div className="p-3 border-b border-gray-200">
           <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')}>
@@ -156,9 +156,9 @@ const BidEditing: React.FC<BidEditingProps> = ({
         </ScrollArea>
       </div>
 
-      {/* 中间可编辑区域 - 占据剩余空间 */}
+      {/* 中间可编辑区域 - 占据剩余空间，内容居中 */}
       <div className="flex-1 flex flex-col">
-        {/* Word样式工具栏 - 移除AI润色和AI美化按钮 */}
+        {/* Word样式工具栏 */}
         <div className="flex items-center p-3 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center space-x-1">
             {/* 文本格式工具 */}
@@ -207,20 +207,20 @@ const BidEditing: React.FC<BidEditingProps> = ({
           </div>
         </div>
 
-        {/* 文档编辑区域 */}
-        <div className="flex-1 p-6 bg-white" style={{ backgroundColor: '#fafafa' }}>
-          <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg min-h-full p-8">
+        {/* 文档编辑区域 - 充满剩余空间，内容居中 */}
+        <div className="flex-1 bg-gray-50 flex justify-center items-start overflow-hidden">
+          <div className="w-full max-w-4xl bg-white shadow-sm rounded-lg m-6 flex-1">
             <Textarea
               value={editingContent}
               onChange={(e) => setEditingContent(e.target.value)}
               placeholder="在此输入或编辑标书内容..."
-              className="min-h-[600px] border-0 resize-none focus-visible:ring-0 text-sm leading-relaxed"
+              className="w-full h-full border-0 resize-none focus-visible:ring-0 text-sm leading-relaxed p-8 rounded-lg"
             />
           </div>
         </div>
       </div>
 
-      {/* 右侧知识库 - 固定宽度 */}
+      {/* 右侧知识库 - 固定宽度，无边距 */}
       <div className="w-80 border-l border-gray-200 flex flex-col">
         <div className="p-3 border-b border-gray-200">
           <h4 className="font-medium text-gray-900 mb-3 flex items-center">
