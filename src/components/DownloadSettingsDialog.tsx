@@ -22,10 +22,10 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
 }) => {
   const [numberingStyle, setNumberingStyle] = useState('1');
   const [titleSettings, setTitleSettings] = useState({
-    level1: { font: '黑体', size: '16', indent: '0', spacing: '1.5', align: 'center', bold: true },
-    level2: { font: '宋体', size: '14', indent: '0', spacing: '1.5', align: 'left', bold: true },
-    level3: { font: '宋体', size: '12', indent: '0', spacing: '1.5', align: 'left', bold: true },
-    body: { font: '宋体', size: '12', indent: '2', spacing: '1.5', align: 'left', bold: false }
+    level1: { font: '黑体', size: '二号', indent: '0', spacing: '1.5', align: 'center', bold: true },
+    level2: { font: '黑体', size: '小二', indent: '0', spacing: '1.5', align: 'center', bold: true },
+    level3: { font: '宋体', size: '三号', indent: '2', spacing: '1.5', align: 'left', bold: true },
+    body: { font: '宋体', size: '三号', indent: '2', spacing: '1.5', align: 'left', bold: false }
   });
   const [contentSettings, setContentSettings] = useState({
     numbering: { level1: '一、', level2: '(一)', level3: '1.', level4: '(1)' },
