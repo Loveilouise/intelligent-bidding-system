@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -385,7 +384,6 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                       setEditingText={setEditingText}
                       onSaveEdit={handleSaveEdit}
                       showWordCount={false}
-                      showGenerateButton={false}
                     />
                   ))}
                 </div>
@@ -490,8 +488,6 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                       setEditingText={setEditingText}
                       onSaveEdit={handleSaveEdit}
                       showWordCount={true}
-                      showGenerateButton={true}
-                      onGenerate={handleGenerate}
                     />
                   ))}
                 </div>
@@ -532,7 +528,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
           </div>
         </DialogContent>
       </Dialog>
-
+      
       {/* Generate Confirmation Dialog */}
       <AlertDialog open={generateDialogOpen} onOpenChange={setGenerateDialogOpen}>
         <AlertDialogContent>
