@@ -7,7 +7,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import CatalogItem from '@/components/CatalogItem';
 import { CatalogItem as CatalogItemType } from '@/types/bid';
 
@@ -44,65 +43,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
 
-  // 技术标和商务标的独立目录
-  const [businessCatalogItems] = useState<CatalogItemType[]>([
-    { 
-      id: 'b1', 
-      title: '投标函', 
-      level: 1,
-      expanded: true
-    },
-    { 
-      id: 'b2', 
-      title: '法定代表人身份证明', 
-      level: 1,
-      expanded: true
-    },
-    { 
-      id: 'b3', 
-      title: '授权委托书', 
-      level: 1,
-      expanded: true
-    },
-    { 
-      id: 'b4', 
-      title: '财务状况报告', 
-      level: 1,
-      expanded: true
-    }
-  ]);
-
-  const [technicalCatalogItems] = useState<CatalogItemType[]>([
-    { 
-      id: 't1', 
-      title: '技术方案', 
-      level: 1,
-      expanded: true,
-      children: [
-        { id: 't1-1', title: '技术架构设计', level: 2 },
-        { id: 't1-2', title: '系统功能模块', level: 2 },
-        { id: 't1-3', title: '技术实施方案', level: 2 }
-      ]
-    },
-    { 
-      id: 't2', 
-      title: '项目实施方案', 
-      level: 1,
-      expanded: true,
-      children: [
-        { id: 't2-1', title: '实施计划', level: 2 },
-        { id: 't2-2', title: '人员配置', level: 2 },
-        { id: 't2-3', title: '质量保证', level: 2 }
-      ]
-    },
-    { 
-      id: 't3', 
-      title: '售后服务方案', 
-      level: 1,
-      expanded: true
-    }
-  ]);
-
   // Mock 素材库数据
   const [materialFolders] = useState([
     { id: 'company', name: '公司介绍', count: 15 },
@@ -119,11 +59,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
     { id: '5', name: '资质证书扫描件', type: 'image', folder: 'certificates' },
     { id: '6', name: '类似项目案例', type: 'document', folder: 'cases', content: '项目案例详细描述...' }
   ]);
-
-  const handleGenerate = (itemId: string, title: string) => {
-    console.log(`开始生成章节: ${title} (ID: ${itemId})`);
-    // 这里可以添加实际的生成逻辑
-  };
 
   const handleToggleExpansion = (itemId: string) => {
     const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
@@ -288,7 +223,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
   };
 
   const getCurrentOutline = () => {
-    return editingTab === 'business' ? businessCatalogItems : technicalCatalogItems;
+    return catalogItems;
   };
 
   return (
@@ -317,12 +252,10 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 onAddSubLevel={handleAddSubLevel}
                 onDelete={handleDelete}
                 onDoubleClick={handleDoubleClick}
-                onGenerate={editingTab === 'technical' ? handleGenerate : undefined}
                 editingItem={editingItem}
                 editingText={editingText}
                 setEditingText={setEditingText}
                 onSaveEdit={handleSaveEdit}
-                showGenerateButton={editingTab === 'technical'}
               />
             ))}
           </div>

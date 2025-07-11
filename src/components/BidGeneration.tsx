@@ -1,12 +1,14 @@
+
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, RotateCcw, FileText, Users, HelpCircle, Plus, Settings } from 'lucide-react';
+import { RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import CatalogItem from '@/components/CatalogItem';
+import CatalogItem from './CatalogItem';
 import { CatalogItem as CatalogItemType } from '@/types/bid';
 
 interface BidGenerationProps {
@@ -26,106 +28,149 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
   generationStatus,
   catalogType,
   setCatalogType,
-  catalogExpanded,
-  setCatalogExpanded,
-  rightPanelTab,
-  setRightPanelTab,
-  catalogItems,
-  setCatalogItems,
   onRegenerateCatalog
 }) => {
+  const [businessBatchMode, setBusinessBatchMode] = useState(false);
+  const [technicalBatchMode, setTechnicalBatchMode] = useState(false);
+  const [businessSelectedItems, setBusinessSelectedItems] = useState<Set<string>>(new Set());
+  const [technicalSelectedItems, setTechnicalSelectedItems] = useState<Set<string>>(new Set());
+  const [businessSelectAll, setBusinessSelectAll] = useState(false);
+  const [technicalSelectAll, setTechnicalSelectAll] = useState(false);
+  const [businessExpanded, setBusinessExpanded] = useState(true);
+  const [technicalExpanded, setTechnicalExpanded] = useState(true);
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
   const [wordCountDialogOpen, setWordCountDialogOpen] = useState(false);
-  const [currentEditingWordCount, setCurrentEditingWordCount] = useState<{id: string, count: number} | null>(null);
-  const [tempWordCount, setTempWordCount] = useState('');
+  const [editingWordCount, setEditingWordCount] = useState('');
+  const [currentWordCountItem, setCurrentWordCountItem] = useState<string | null>(null);
+  const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+  const [currentGenerateItem, setCurrentGenerateItem] = useState<{ id: string, title: string } | null>(null);
 
-  const handleToggleExpansion = (itemId: string) => {
-    const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
-      return items.map(item => {
-        if (item.id === itemId) {
-          return { ...item, expanded: !item.expanded };
-        }
-        if (item.children) {
-          return { ...item, children: updateItems(item.children) };
-        }
-        return item;
-      });
-    };
-    setCatalogItems(updateItems(catalogItems));
-  };
+  // Sample data - separate catalogs for business and technical with default 1000 words
+  const [businessCatalogItems, setBusinessCatalogItems] = useState<CatalogItemType[]>([
+    { 
+      id: 'b1', 
+      title: '投标函', 
+      level: 1,
+      expanded: true,
+      wordCount: 1000,
+      children: [
+        { id: 'b1-1', title: '投标函', level: 2, wordCount: 1000 },
+        { id: 'b1-2', title: '法定代表人身份证明', level: 2, wordCount: 1000 },
+        { id: 'b1-3', title: '授权委托书', level: 2, wordCount: 1000 }
+      ]
+    },
+    { id: 'b2', title: '资质证明文件', level: 1, expanded: true, wordCount: 1000 },
+    { id: 'b3', title: '财务状况报告', level: 1, expanded: true, wordCount: 1000 }
+  ]);
 
-  const handleAddSameLevel = (parentId: string | null, afterId: string) => {
-    const newId = Date.now().toString();
-    const newItem: CatalogItemType = {
-      id: newId,
-      title: '新章节',
-      level: getItemLevel(afterId) || 1,
-      wordCount: 1000
-    };
+  const [technicalCatalogItems, setTechnicalCatalogItems] = useState<CatalogItemType[]>([
+    { 
+      id: 't1', 
+      title: '技术方案', 
+      level: 1,
+      expanded: true,
+      wordCount: 1000,
+      children: [
+        { id: 't1-1', title: '总体技术方案', level: 2, wordCount: 1000 },
+        { id: 't1-2', title: '技术路线', level: 2, wordCount: 1000 },
+        { id: 't1-3', title: '关键技术', level: 2, wordCount: 1000 }
+      ]
+    },
+    { id: 't2', title: '项目组织架构', level: 1, expanded: true, wordCount: 1000 },
+    { id: 't3', title: '进度计划', level: 1, expanded: true, wordCount: 1000 },
+    { id: 't4', title: '质量保证措施', level: 1, expanded: true, wordCount: 1000 }
+  ]);
 
-    const addItem = (items: CatalogItemType[]): CatalogItemType[] => {
-      if (!parentId) {
-        const index = items.findIndex(item => item.id === afterId);
-        return [...items.slice(0, index + 1), newItem, ...items.slice(index + 1)];
+  const calculateTotalWordCount = (items: CatalogItemType[]): number => {
+    return items.reduce((total, item) => {
+      let itemTotal = item.wordCount || 1000;
+      if (item.children) {
+        itemTotal += calculateTotalWordCount(item.children);
       }
-      
-      return items.map(item => {
-        if (item.id === parentId && item.children) {
-          const index = item.children.findIndex(child => child.id === afterId);
-          const newChildren = [...item.children.slice(0, index + 1), newItem, ...item.children.slice(index + 1)];
-          return { ...item, children: newChildren };
-        }
-        if (item.children) {
-          return { ...item, children: addItem(item.children) };
-        }
-        return item;
-      });
-    };
-
-    setCatalogItems(addItem(catalogItems));
+      return total + itemTotal;
+    }, 0);
   };
 
-  const handleAddSubLevel = (parentId: string) => {
-    const newId = Date.now().toString();
-    const parentLevel = getItemLevel(parentId) || 1;
-    const newItem: CatalogItemType = {
-      id: newId,
-      title: '新子章节',
-      level: parentLevel + 1,
-      wordCount: 1000
-    };
-
-    const addSubItem = (items: CatalogItemType[]): CatalogItemType[] => {
-      return items.map(item => {
-        if (item.id === parentId) {
-          return {
-            ...item,
-            expanded: true,
-            children: [...(item.children || []), newItem]
-          };
-        }
-        if (item.children) {
-          return { ...item, children: addSubItem(item.children) };
-        }
-        return item;
-      });
-    };
-
-    setCatalogItems(addSubItem(catalogItems));
+  const getAllItemIds = (items: CatalogItemType[]): string[] => {
+    const ids: string[] = [];
+    items.forEach(item => {
+      ids.push(item.id);
+      if (item.children) {
+        ids.push(...getAllItemIds(item.children));
+      }
+    });
+    return ids;
   };
 
-  const handleDelete = (itemId: string) => {
-    const removeItem = (items: CatalogItemType[]): CatalogItemType[] => {
-      return items.filter(item => {
-        if (item.id === itemId) return false;
-        if (item.children) {
-          item.children = removeItem(item.children);
-        }
-        return true;
-      });
-    };
-    setCatalogItems(removeItem(catalogItems));
+  const handleBusinessBatchMode = () => {
+    setBusinessBatchMode(true);
+    setBusinessSelectedItems(new Set());
+    setBusinessSelectAll(false);
+  };
+
+  const handleTechnicalBatchMode = () => {
+    setTechnicalBatchMode(true);
+    setTechnicalSelectedItems(new Set());
+    setTechnicalSelectAll(false);
+  };
+
+  const handleBusinessCancelBatch = () => {
+    setBusinessBatchMode(false);
+    setBusinessSelectedItems(new Set());
+    setBusinessSelectAll(false);
+  };
+
+  const handleTechnicalCancelBatch = () => {
+    setTechnicalBatchMode(false);
+    setTechnicalSelectedItems(new Set());
+    setTechnicalSelectAll(false);
+  };
+
+  const handleBusinessSelectAll = (checked: boolean) => {
+    setBusinessSelectAll(checked);
+    if (checked) {
+      const allIds = getAllItemIds(businessCatalogItems);
+      setBusinessSelectedItems(new Set(allIds));
+    } else {
+      setBusinessSelectedItems(new Set());
+    }
+  };
+
+  const handleTechnicalSelectAll = (checked: boolean) => {
+    setTechnicalSelectAll(checked);
+    if (checked) {
+      const allIds = getAllItemIds(technicalCatalogItems);
+      setTechnicalSelectedItems(new Set(allIds));
+    } else {
+      setTechnicalSelectedItems(new Set());
+    }
+  };
+
+  const handleBusinessItemSelect = (itemId: string, checked: boolean) => {
+    const newSelected = new Set(businessSelectedItems);
+    if (checked) {
+      newSelected.add(itemId);
+    } else {
+      newSelected.delete(itemId);
+    }
+    setBusinessSelectedItems(newSelected);
+    
+    const allIds = getAllItemIds(businessCatalogItems);
+    setBusinessSelectAll(newSelected.size === allIds.length);
+  };
+
+  const handleTechnicalItemSelect = (itemId: string, checked: boolean) => {
+    const newSelected = new Set(technicalSelectedItems);
+    if (checked) {
+      newSelected.add(itemId);
+    } else {
+      newSelected.delete(itemId);
+    }
+    setTechnicalSelectedItems(newSelected);
+    
+    const allIds = getAllItemIds(technicalCatalogItems);
+    setTechnicalSelectAll(newSelected.size === allIds.length);
   };
 
   const handleDoubleClick = (itemId: string, title: string) => {
@@ -134,285 +179,377 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
   };
 
   const handleSaveEdit = () => {
-    if (!editingItem || !editingText.trim()) return;
-    
-    const updateItem = (items: CatalogItemType[]): CatalogItemType[] => {
-      return items.map(item => {
-        if (item.id === editingItem) {
-          return { ...item, title: editingText.trim() };
-        }
-        if (item.children) {
-          return { ...item, children: updateItem(item.children) };
-        }
-        return item;
-      });
-    };
-    
-    setCatalogItems(updateItem(catalogItems));
+    if (editingItem && editingText.trim()) {
+      // Update business catalog
+      const updateBusinessItems = (items: CatalogItemType[]): CatalogItemType[] => {
+        return items.map(item => {
+          if (item.id === editingItem) {
+            return { ...item, title: editingText.trim() };
+          }
+          if (item.children) {
+            return { ...item, children: updateBusinessItems(item.children) };
+          }
+          return item;
+        });
+      };
+
+      // Update technical catalog
+      const updateTechnicalItems = (items: CatalogItemType[]): CatalogItemType[] => {
+        return items.map(item => {
+          if (item.id === editingItem) {
+            return { ...item, title: editingText.trim() };
+          }
+          if (item.children) {
+            return { ...item, children: updateTechnicalItems(item.children) };
+          }
+          return item;
+        });
+      };
+
+      setBusinessCatalogItems(updateBusinessItems(businessCatalogItems));
+      setTechnicalCatalogItems(updateTechnicalItems(technicalCatalogItems));
+    }
     setEditingItem(null);
     setEditingText('');
   };
 
   const handleWordCountSetting = (itemId: string, currentCount: number) => {
-    setCurrentEditingWordCount({ id: itemId, count: currentCount });
-    setTempWordCount(currentCount.toString());
+    setCurrentWordCountItem(itemId);
+    setEditingWordCount(currentCount.toString());
     setWordCountDialogOpen(true);
   };
 
   const handleSaveWordCount = () => {
-    if (!currentEditingWordCount) return;
-    
-    const newCount = parseInt(tempWordCount) || 1000;
-    const updateItem = (items: CatalogItemType[]): CatalogItemType[] => {
-      return items.map(item => {
-        if (item.id === currentEditingWordCount.id) {
-          return { ...item, wordCount: newCount };
-        }
-        if (item.children) {
-          return { ...item, children: updateItem(item.children) };
-        }
-        return item;
-      });
-    };
-    
-    setCatalogItems(updateItem(catalogItems));
-    setWordCountDialogOpen(false);
-    setCurrentEditingWordCount(null);
-    setTempWordCount('');
-  };
+    if (currentWordCountItem && editingWordCount) {
+      const newCount = parseInt(editingWordCount);
+      if (newCount >= 1 && newCount <= 10000) {
+        // Update business catalog
+        const updateBusinessWordCount = (items: CatalogItemType[]): CatalogItemType[] => {
+          return items.map(item => {
+            if (item.id === currentWordCountItem) {
+              return { ...item, wordCount: newCount };
+            }
+            if (item.children) {
+              return { ...item, children: updateBusinessWordCount(item.children) };
+            }
+            return item;
+          });
+        };
 
-  const getItemLevel = (itemId: string): number | null => {
-    const findItem = (items: CatalogItemType[]): CatalogItemType | null => {
-      for (const item of items) {
-        if (item.id === itemId) return item;
-        if (item.children) {
-          const found = findItem(item.children);
-          if (found) return found;
-        }
+        // Update technical catalog
+        const updateTechnicalWordCount = (items: CatalogItemType[]): CatalogItemType[] => {
+          return items.map(item => {
+            if (item.id === currentWordCountItem) {
+              return { ...item, wordCount: newCount };
+            }
+            if (item.children) {
+              return { ...item, children: updateTechnicalWordCount(item.children) };
+            }
+            return item;
+          });
+        };
+
+        setBusinessCatalogItems(updateBusinessWordCount(businessCatalogItems));
+        setTechnicalCatalogItems(updateTechnicalWordCount(technicalCatalogItems));
       }
-      return null;
-    };
-    
-    const item = findItem(catalogItems);
-    return item?.level || null;
+    }
+    setWordCountDialogOpen(false);
+    setCurrentWordCountItem(null);
+    setEditingWordCount('');
   };
 
-  const calculateTotalWords = () => {
-    const countWords = (items: CatalogItemType[]): number => {
-      return items.reduce((total, item) => {
-        const itemWords = item.wordCount || 1000;
-        const childWords = item.children ? countWords(item.children) : 0;
-        return total + itemWords + childWords;
-      }, 0);
-    };
-    return countWords(catalogItems);
+  const handleGenerate = (itemId: string, title: string) => {
+    setCurrentGenerateItem({ id: itemId, title });
+    setGenerateDialogOpen(true);
+  };
+
+  const handleConfirmGenerate = () => {
+    if (currentGenerateItem) {
+      // TODO: Implement actual generation logic
+      console.log(`Generating content for: ${currentGenerateItem.title}`);
+    }
+    setGenerateDialogOpen(false);
+    setCurrentGenerateItem(null);
   };
 
   if (generationStatus === 'generating') {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成目录</h2>
-          <p className="text-gray-600 mb-4">AI正在根据您的需求和上传的文件生成标书目录...</p>
-          <div className="flex items-center justify-center text-sm text-gray-500">
-            <span>预计需要1-2分钟</span>
-          </div>
+      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+        <div className="flex items-center justify-center mb-4">
+          <RefreshCw className="w-8 h-8 text-sky-600 animate-spin" />
         </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">正在生成标书目录...</h3>
+        <p className="text-gray-600">AI正在分析您的需求和上传的文件，请稍候</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 h-full flex">
-      {/* 左侧目录区域 - 固定宽度 */}
-      <div className="w-96 border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">生成的目录</h3>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRegenerateCatalog}
-              className="text-xs"
-            >
-              <RotateCcw className="w-3 h-3 mr-1" />
-              重新生成
-            </Button>
-          </div>
-          
-          <Tabs value={catalogType} onValueChange={(value) => setCatalogType(value as 'business' | 'technical')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="business" className="text-sm">商务标</TabsTrigger>
-              <TabsTrigger value="technical" className="text-sm">技术标</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">预计总字数：</span>
-              <span className="font-medium text-gray-900">{calculateTotalWords().toLocaleString()}字</span>
-            </div>
-          </div>
-        </div>
-        
-        <ScrollArea className="flex-1 p-2">
-          <div className="space-y-1">
-            {catalogItems.map(item => (
-              <CatalogItem
-                key={item.id}
-                item={item}
-                parentId={null}
-                onToggleExpansion={handleToggleExpansion}
-                onAddSameLevel={handleAddSameLevel}
-                onAddSubLevel={handleAddSubLevel}
-                onDelete={handleDelete}
-                onDoubleClick={handleDoubleClick}
-                onWordCountSetting={handleWordCountSetting}
-                editingItem={editingItem}
-                editingText={editingText}
-                setEditingText={setEditingText}
-                onSaveEdit={handleSaveEdit}
-                showWordCount={true}
-              />
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
+    <div className="h-[600px]">
+      <Tabs value={catalogType} onValueChange={(value) => setCatalogType(value as 'business' | 'technical')} className="h-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="business">商务标</TabsTrigger>
+          <TabsTrigger value="technical">技术标</TabsTrigger>
+        </TabsList>
 
-      {/* 右侧信息面板 - 占据剩余空间 */}
-      <div className="flex-1 flex flex-col">
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
-          <Tabs value={rightPanelTab} onValueChange={(value) => setRightPanelTab(value as 'requirements' | 'information')}>
-            <TabsList>
-              <TabsTrigger value="requirements" className="flex items-center">
-                <FileText className="w-4 h-4 mr-2" />
-                招标要求
-              </TabsTrigger>
-              <TabsTrigger value="information" className="flex items-center">
-                <Users className="w-4 h-4 mr-2" />
-                企业信息
-              </TabsTrigger>
-            </TabsList>
-            
-            <div className="flex-1 p-6">
-              <TabsContent value="requirements" className="mt-0">
-                <div className="space-y-4">
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h4 className="font-medium text-yellow-800 mb-2 flex items-center">
-                      <HelpCircle className="w-4 h-4 mr-2" />
-                      关键要求提醒
-                    </h4>
-                    <ul className="text-sm text-yellow-700 space-y-1">
-                      <li>• 项目经验要求：近3年内有类似项目经验</li>
-                      <li>• 技术要求：必须支持分布式架构</li>
-                      <li>• 资质要求：具备软件企业认定证书</li>
-                      <li>• 投标保证金：50万元人民币</li>
-                    </ul>
-                  </div>
+        <TabsContent value="business" className="h-[calc(100%-3rem)]">
+          <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div className="flex items-center space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setBusinessExpanded(!businessExpanded)}
+                >
+                  {businessExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </Button>
+              </div>
+              
+              {!businessBatchMode ? (
+                <div className="flex items-center space-x-2">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-sky-600 text-sky-600 hover:bg-sky-50">
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        重新生成
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>确认重新生成</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          重新生成将覆盖当前目录，确定要继续吗？
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={onRegenerateCatalog} className="bg-sky-600 hover:bg-sky-700">确认</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                   
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 mb-3">技术规格要求</h4>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <p>• 系统架构：微服务架构，支持容器化部署</p>
-                      <p>• 数据库：支持MySQL 8.0及以上版本</p>
-                      <p>• 并发处理：支持10000+用户同时在线</p>
-                      <p>• 响应时间：页面响应时间不超过2秒</p>
-                      <p>• 安全要求：符合等保三级要求</p>
-                    </div>
-                  </div>
+                  <Button variant="outline" size="sm" onClick={handleBusinessBatchMode}>
+                    批量操作
+                  </Button>
                 </div>
-              </TabsContent>
-
-              <TabsContent value="information" className="mt-0">
-                <div className="space-y-4">
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <h4 className="font-medium text-green-800 mb-2">企业基本信息</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600">公司名称：</span>
-                        <span className="text-gray-900">北京创新科技有限公司</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">成立时间：</span>
-                        <span className="text-gray-900">2015年3月</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">注册资本：</span>
-                        <span className="text-gray-900">5000万元</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">员工数量：</span>
-                        <span className="text-gray-900">280人</span>
-                      </div>
-                    </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="business-select-all"
+                      checked={businessSelectAll}
+                      onCheckedChange={(checked) => handleBusinessSelectAll(checked === true)}
+                      className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                    />
+                    <label htmlFor="business-select-all" className="text-sm">全选</label>
                   </div>
                   
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 mb-3">核心资质证书</h4>
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <p>• 高新技术企业证书</p>
-                      <p>• ISO 9001质量管理体系认证</p>
-                      <p>• ISO 27001信息安全管理体系认证</p>
-                      <p>• CMMI 5级认证</p>
-                      <p>• 软件企业认定证书</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white border border-gray-200 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 mb-3">近期项目经验</h4>
-                    <div className="space-y-3">
-                      <div className="border-l-4 border-sky-500 pl-3">
-                        <h5 className="font-medium text-gray-900">智慧城市综合管理平台</h5>
-                        <p className="text-sm text-gray-600">项目金额：2800万元 | 完成时间：2023年10月</p>
-                      </div>
-                      <div className="border-l-4 border-sky-500 pl-3">
-                        <h5 className="font-medium text-gray-900">企业数字化转型系统</h5>
-                        <p className="text-sm text-gray-600">项目金额：1500万元 | 完成时间：2023年8月</p>
-                      </div>
-                    </div>
-                  </div>
+                  <Button variant="outline" size="sm" onClick={handleBusinessCancelBatch}>
+                    取消
+                  </Button>
                 </div>
-              </TabsContent>
+              )}
             </div>
-          </Tabs>
-        </div>
-      </div>
 
-      {/* 字数设置弹窗 */}
+            {businessExpanded && (
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-1">
+                  {businessCatalogItems.map(item => (
+                    <CatalogItem
+                      key={item.id}
+                      item={item}
+                      batchMode={businessBatchMode}
+                      isSelected={businessSelectedItems.has(item.id)}
+                      onToggleSelect={handleBusinessItemSelect}
+                      onToggleExpansion={(itemId) => {
+                        const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
+                          return items.map(item => {
+                            if (item.id === itemId) {
+                              return { ...item, expanded: !item.expanded };
+                            }
+                            if (item.children) {
+                              return { ...item, children: updateItems(item.children) };
+                            }
+                            return item;
+                          });
+                        };
+                        setBusinessCatalogItems(updateItems(businessCatalogItems));
+                      }}
+                      onAddSameLevel={() => {}}
+                      onAddSubLevel={() => {}}
+                      onDelete={() => {}}
+                      onDoubleClick={handleDoubleClick}
+                      onWordCountSetting={handleWordCountSetting}
+                      editingItem={editingItem}
+                      editingText={editingText}
+                      setEditingText={setEditingText}
+                      onSaveEdit={handleSaveEdit}
+                      showWordCount={false}
+                      showGenerateButton={false}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="technical" className="h-[calc(100%-3rem)]">
+          <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div className="flex items-center space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setTechnicalExpanded(!technicalExpanded)}
+                >
+                  {technicalExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </Button>
+                <span className="text-sm text-gray-600">
+                  预计生成字数：{calculateTotalWordCount(technicalCatalogItems)}
+                </span>
+              </div>
+              
+              {!technicalBatchMode ? (
+                <div className="flex items-center space-x-2">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-sky-600 text-sky-600 hover:bg-sky-50">
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        重新生成
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>确认重新生成</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          重新生成将覆盖当前目录，确定要继续吗？
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={onRegenerateCatalog} className="bg-sky-600 hover:bg-sky-700">确认</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  
+                  <Button variant="outline" size="sm" onClick={handleTechnicalBatchMode}>
+                    批量操作
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="technical-select-all"
+                      checked={technicalSelectAll}
+                      onCheckedChange={(checked) => handleTechnicalSelectAll(checked === true)}
+                      className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                    />
+                    <label htmlFor="technical-select-all" className="text-sm">全选</label>
+                  </div>
+                  
+                  <Button variant="outline" size="sm" onClick={handleTechnicalCancelBatch}>
+                    取消
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {technicalExpanded && (
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-1">
+                  {technicalCatalogItems.map(item => (
+                    <CatalogItem
+                      key={item.id}
+                      item={item}
+                      batchMode={technicalBatchMode}
+                      isSelected={technicalSelectedItems.has(item.id)}
+                      onToggleSelect={handleTechnicalItemSelect}
+                      onToggleExpansion={(itemId) => {
+                        const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
+                          return items.map(item => {
+                            if (item.id === itemId) {
+                              return { ...item, expanded: !item.expanded };
+                            }
+                            if (item.children) {
+                              return { ...item, children: updateItems(item.children) };
+                            }
+                            return item;
+                          });
+                        };
+                        setTechnicalCatalogItems(updateItems(technicalCatalogItems));
+                      }}
+                      onAddSameLevel={() => {}}
+                      onAddSubLevel={() => {}}
+                      onDelete={() => {}}
+                      onDoubleClick={handleDoubleClick}
+                      onWordCountSetting={handleWordCountSetting}
+                      editingItem={editingItem}
+                      editingText={editingText}
+                      setEditingText={setEditingText}
+                      onSaveEdit={handleSaveEdit}
+                      showWordCount={true}
+                      showGenerateButton={true}
+                      onGenerate={handleGenerate}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Word Count Setting Dialog */}
       <Dialog open={wordCountDialogOpen} onOpenChange={setWordCountDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>设置章节字数</DialogTitle>
-            <DialogDescription>
-              请设置该章节的目标字数，系统将根据此字数生成相应长度的内容。
-            </DialogDescription>
+            <DialogTitle>字数设置</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="wordCount" className="text-right">
-                字数
-              </Label>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="wordCount">预计生成字数</Label>
               <Input
                 id="wordCount"
-                value={tempWordCount}
-                onChange={(e) => setTempWordCount(e.target.value)}
-                className="col-span-3"
-                placeholder="请输入字数"
                 type="number"
+                value={editingWordCount}
+                onChange={(e) => setEditingWordCount(e.target.value)}
+                min="1"
+                max="10000"
+                placeholder="1000"
               />
+              <p className="text-xs text-gray-500 mt-1">字数范围：1-10000</p>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setWordCountDialogOpen(false)}>
+                取消
+              </Button>
+              <Button onClick={handleSaveWordCount} className="bg-sky-600 hover:bg-sky-700">
+                确定
+              </Button>
             </div>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setWordCountDialogOpen(false)}>
-              取消
-            </Button>
-            <Button type="button" onClick={handleSaveWordCount}>
-              确定
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Generate Confirmation Dialog */}
+      <AlertDialog open={generateDialogOpen} onOpenChange={setGenerateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认生成</AlertDialogTitle>
+            <AlertDialogDescription>
+              整章生成会替换已经生成的内容，确定生成吗？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmGenerate} className="bg-sky-600 hover:bg-sky-700">
+              立即生成
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
