@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Clock, CheckCircle, Save, ArrowLeft, ChevronDown, ChevronRight, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -57,45 +58,7 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
   const [currentWordCount, setCurrentWordCount] = useState(0);
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [currentGenerateItem, setCurrentGenerateItem] = useState<{ id: string, title: string } | null>(null);
-  const [fullTextCatalogType, setFullTextCatalogType] = useState<'business' | 'technical'>('technical');
-  const [fullTextExpanded, setFullTextExpanded] = useState(true);
   const { toast } = useToast();
-
-  // Sample data for full text generation
-  const [fullTextBusinessCatalog] = useState<CatalogItem[]>([
-    { 
-      id: 'fb1', 
-      title: '投标函', 
-      level: 1,
-      expanded: true,
-      wordCount: 1000,
-      children: [
-        { id: 'fb1-1', title: '投标函', level: 2, wordCount: 1000 },
-        { id: 'fb1-2', title: '法定代表人身份证明', level: 2, wordCount: 1000 },
-        { id: 'fb1-3', title: '授权委托书', level: 2, wordCount: 1000 }
-      ]
-    },
-    { id: 'fb2', title: '资质证明文件', level: 1, expanded: true, wordCount: 1000 },
-    { id: 'fb3', title: '财务状况报告', level: 1, expanded: true, wordCount: 1000 }
-  ]);
-
-  const [fullTextTechnicalCatalog] = useState<CatalogItem[]>([
-    { 
-      id: 'ft1', 
-      title: '技术方案', 
-      level: 1,
-      expanded: true,
-      wordCount: 1000,
-      children: [
-        { id: 'ft1-1', title: '总体技术方案', level: 2, wordCount: 1000 },
-        { id: 'ft1-2', title: '技术路线', level: 2, wordCount: 1000 },
-        { id: 'ft1-3', title: '关键技术', level: 2, wordCount: 1000 }
-      ]
-    },
-    { id: 'ft2', title: '项目组织架构', level: 1, expanded: true, wordCount: 1000 },
-    { id: 'ft3', title: '进度计划', level: 1, expanded: true, wordCount: 1000 },
-    { id: 'ft4', title: '质量保证措施', level: 1, expanded: true, wordCount: 1000 }
-  ]);
 
   const tabs = [
     { id: 'setup', title: '创建标书' },
@@ -136,7 +99,6 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
 
   const handleConfirmGenerate = () => {
     if (currentGenerateItem) {
-      // TODO: Implement actual generation logic
       console.log(`Generating content for: ${currentGenerateItem.title}`);
       toast({
         title: "开始生成",
@@ -249,88 +211,15 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
         )}
 
         <div className={`flex-1 ${showHeaderControls ? 'pt-20' : ''}`}>
-          <div className="max-w-7xl mx-auto h-full flex">
-            {/* 左侧目录 */}
-            <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">目录</h3>
-                <Tabs value={fullTextCatalogType} onValueChange={(value) => setFullTextCatalogType(value as 'business' | 'technical')}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="business">商务标</TabsTrigger>
-                    <TabsTrigger value="technical">技术标</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="business" className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setFullTextExpanded(!fullTextExpanded)}
-                      >
-                        {fullTextExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                      </Button>
-                    </div>
-                    {fullTextExpanded && (
-                      <div className="space-y-1 max-h-96 overflow-y-auto">
-                        {fullTextBusinessCatalog.map(item => (
-                          <CatalogItemComponent
-                            key={item.id}
-                            item={item}
-                            onToggleExpansion={() => {}}
-                            onAddSameLevel={() => {}}
-                            onAddSubLevel={() => {}}
-                            onDelete={() => {}}
-                            showWordCount={false}
-                            showGenerateButton={false}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </TabsContent>
-                  
-                  <TabsContent value="technical" className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => setFullTextExpanded(!fullTextExpanded)}
-                      >
-                        {fullTextExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                      </Button>
-                    </div>
-                    {fullTextExpanded && (
-                      <div className="space-y-1 max-h-96 overflow-y-auto">
-                        {fullTextTechnicalCatalog.map(item => (
-                          <CatalogItemComponent
-                            key={item.id}
-                            item={item}
-                            onToggleExpansion={() => {}}
-                            onAddSameLevel={() => {}}
-                            onAddSubLevel={() => {}}
-                            onDelete={() => {}}
-                            onGenerate={handleGenerate}
-                            showWordCount={true}
-                            showGenerateButton={true}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </TabsContent>
-                </Tabs>
-              </div>
-            </div>
-            
-            {/* 右侧内容区域 */}
-            <div className="flex-1 p-6">
-              <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成全文</h2>
-                  <p className="text-gray-600 mb-4">AI正在根据目录结构生成完整的标书内容...</p>
-                  <div className="flex items-center justify-center text-sm text-gray-500">
-                    <Clock className="w-4 h-4 mr-2" />
-                    预计需要2-3分钟
-                  </div>
+          <div className="max-w-7xl mx-auto h-full flex justify-center items-center">
+            <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成全文</h2>
+                <p className="text-gray-600 mb-4">AI正在根据目录结构生成完整的标书内容...</p>
+                <div className="flex items-center justify-center text-sm text-gray-500">
+                  <Clock className="w-4 h-4 mr-2" />
+                  预计需要2-3分钟
                 </div>
               </div>
             </div>
@@ -576,6 +465,7 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
               setEditingContent={setEditingContent}
               catalogItems={catalogItems}
               setCatalogItems={setCatalogItems}
+              onGenerate={handleGenerate}
             />
           )}
         </div>
