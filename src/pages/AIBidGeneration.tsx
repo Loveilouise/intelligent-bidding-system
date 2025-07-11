@@ -109,7 +109,8 @@ const AIBidGeneration: React.FC = () => {
       <div className="flex-1 p-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            {/* 合并后的标题行 */}
+            <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
+            
             <div className="flex items-center space-x-6">
               {tabs.map((tab, index) => (
                 <div key={tab.id} className="flex items-center">
@@ -170,10 +171,10 @@ const AIBidGeneration: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* 页面标题和流程指示器 */}
         <div className="flex items-center justify-between mb-4">
-          {/* 合并后的标题行 */}
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center">
+            <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
             {activeTab === 'editing' && (
-              <div className="flex items-center">
+              <div className="flex items-center ml-6">
                 <span className="text-sm text-gray-600 mr-2">已自动保存</span>
                 <Button
                   variant="ghost"
@@ -185,8 +186,10 @@ const AIBidGeneration: React.FC = () => {
                 </Button>
               </div>
             )}
-            
-            {/* 流程步骤指示器 */}
+          </div>
+          
+          {/* 流程步骤指示器 */}
+          <div className="flex items-center space-x-6">
             {tabs.map((tab, index) => (
               <div key={tab.id} className="flex items-center">
                 <div className="flex items-center">
