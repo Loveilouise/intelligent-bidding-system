@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Clock, CheckCircle, Save, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,9 +10,13 @@ import { useToast } from '@/hooks/use-toast';
 
 interface AIBidGenerationProps {
   showHeaderControls?: boolean;
+  onBack?: () => void;
 }
 
-const AIBidGeneration: React.FC<AIBidGenerationProps> = ({ showHeaderControls = false }) => {
+const AIBidGeneration: React.FC<AIBidGenerationProps> = ({ 
+  showHeaderControls = false, 
+  onBack 
+}) => {
   const [activeTab, setActiveTab] = useState('setup');
   const [settingsMode, setSettingsMode] = useState('auto-parse');
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
@@ -106,15 +109,29 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({ showHeaderControls = 
     });
   };
 
-  // 生成全文动画页面
+  const handleBackClick = () => {
+    if (onBack) {
+      onBack();
+    }
+  };
+
   if (fullTextGenerationStatus === 'generating') {
     return (
-      <div className="flex-1 p-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          {showHeaderControls && (
-            <div className="flex items-center justify-between mb-4">
+      <div className="min-h-screen bg-gray-50">
+        {showHeaderControls && (
+          <div className="bg-white border-b border-gray-200 px-4 py-3">
+            <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="flex items-center ml-6">
+                <Button
+                  variant="ghost"
+                  onClick={handleBackClick}
+                  className="mr-4 text-gray-600 hover:text-gray-800"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  返回
+                </Button>
+                <h1 className="text-lg font-semibold text-gray-900 mr-6">创建标书</h1>
+                <div className="flex items-center">
                   <span className="text-sm text-gray-600 mr-2">已自动保存</span>
                   <Button
                     variant="ghost"
@@ -165,16 +182,20 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({ showHeaderControls = 
                 </Button>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成全文</h2>
-              <p className="text-gray-600 mb-4">AI正在根据目录结构生成完整的标书内容...</p>
-              <div className="flex items-center justify-center text-sm text-gray-500">
-                <Clock className="w-4 h-4 mr-2" />
-                预计需要2-3分钟
+        <div className={`flex-1 p-6 ${showHeaderControls ? 'pt-6' : ''}`}>
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成全文</h2>
+                <p className="text-gray-600 mb-4">AI正在根据目录结构生成完整的标书内容...</p>
+                <div className="flex items-center justify-center text-sm text-gray-500">
+                  <Clock className="w-4 h-4 mr-2" />
+                  预计需要2-3分钟
+                </div>
               </div>
             </div>
           </div>
@@ -276,7 +297,7 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({ showHeaderControls = 
                 <div className="flex items-center">
                   <Button
                     variant="ghost"
-                    onClick={() => window.history.back()}
+                    onClick={handleBackClick}
                     className="mr-4 text-gray-600 hover:text-gray-800"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
