@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -136,7 +137,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
                 [key]: { ...prev[key], align: 'left' }
               }))}
               size="sm"
-              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
             >
               <AlignLeft className="w-3 h-3" />
             </Toggle>
@@ -147,7 +148,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
                 [key]: { ...prev[key], align: 'center' }
               }))}
               size="sm"
-              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
             >
               <AlignCenter className="w-3 h-3" />
             </Toggle>
@@ -158,7 +159,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
                 [key]: { ...prev[key], align: 'right' }
               }))}
               size="sm"
-              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
             >
               <AlignRight className="w-3 h-3" />
             </Toggle>
@@ -174,7 +175,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
                 [key]: { ...prev[key], bold: !prev[key].bold }
               }))}
               size="sm"
-              className="data-[state=on]:bg-blue-500 data-[state=on]:text-white"
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
             >
               <Bold className="w-3 h-3" />
             </Toggle>
@@ -205,7 +206,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
                     key={template.id}
                     className={`p-3 border rounded-lg cursor-pointer transition-colors ${
                       numberingStyle === template.id 
-                        ? 'border-blue-500 bg-blue-50' 
+                        ? 'border-primary bg-primary/10' 
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                     onClick={() => setNumberingStyle(template.id)}
@@ -412,7 +413,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             取消
           </Button>
-          <Button onClick={onDownload} className="bg-purple-600 hover:bg-purple-700">
+          <Button onClick={onDownload}>
             下载
           </Button>
         </DialogFooter>
