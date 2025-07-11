@@ -245,191 +245,184 @@ const BidEditing: React.FC<BidEditingProps> = ({
   };
 
   return (
-    <div className="bg-white h-full">
-      {/* 使用Grid布局 - 紧凑排列 */}
-      <div className="grid grid-cols-12 h-full gap-2 p-2">
-        {/* 左侧目录区域 - 3列 */}
-        <div className="col-span-3 border border-gray-200 rounded-lg flex flex-col">
-          <div className="p-3 border-b border-gray-200">
-            <h4 className="font-medium text-gray-900 mb-2 text-sm">目录</h4>
-            <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')}>
-              <TabsList className="grid w-full grid-cols-2 h-8">
-                <TabsTrigger value="business" className="text-xs py-1">商务标</TabsTrigger>
-                <TabsTrigger value="technical" className="text-xs py-1">技术标</TabsTrigger>
-              </TabsList>
-            </Tabs>
+    <div className="bg-white rounded-lg border border-gray-200 h-full flex">
+      {/* 左侧大纲目录 - 固定宽度 */}
+      <div className="w-80 border-r border-gray-200 flex flex-col">
+        <div className="p-3 border-b border-gray-200">
+          <h4 className="font-medium text-gray-900 mb-3">目录</h4>
+          <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="business" className="text-xs">商务标</TabsTrigger>
+              <TabsTrigger value="technical" className="text-xs">技术标</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        
+        <ScrollArea className="flex-1 p-2">
+          <div className="space-y-1">
+            {getCurrentOutline().map(item => (
+              <CatalogItem
+                key={item.id}
+                item={item}
+                parentId={null}
+                onToggleExpansion={handleToggleExpansion}
+                onAddSameLevel={handleAddSameLevel}
+                onAddSubLevel={handleAddSubLevel}
+                onDelete={handleDelete}
+                onDoubleClick={handleDoubleClick}
+                onGenerate={handleGenerate}
+                editingItem={editingItem}
+                editingText={editingText}
+                setEditingText={setEditingText}
+                onSaveEdit={handleSaveEdit}
+                showGenerateButton={editingTab === 'technical'}
+              />
+            ))}
           </div>
+        </ScrollArea>
+      </div>
+
+      {/* 中间可编辑区域 - 占据剩余空间 */}
+      <div className="flex-1 flex flex-col">
+        {/* Word样式工具栏 */}
+        <div className="flex items-center p-3 border-b border-gray-200 bg-gray-50">
+          <div className="flex items-center space-x-1">
+            {/* 文本格式工具 */}
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <Bold className="w-4 h-4" />
+            </button>
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <Italic className="w-4 h-4" />
+            </button>
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <Underline className="w-4 h-4" />
+            </button>
+            
+            <div className="w-px h-6 bg-gray-300 mx-2" />
+            
+            {/* 对齐工具 */}
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <AlignLeft className="w-4 h-4" />
+            </button>
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <AlignCenter className="w-4 h-4" />
+            </button>
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <AlignRight className="w-4 h-4" />
+            </button>
+            
+            <div className="w-px h-6 bg-gray-300 mx-2" />
+            
+            {/* 列表工具 */}
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <List className="w-4 h-4" />
+            </button>
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <ListOrdered className="w-4 h-4" />
+            </button>
+            
+            <div className="w-px h-6 bg-gray-300 mx-2" />
+            
+            {/* 其他工具 */}
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <Link className="w-4 h-4" />
+            </button>
+            <button className="p-1 hover:bg-gray-200 rounded">
+              <Type className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* 文档编辑区域 */}
+        <div className="flex-1 p-6 bg-white" style={{ backgroundColor: '#fafafa' }}>
+          <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg min-h-full p-8">
+            <Textarea
+              value={editingContent}
+              onChange={(e) => setEditingContent(e.target.value)}
+              placeholder="在此输入或编辑标书内容..."
+              className="min-h-[600px] border-0 resize-none focus-visible:ring-0 text-sm leading-relaxed"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 右侧素材库 - 固定宽度 */}
+      <div className="w-80 border-l border-gray-200 flex flex-col">
+        <div className="p-3 border-b border-gray-200">
+          <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+            <FileText className="w-4 h-4 mr-2" />
+            素材库
+          </h4>
           
-          <ScrollArea className="flex-1 p-2">
-            <div className="space-y-1">
-              {getCurrentOutline().map(item => (
-                <CatalogItem
-                  key={item.id}
-                  item={item}
-                  parentId={null}
-                  onToggleExpansion={handleToggleExpansion}
-                  onAddSameLevel={handleAddSameLevel}
-                  onAddSubLevel={handleAddSubLevel}
-                  onDelete={handleDelete}
-                  onDoubleClick={handleDoubleClick}
-                  onGenerate={handleGenerate}
-                  editingItem={editingItem}
-                  editingText={editingText}
-                  setEditingText={setEditingText}
-                  onSaveEdit={handleSaveEdit}
-                  showGenerateButton={editingTab === 'technical'}
-                />
+          {currentFolder === 'root' ? (
+            // 显示文件夹列表
+            <div className="space-y-2">
+              {materialFolders.map(folder => (
+                <div
+                  key={folder.id}
+                  className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setCurrentFolder(folder.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{folder.name}</span>
+                    <span className="text-xs text-gray-500">{folder.count}个</span>
+                  </div>
+                </div>
               ))}
             </div>
-          </ScrollArea>
-        </div>
-
-        {/* 中间可编辑区域 - 6列 */}
-        <div className="col-span-6 border border-gray-200 rounded-lg flex flex-col">
-          {/* Word样式工具栏 - 更紧凑 */}
-          <div className="flex items-center px-3 py-2 border-b border-gray-200 bg-gray-50">
-            <div className="flex items-center space-x-1">
-              {/* 文本格式工具 */}
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <Bold className="w-3.5 h-3.5" />
-              </button>
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <Italic className="w-3.5 h-3.5" />
-              </button>
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <Underline className="w-3.5 h-3.5" />
-              </button>
-              
-              <div className="w-px h-5 bg-gray-300 mx-1" />
-              
-              {/* 对齐工具 */}
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <AlignLeft className="w-3.5 h-3.5" />
-              </button>
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <AlignCenter className="w-3.5 h-3.5" />
-              </button>
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <AlignRight className="w-3.5 h-3.5" />
-              </button>
-              
-              <div className="w-px h-5 bg-gray-300 mx-1" />
-              
-              {/* 列表工具 */}
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <List className="w-3.5 h-3.5" />
-              </button>
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <ListOrdered className="w-3.5 h-3.5" />
-              </button>
-              
-              <div className="w-px h-5 bg-gray-300 mx-1" />
-              
-              {/* 其他工具 */}
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <Link className="w-3.5 h-3.5" />
-              </button>
-              <button className="p-1 hover:bg-gray-200 rounded">
-                <Type className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* 文档编辑区域 - 紧凑布局 */}
-          <div className="flex-1 p-3 bg-gray-50">
-            <div className="bg-white shadow-sm rounded border min-h-full p-4">
-              <Textarea
-                value={editingContent}
-                onChange={(e) => setEditingContent(e.target.value)}
-                placeholder="在此输入或编辑标书内容..."
-                className="min-h-[500px] border-0 resize-none focus-visible:ring-0 text-sm leading-relaxed p-0"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 右侧素材库 - 3列 */}
-        <div className="col-span-3 border border-gray-200 rounded-lg flex flex-col">
-          <div className="p-3 border-b border-gray-200">
-            <h4 className="font-medium text-gray-900 mb-2 flex items-center text-sm">
-              <FileText className="w-4 h-4 mr-2" />
-              素材库
-            </h4>
-            
-            {currentFolder === 'root' ? (
-              // 显示文件夹列表
-              <div className="space-y-2">
-                {materialFolders.map(folder => (
-                  <div
-                    key={folder.id}
-                    className="p-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer"
-                    onClick={() => setCurrentFolder(folder.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium">{folder.name}</span>
-                      <span className="text-xs text-gray-500">{folder.count}</span>
-                    </div>
-                  </div>
-                ))}
+          ) : (
+            // 显示文件夹内容
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentFolder('root')}
+                  className="text-xs"
+                >
+                  返回
+                </Button>
+                <span className="text-sm text-gray-600">
+                  {materialFolders.find(f => f.id === currentFolder)?.name}
+                </span>
               </div>
-            ) : (
-              // 显示文件夹内容
+              
+              {/* 搜索和筛选 */}
               <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentFolder('root')}
-                    className="text-xs h-6"
-                  >
-                    返回
-                  </Button>
-                  <span className="text-xs text-gray-600">
-                    {materialFolders.find(f => f.id === currentFolder)?.name}
-                  </span>
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="搜索素材..."
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    className="pl-8 h-8 text-xs"
+                  />
                 </div>
                 
-                {/* 搜索和筛选 */}
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Search className="absolute left-2 top-1.5 h-3 w-3 text-gray-400" />
-                    <Input
-                      placeholder="搜索素材..."
-                      value={searchKeyword}
-                      onChange={(e) => setSearchKeyword(e.target.value)}
-                      className="pl-7 h-6 text-xs"
-                    />
-                  </div>
-                  
-                  <Select value={materialFilter} onValueChange={(value) => setMaterialFilter(value as any)}>
-                    <SelectTrigger className="h-6 text-xs">
-                      <SelectValue placeholder="筛选类型" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">全部类型</SelectItem>
-                      <SelectItem value="document">文档</SelectItem>
-                      <SelectItem value="image">图片</SelectItem>
-                      <SelectItem value="table">表格</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Select value={materialFilter} onValueChange={(value) => setMaterialFilter(value as any)}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="筛选类型" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部类型</SelectItem>
+                    <SelectItem value="document">文档</SelectItem>
+                    <SelectItem value="image">图片</SelectItem>
+                    <SelectItem value="table">表格</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-          </div>
-          
-          {/* 素材列表区域 */}
-          {currentFolder !== 'root' && (
-            <ScrollArea className="flex-1 p-2">
-              <div className="space-y-2">
+              
+              {/* 素材列表 */}
+              <div className="space-y-2 max-h-96 overflow-y-auto">
                 {getFilteredMaterials().map(material => (
                   <div
                     key={material.id}
-                    className="p-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer"
+                    className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
                     onClick={() => handleInsertMaterial(material)}
                   >
                     <div className="flex items-center">
                       {renderMaterialIcon(material.type)}
-                      <span className="text-xs ml-2 truncate">{material.name}</span>
+                      <span className="text-sm ml-2">{material.name}</span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
                       {material.type === 'document' ? '文档' : 
@@ -438,7 +431,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           )}
         </div>
       </div>
