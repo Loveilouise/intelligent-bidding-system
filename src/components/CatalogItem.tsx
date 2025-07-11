@@ -111,15 +111,35 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
         {!batchMode && (
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
             {showGenerateButton && onGenerate && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-6 px-2 text-xs border-sky-600 text-sky-600 hover:bg-sky-50"
-                onClick={() => onGenerate(item.id, item.title)}
-              >
-                <Play className="h-3 w-3 mr-1" />
-                生成
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 px-2 text-xs border-sky-600 text-sky-600 hover:bg-sky-50"
+                  >
+                    <Play className="h-3 w-3 mr-1" />
+                    生成
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>确认生成</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      整章生成会替换已经生成的内容，确定生成吗？
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>取消</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={() => onGenerate(item.id, item.title)}
+                      className="bg-sky-600 hover:bg-sky-700"
+                    >
+                      立即生成
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
             
             {showWordCount && onWordCountSetting && (
