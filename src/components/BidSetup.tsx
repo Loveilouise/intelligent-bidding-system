@@ -239,7 +239,7 @@ const BidSetup: React.FC<BidSetupProps> = ({
       {settingsMode === 'custom-create' && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">手动输入目录</h3>
+            <h3 className="text-lg font-semibold text-gray-900">输入目录</h3>
             <Button 
               variant="outline"
               onClick={handleOpenTemplateDialog}
