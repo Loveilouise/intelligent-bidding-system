@@ -108,9 +108,24 @@ const AIBidGeneration: React.FC = () => {
     return (
       <div className="flex-1 p-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
+          {/* 全局页面标题和操作栏 */}
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
+            <div className="flex items-center">
+              <h1 className="text-2xl font-semibold text-gray-900">创建标书</h1>
+              <div className="flex items-center ml-6">
+                <span className="text-sm text-gray-600 mr-2">已自动保存</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAutoSave}
+                  className="h-6 w-6 p-0"
+                >
+                  <Save className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
             
+            {/* 流程步骤指示器 */}
             <div className="flex items-center space-x-6">
               {tabs.map((tab, index) => (
                 <div key={tab.id} className="flex items-center">
@@ -169,23 +184,21 @@ const AIBidGeneration: React.FC = () => {
   return (
     <div className="flex-1 p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        {/* 页面标题和流程指示器 */}
+        {/* 全局页面标题和操作栏 */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
-            {activeTab === 'editing' && (
-              <div className="flex items-center ml-6">
-                <span className="text-sm text-gray-600 mr-2">已自动保存</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleAutoSave}
-                  className="h-6 w-6 p-0"
-                >
-                  <Save className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
+            <h1 className="text-2xl font-semibold text-gray-900">创建标书</h1>
+            <div className="flex items-center ml-6">
+              <span className="text-sm text-gray-600 mr-2">已自动保存</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleAutoSave}
+                className="h-6 w-6 p-0"
+              >
+                <Save className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           
           {/* 流程步骤指示器 */}
