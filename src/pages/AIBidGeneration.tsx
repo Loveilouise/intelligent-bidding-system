@@ -1,16 +1,12 @@
-
 import React, { useState } from 'react';
-import { Clock, CheckCircle, Save, ArrowLeft, ChevronDown, ChevronRight, Play } from 'lucide-react';
+import { Clock, CheckCircle, Save, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import BidSetup from '@/components/BidSetup';
 import BidGeneration from '@/components/BidGeneration';
 import BidEditing from '@/components/BidEditing';
 import DownloadSettingsDialog from '@/components/DownloadSettingsDialog';
 import { ProjectInfo, UploadedFile, CatalogItem } from '@/types/bid';
 import { useToast } from '@/hooks/use-toast';
-import CatalogItemComponent from '@/components/CatalogItem';
 
 interface AIBidGenerationProps {
   showHeaderControls?: boolean;
@@ -56,8 +52,6 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
   ]);
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
   const [currentWordCount, setCurrentWordCount] = useState(0);
-  const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
-  const [currentGenerateItem, setCurrentGenerateItem] = useState<{ id: string, title: string } | null>(null);
   const { toast } = useToast();
 
   const tabs = [
@@ -90,23 +84,6 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
       setActiveTab('generation');
       setFullTextGenerationStatus('idle');
     }
-  };
-
-  const handleGenerate = (itemId: string, title: string) => {
-    setCurrentGenerateItem({ id: itemId, title });
-    setGenerateDialogOpen(true);
-  };
-
-  const handleConfirmGenerate = () => {
-    if (currentGenerateItem) {
-      console.log(`Generating content for: ${currentGenerateItem.title}`);
-      toast({
-        title: "开始生成",
-        description: `正在生成"${currentGenerateItem.title}"的内容...`,
-      });
-    }
-    setGenerateDialogOpen(false);
-    setCurrentGenerateItem(null);
   };
 
   const handleRegenerateCatalog = () => {
@@ -210,8 +187,8 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
           </div>
         )}
 
-        <div className={`flex-1 ${showHeaderControls ? 'pt-20' : ''}`}>
-          <div className="max-w-7xl mx-auto h-full flex justify-center items-center">
+        <div className={`flex-1 p-6 ${showHeaderControls ? 'pt-20' : ''}`}>
+          <div className="max-w-7xl mx-auto">
             <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
               <div className="text-center">
                 <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
@@ -312,25 +289,7 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
               </div>
             </div>
           </div>
-      )}
-      
-      {/* Generate Confirmation Dialog */}
-      <AlertDialog open={generateDialogOpen} onOpenChange={setGenerateDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>确认生成</AlertDialogTitle>
-            <AlertDialogDescription>
-              整章生成会替换已经生成的内容，确定生成吗？
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmGenerate} className="bg-sky-600 hover:bg-sky-700">
-              立即生成
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        )}
 
         {/* 在CreateBidFlow中显示的控制组件 */}
         {showHeaderControls && (
@@ -465,7 +424,6 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
               setEditingContent={setEditingContent}
               catalogItems={catalogItems}
               setCatalogItems={setCatalogItems}
-              onGenerate={handleGenerate}
             />
           )}
         </div>

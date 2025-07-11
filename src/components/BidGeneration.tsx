@@ -43,6 +43,8 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
   const [wordCountDialogOpen, setWordCountDialogOpen] = useState(false);
   const [editingWordCount, setEditingWordCount] = useState('');
   const [currentWordCountItem, setCurrentWordCountItem] = useState<string | null>(null);
+  const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+  const [currentGenerateItem, setCurrentGenerateItem] = useState<{ id: string, title: string } | null>(null);
 
   // Sample data - separate catalogs for business and technical with default 1000 words
   const [businessCatalogItems, setBusinessCatalogItems] = useState<CatalogItemType[]>([
@@ -256,6 +258,20 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
     setEditingWordCount('');
   };
 
+  const handleGenerate = (itemId: string, title: string) => {
+    setCurrentGenerateItem({ id: itemId, title });
+    setGenerateDialogOpen(true);
+  };
+
+  const handleConfirmGenerate = () => {
+    if (currentGenerateItem) {
+      // TODO: Implement actual generation logic
+      console.log(`Generating content for: ${currentGenerateItem.title}`);
+    }
+    setGenerateDialogOpen(false);
+    setCurrentGenerateItem(null);
+  };
+
   if (generationStatus === 'generating') {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
@@ -369,6 +385,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                       setEditingText={setEditingText}
                       onSaveEdit={handleSaveEdit}
                       showWordCount={false}
+                      showGenerateButton={false}
                     />
                   ))}
                 </div>
@@ -473,6 +490,8 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                       setEditingText={setEditingText}
                       onSaveEdit={handleSaveEdit}
                       showWordCount={true}
+                      showGenerateButton={true}
+                      onGenerate={handleGenerate}
                     />
                   ))}
                 </div>
@@ -513,6 +532,24 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Generate Confirmation Dialog */}
+      <AlertDialog open={generateDialogOpen} onOpenChange={setGenerateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认生成</AlertDialogTitle>
+            <AlertDialogDescription>
+              整章生成会替换已经生成的内容，确定生成吗？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmGenerate} className="bg-sky-600 hover:bg-sky-700">
+              立即生成
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
