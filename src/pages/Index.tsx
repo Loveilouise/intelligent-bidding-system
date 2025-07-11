@@ -16,6 +16,7 @@ const Index = () => {
   const [showPersonalCenter, setShowPersonalCenter] = useState(false);
   const [showCreateBid, setShowCreateBid] = useState(false);
   const [activePersonalTab, setActivePersonalTab] = useState('account');
+  const [editingBidId, setEditingBidId] = useState<string | null>(null);
 
   const handleLogin = (username: string, password: string) => {
     if (username && password) {
@@ -27,6 +28,7 @@ const Index = () => {
     setIsLoggedIn(false);
     setShowPersonalCenter(false);
     setShowCreateBid(false);
+    setEditingBidId(null);
   };
 
   const handlePersonalCenter = () => {
@@ -43,15 +45,25 @@ const Index = () => {
   const handleBackToMain = () => {
     setShowPersonalCenter(false);
     setShowCreateBid(false);
+    setEditingBidId(null);
   };
 
   const handleCreateBid = () => {
+    setShowCreateBid(true);
+    setShowPersonalCenter(false);
+    setEditingBidId(null);
+  };
+
+  const handleEditBid = (bidId: string) => {
+    console.log('编辑标书:', bidId);
+    setEditingBidId(bidId);
     setShowCreateBid(true);
     setShowPersonalCenter(false);
   };
 
   const handleBackFromCreateBid = () => {
     setShowCreateBid(false);
+    setEditingBidId(null);
   };
 
   if (!isLoggedIn) {
@@ -87,7 +99,12 @@ const Index = () => {
             <PersonalCenter onBack={handleBackToMain} activeTab={activePersonalTab} />
           ) : (
             <>
-              {activeModule === 'history-bid-management' && <HistoryBidManagement onCreateBid={handleCreateBid} />}
+              {activeModule === 'history-bid-management' && (
+                <HistoryBidManagement 
+                  onCreateBid={handleCreateBid}
+                  onEditBid={handleEditBid}
+                />
+              )}
               {activeModule === 'template-management' && <TemplateManagement />}
               {activeModule === 'personal-knowledge' && <PersonalKnowledge />}
               {!['history-bid-management', 'template-management', 'personal-knowledge'].includes(activeModule) && (

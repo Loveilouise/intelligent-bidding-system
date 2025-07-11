@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Search, Eye, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check, Plus, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { Search, Edit, Trash2, Calendar, FileText, ArrowUpDown, ChevronDown, Check, Plus, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -35,9 +34,10 @@ interface BidProject {
 
 interface HistoryBidManagementProps {
   onCreateBid: () => void;
+  onEditBid?: (bidId: string) => void;
 }
 
-const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid }) => {
+const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid, onEditBid }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
@@ -131,12 +131,11 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
     setCurrentPage(1);
   };
 
-  const handleView = (id: string) => {
-    console.log('查看项目:', id);
-  };
-
   const handleEdit = (id: string) => {
     console.log('编辑项目:', id);
+    if (onEditBid) {
+      onEditBid(id);
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -404,14 +403,6 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleView(project.id)}
-                          className="text-gray-600 hover:text-blue-600"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
