@@ -50,17 +50,16 @@ const BidSetup: React.FC<BidSetupProps> = ({
   const [selectedTemplateInfo, setSelectedTemplateInfo] = useState<Template | null>(null);
 
   const businessTypes = [
-    { value: 'construction', label: '建筑工程' },
-    { value: 'equipment', label: '设备采购' },
-    { value: 'service', label: '服务类' },
-    { value: 'design', label: '设计类' },
-    { value: 'consulting', label: '咨询类' }
+    { value: 'general', label: '通用' },
+    { value: 'servive', label: '服务咨询' },
+    { value: 'construction', label: '工程建设' },
+    { value: 'equipment', label: '政府采购' }
   ];
 
   const materialLibraries = [
     { value: 'folder1', label: '建筑工程素材' },
     { value: 'folder2', label: '设备采购素材' },
-    { value: 'folder3', label: '服务类素材' },
+    { value: 'folder3', label: '服务咨询素材' },
     { value: 'folder4', label: '通用素材库' }
   ];
 
@@ -99,11 +98,10 @@ const BidSetup: React.FC<BidSetupProps> = ({
     
     // Auto-fill project information based on template
     const businessTypeMapping: { [key: string]: string } = {
-      '市政工程': 'construction',
-      '装修工程': 'construction',
-      '系统集成': 'equipment',
-      '通用': 'construction',
-      '水利工程': 'construction'
+      '通用': 'general',
+      '服务咨询': 'servive',
+      '工程建设': 'construction',
+      '政府采购': 'equipment',
     };
 
     setProjectInfo({
