@@ -23,8 +23,7 @@ const WordCounter: React.FC<WordCounterProps> = ({ className = '' }) => {
 
   const formatWordCount = (count: number) => {
     if (count >= 10000) {
-      return Math.floor(count);
-      //return Math.floor(count / 10000) + '万';
+      return Math.floor(count / 10000) + '万';
     }
     return count.toLocaleString();
   };
