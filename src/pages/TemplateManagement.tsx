@@ -31,7 +31,7 @@ const TemplateManagement: React.FC = () => {
     {
       id: '1',
       name: '市政道路施工方案模板',
-      category: '市政工程',
+      category: '工程建设',
       createDate: '2024-01-10',
       updateDate: '2024-02-15',
       description: '适用于城市道路、桥梁等市政基础设施建设项目',
@@ -42,7 +42,7 @@ const TemplateManagement: React.FC = () => {
     {
       id: '2',
       name: '建筑装修工程方案模板',
-      category: '装修工程',
+      category: '工程建设',
       createDate: '2024-01-20',
       updateDate: '2024-02-10',
       description: '包含室内外装修、水电安装等完整施工方案',
@@ -53,7 +53,7 @@ const TemplateManagement: React.FC = () => {
     {
       id: '3',
       name: '智能化系统集成方案模板',
-      category: '系统集成',
+      category: '通用',
       createDate: '2024-02-01',
       updateDate: '2024-02-20',
       description: '智能监控、消防、安防等系统集成标准方案',
