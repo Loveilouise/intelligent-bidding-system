@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RefreshCw, ChevronDown, ChevronRight, UnfoldVertical, FoldVertical } from 'lucide-react';
+import { RefreshCw, ChevronDown, ChevronRight, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -333,7 +333,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                   onClick={handleBusinessExpandCollapseAll}
                   title={businessAllExpanded ? "收起全部" : "展开全部"}
                 >
-                  {businessAllExpanded ? <FoldVertical className="w-4 h-4" /> : <UnfoldVertical className="w-4 h-4" />}
+                  <Menu className="w-4 h-4" />
                 </Button>
               </div>
               
@@ -435,7 +435,7 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                   onClick={handleTechnicalExpandCollapseAll}
                   title={technicalAllExpanded ? "收起全部" : "展开全部"}
                 >
-                  {technicalAllExpanded ? <FoldVertical className="w-4 h-4" /> : <UnfoldVertical className="w-4 h-4" />}
+                  <Menu className="w-4 h-4" />
                 </Button>
                 <span className="text-sm text-gray-600">
                   预计生成字数：{calculateTotalWordCount(technicalCatalogItems)}
