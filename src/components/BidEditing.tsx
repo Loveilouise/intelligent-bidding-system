@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import CatalogItem from '@/components/CatalogItem';
 import { CatalogItem as CatalogItemType } from '@/types/bid';
 
@@ -42,6 +42,8 @@ const BidEditing: React.FC<BidEditingProps> = ({
   const [currentFolder, setCurrentFolder] = useState<string>('root');
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
+  const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+  const [selectedGenerateItem, setSelectedGenerateItem] = useState<{ id: string; title: string } | null>(null);
 
   // Mock 素材库数据
   const [materialFolders] = useState([
@@ -171,6 +173,22 @@ const BidEditing: React.FC<BidEditingProps> = ({
     setEditingText('');
   };
 
+  const handleGenerate = (itemId: string, title: string) => {
+    setSelectedGenerateItem({ id: itemId, title });
+    setGenerateDialogOpen(true);
+  };
+
+  const handleConfirmGenerate = () => {
+    if (selectedGenerateItem) {
+      // 这里执行实际的生成逻辑
+      console.log('生成章节:', selectedGenerateItem.title);
+      // 可以在这里添加生成内容的逻辑
+      setEditingContent(editingContent + `\n\n## ${selectedGenerateItem.title}\n\n[AI生成的内容将在这里显示...]`);
+    }
+    setGenerateDialogOpen(false);
+    setSelectedGenerateItem(null);
+  };
+
   const getItemLevel = (itemId: string): number | null => {
     const findItem = (items: CatalogItemType[]): CatalogItemType | null => {
       for (const item of items) {
@@ -252,10 +270,12 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 onAddSubLevel={handleAddSubLevel}
                 onDelete={handleDelete}
                 onDoubleClick={handleDoubleClick}
+                onGenerate={handleGenerate}
                 editingItem={editingItem}
                 editingText={editingText}
                 setEditingText={setEditingText}
                 onSaveEdit={handleSaveEdit}
+                showGenerateButton={editingTab === 'technical'}
               />
             ))}
           </div>
@@ -415,6 +435,24 @@ const BidEditing: React.FC<BidEditingProps> = ({
           )}
         </div>
       </div>
+
+      {/* 生成确认弹窗 */}
+      <AlertDialog open={generateDialogOpen} onOpenChange={setGenerateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认生成</AlertDialogTitle>
+            <AlertDialogDescription>
+              整章生成会替换已经生成的内容，确定生成吗？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmGenerate}>
+              立即生成
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

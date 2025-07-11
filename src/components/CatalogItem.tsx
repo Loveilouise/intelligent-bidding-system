@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronDown, ChevronRight, Plus, Trash2, Settings2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Trash2, Settings2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -20,11 +20,13 @@ interface CatalogItemProps {
   onDelete: (itemId: string) => void;
   onDoubleClick?: (itemId: string, title: string) => void;
   onWordCountSetting?: (itemId: string, currentCount: number) => void;
+  onGenerate?: (itemId: string, title: string) => void;
   editingItem?: string | null;
   editingText?: string;
   setEditingText?: (text: string) => void;
   onSaveEdit?: () => void;
   showWordCount?: boolean;
+  showGenerateButton?: boolean;
 }
 
 const CatalogItem: React.FC<CatalogItemProps> = ({
@@ -39,11 +41,13 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
   onDelete,
   onDoubleClick,
   onWordCountSetting,
+  onGenerate,
   editingItem,
   editingText,
   setEditingText,
   onSaveEdit,
-  showWordCount = false
+  showWordCount = false,
+  showGenerateButton = false
 }) => {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && onSaveEdit) {
@@ -106,6 +110,26 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
         
         {!batchMode && (
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {showGenerateButton && onGenerate && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-gray-100"
+                      onClick={() => onGenerate(item.id, item.title)}
+                    >
+                      <Zap className="h-3 w-3 text-black" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>生成</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            
             {showWordCount && onWordCountSetting && (
               <TooltipProvider>
                 <Tooltip>
@@ -194,11 +218,13 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
           onDelete={onDelete}
           onDoubleClick={onDoubleClick}
           onWordCountSetting={onWordCountSetting}
+          onGenerate={onGenerate}
           editingItem={editingItem}
           editingText={editingText}
           setEditingText={setEditingText}
           onSaveEdit={onSaveEdit}
           showWordCount={showWordCount}
+          showGenerateButton={showGenerateButton}
         />
       ))}
     </div>
