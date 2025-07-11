@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Clock, CheckCircle, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,11 @@ import DownloadSettingsDialog from '@/components/DownloadSettingsDialog';
 import { ProjectInfo, UploadedFile, CatalogItem } from '@/types/bid';
 import { useToast } from '@/hooks/use-toast';
 
-const AIBidGeneration: React.FC = () => {
+interface AIBidGenerationProps {
+  showHeaderControls?: boolean;
+}
+
+const AIBidGeneration: React.FC<AIBidGenerationProps> = ({ showHeaderControls = false }) => {
   const [activeTab, setActiveTab] = useState('setup');
   const [settingsMode, setSettingsMode] = useState('auto-parse');
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
@@ -65,7 +68,6 @@ const AIBidGeneration: React.FC = () => {
       setTimeout(() => {
         setFullTextGenerationStatus('completed');
         setActiveTab('editing');
-        // 模拟生成的全文字数
         setCurrentWordCount(8543);
       }, 3000);
     }
@@ -108,7 +110,83 @@ const AIBidGeneration: React.FC = () => {
     return (
       <div className="flex-1 p-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          {/* 全局页面标题和操作栏 */}
+          {showHeaderControls && (
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <div className="flex items-center ml-6">
+                  <span className="text-sm text-gray-600 mr-2">已自动保存</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAutoSave}
+                    className="h-6 w-6 p-0"
+                  >
+                    <Save className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-6">
+                {tabs.map((tab, index) => (
+                  <div key={tab.id} className="flex items-center">
+                    <div className="flex items-center">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                        activeTab === tab.id 
+                          ? 'bg-sky-600 text-white' 
+                          : tabs.findIndex(t => t.id === activeTab) > index
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-200 text-gray-500'
+                      }`}>
+                        {tabs.findIndex(t => t.id === activeTab) > index ? (
+                          <CheckCircle className="w-3 h-3" />
+                        ) : (
+                          index + 1
+                        )}
+                      </div>
+                      <span className={`ml-2 text-sm font-medium ${
+                        activeTab === tab.id ? 'text-sky-600' : 'text-gray-500'
+                      }`}>
+                        {tab.title}
+                      </span>
+                    </div>
+                    {index < tabs.length - 1 && (
+                      <div className={`w-8 h-0.5 mx-3 ${
+                        tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <Button variant="outline" onClick={handlePrevStep}>
+                  上一步
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成全文</h2>
+              <p className="text-gray-600 mb-4">AI正在根据目录结构生成完整的标书内容...</p>
+              <div className="flex items-center justify-center text-sm text-gray-500">
+                <Clock className="w-4 h-4 mr-2" />
+                预计需要2-3分钟
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 p-6 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        {/* 控制组件 - 只在独立页面显示，在CreateBidFlow中会被移到顶部 */}
+        {!showHeaderControls && (
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <h1 className="text-2xl font-semibold text-gray-900">创建标书</h1>
@@ -125,7 +203,6 @@ const AIBidGeneration: React.FC = () => {
               </div>
             </div>
             
-            {/* 流程步骤指示器 */}
             <div className="flex items-center space-x-6">
               {tabs.map((tab, index) => (
                 <div key={tab.id} className="flex items-center">
@@ -159,115 +236,133 @@ const AIBidGeneration: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={handlePrevStep}>
-                上一步
-              </Button>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">正在生成全文</h2>
-              <p className="text-gray-600 mb-4">AI正在根据目录结构生成完整的标书内容...</p>
-              <div className="flex items-center justify-center text-sm text-gray-500">
-                <Clock className="w-4 h-4 mr-2" />
-                预计需要2-3分钟
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex-1 p-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        {/* 全局页面标题和操作栏 */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">创建标书</h1>
-            <div className="flex items-center ml-6">
-              <span className="text-sm text-gray-600 mr-2">已自动保存</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleAutoSave}
-                className="h-6 w-6 p-0"
-              >
-                <Save className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          
-          {/* 流程步骤指示器 */}
-          <div className="flex items-center space-x-6">
-            {tabs.map((tab, index) => (
-              <div key={tab.id} className="flex items-center">
-                <div className="flex items-center">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                    activeTab === tab.id 
-                      ? 'bg-sky-600 text-white' 
-                      : tabs.findIndex(t => t.id === activeTab) > index
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-200 text-gray-500'
-                  }`}>
-                    {tabs.findIndex(t => t.id === activeTab) > index ? (
-                      <CheckCircle className="w-3 h-3" />
-                    ) : (
-                      index + 1
-                    )}
-                  </div>
-                  <span className={`ml-2 text-sm font-medium ${
-                    activeTab === tab.id ? 'text-sky-600' : 'text-gray-500'
-                  }`}>
-                    {tab.title}
+              <div className="flex items-center space-x-2">
+                {activeTab === 'editing' && (
+                  <span className="text-sm text-gray-600">
+                    当前字数：{currentWordCount.toLocaleString()}
                   </span>
-                </div>
-                {index < tabs.length - 1 && (
-                  <div className={`w-8 h-0.5 mx-3 ${
-                    tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
-                  }`} />
+                )}
+                {activeTab !== 'setup' && (
+                  <Button variant="outline" onClick={handlePrevStep}>
+                    上一步
+                  </Button>
+                )}
+                {activeTab === 'editing' && (
+                  <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
+                    下载标书
+                  </Button>
+                )}
+                {activeTab === 'setup' && (
+                  <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
+                    下一步
+                  </Button>
+                )}
+                {activeTab === 'generation' && (
+                  <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
+                    下一步
+                  </Button>
                 )}
               </div>
-            ))}
-          </div>
-
-          {/* 操作按钮 */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              {activeTab === 'editing' && (
-                <span className="text-sm text-gray-600">
-                  当前字数：{currentWordCount.toLocaleString()}
-                </span>
-              )}
-              {activeTab !== 'setup' && (
-                <Button variant="outline" onClick={handlePrevStep}>
-                  上一步
-                </Button>
-              )}
-              {activeTab === 'editing' && (
-                <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
-                  下载标书
-                </Button>
-              )}
-              {activeTab === 'setup' && (
-                <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
-                  下一步
-                </Button>
-              )}
-              {activeTab === 'generation' && (
-                <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
-                  下一步
-                </Button>
-              )}
             </div>
           </div>
-        </div>
+        )}
 
-        {/* 内容区域 */}
-        <div className="min-h-[600px]">
+        {/* 在CreateBidFlow中显示的控制组件 */}
+        {showHeaderControls && (
+          <div className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between max-w-7xl mx-auto">
+                <div className="flex items-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => window.history.back()}
+                    className="mr-4 text-gray-600 hover:text-gray-800"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    返回
+                  </Button>
+                  <h1 className="text-lg font-semibold text-gray-900 mr-6">创建标书</h1>
+                  <div className="flex items-center">
+                    <span className="text-sm text-gray-600 mr-2">已自动保存</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleAutoSave}
+                      className="h-6 w-6 p-0"
+                    >
+                      <Save className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-6">
+                  {tabs.map((tab, index) => (
+                    <div key={tab.id} className="flex items-center">
+                      <div className="flex items-center">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                          activeTab === tab.id 
+                            ? 'bg-sky-600 text-white' 
+                            : tabs.findIndex(t => t.id === activeTab) > index
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-200 text-gray-500'
+                        }`}>
+                          {tabs.findIndex(t => t.id === activeTab) > index ? (
+                            <CheckCircle className="w-3 h-3" />
+                          ) : (
+                            index + 1
+                          )}
+                        </div>
+                        <span className={`ml-2 text-sm font-medium ${
+                          activeTab === tab.id ? 'text-sky-600' : 'text-gray-500'
+                        }`}>
+                          {tab.title}
+                        </span>
+                      </div>
+                      {index < tabs.length - 1 && (
+                        <div className={`w-8 h-0.5 mx-3 ${
+                          tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
+                        }`} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    {activeTab === 'editing' && (
+                      <span className="text-sm text-gray-600">
+                        当前字数：{currentWordCount.toLocaleString()}
+                      </span>
+                    )}
+                    {activeTab !== 'setup' && (
+                      <Button variant="outline" onClick={handlePrevStep}>
+                        上一步
+                      </Button>
+                    )}
+                    {activeTab === 'editing' && (
+                      <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
+                        下载标书
+                      </Button>
+                    )}
+                    {activeTab === 'setup' && (
+                      <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
+                        下一步
+                      </Button>
+                    )}
+                    {activeTab === 'generation' && (
+                      <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
+                        下一步
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 内容区域 - 在使用顶部控制时需要加上顶部边距 */}
+        <div className={`min-h-[600px] ${showHeaderControls ? 'pt-20' : ''}`}>
           {activeTab === 'setup' && (
             <BidSetup
               projectInfo={projectInfo}
