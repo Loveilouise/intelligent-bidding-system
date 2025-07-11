@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter, Check } from 'lucide-react';
+import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter, Check, Eye, Square, CheckSquare } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Checkbox } from '@/components/ui/checkbox';
 import CatalogItem from '@/components/CatalogItem';
 import { CatalogItem as CatalogItemType } from '@/types/bid';
 
@@ -44,10 +46,11 @@ const BidEditing: React.FC<BidEditingProps> = ({
   const [editingText, setEditingText] = useState('');
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [selectedGenerateItem, setSelectedGenerateItem] = useState<{ id: string; title: string } | null>(null);
-  const [selectedMaterial, setSelectedMaterial] = useState<MaterialItem | null>(null);
+  const [selectedMaterials, setSelectedMaterials] = useState<Set<string>>(new Set());
+  const [previewMaterial, setPreviewMaterial] = useState<MaterialItem | null>(null);
+  const [previewSheetOpen, setPreviewSheetOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Mock 素材库数据
   const [materialFolders] = useState([
     { id: 'company', name: '公司介绍', count: 15 },
     { id: 'technical', name: '技术方案', count: 23 },
@@ -225,29 +228,63 @@ const BidEditing: React.FC<BidEditingProps> = ({
     return filtered;
   };
 
-  const handleSelectMaterial = (material: MaterialItem) => {
-    setSelectedMaterial(material);
+  const handleSelectMaterial = (materialId: string) => {
+    const newSelectedMaterials = new Set(selectedMaterials);
+    if (newSelectedMaterials.has(materialId)) {
+      newSelectedMaterials.delete(materialId);
+    } else {
+      newSelectedMaterials.add(materialId);
+    }
+    setSelectedMaterials(newSelectedMaterials);
   };
 
-  const handleInsertMaterial = () => {
-    if (selectedMaterial && selectedMaterial.content && textareaRef.current) {
-      const textarea = textareaRef.current;
-      const cursorPosition = textarea.selectionStart;
-      const textBefore = editingContent.slice(0, cursorPosition);
-      const textAfter = editingContent.slice(cursorPosition);
-      
-      const newContent = textBefore + '\n\n' + selectedMaterial.content + '\n\n' + textAfter;
-      setEditingContent(newContent);
-      
-      // 重新设置光标位置
-      setTimeout(() => {
-        const newCursorPosition = cursorPosition + selectedMaterial.content.length + 4;
-        textarea.setSelectionRange(newCursorPosition, newCursorPosition);
-        textarea.focus();
-      }, 0);
-      
-      setSelectedMaterial(null);
+  const handleSelectAllMaterials = () => {
+    const filteredMaterials = getFilteredMaterials();
+    const allIds = filteredMaterials.map(m => m.id);
+    const isAllSelected = allIds.every(id => selectedMaterials.has(id));
+    
+    if (isAllSelected) {
+      // 取消全选
+      const newSelectedMaterials = new Set(selectedMaterials);
+      allIds.forEach(id => newSelectedMaterials.delete(id));
+      setSelectedMaterials(newSelectedMaterials);
+    } else {
+      // 全选
+      const newSelectedMaterials = new Set(selectedMaterials);
+      allIds.forEach(id => newSelectedMaterials.add(id));
+      setSelectedMaterials(newSelectedMaterials);
     }
+  };
+
+  const handlePreviewMaterial = (material: MaterialItem) => {
+    setPreviewMaterial(material);
+    setPreviewSheetOpen(true);
+  };
+
+  const handleInsertMaterials = () => {
+    if (selectedMaterials.size === 0 || !textareaRef.current) return;
+    
+    const selectedMaterialsData = materials.filter(m => selectedMaterials.has(m.id));
+    const textarea = textareaRef.current;
+    const cursorPosition = textarea.selectionStart;
+    const textBefore = editingContent.slice(0, cursorPosition);
+    const textAfter = editingContent.slice(cursorPosition);
+    
+    const insertContent = selectedMaterialsData
+      .map(material => material.content || '')
+      .join('\n\n');
+    
+    const newContent = textBefore + '\n\n' + insertContent + '\n\n' + textAfter;
+    setEditingContent(newContent);
+    
+    // 重新设置光标位置
+    setTimeout(() => {
+      const newCursorPosition = cursorPosition + insertContent.length + 4;
+      textarea.setSelectionRange(newCursorPosition, newCursorPosition);
+      textarea.focus();
+    }, 0);
+    
+    setSelectedMaterials(new Set());
   };
 
   const renderMaterialIcon = (type: string) => {
@@ -266,6 +303,10 @@ const BidEditing: React.FC<BidEditingProps> = ({
   const getCurrentOutline = () => {
     return catalogItems;
   };
+
+  const filteredMaterials = getFilteredMaterials();
+  const isAllSelected = filteredMaterials.length > 0 && filteredMaterials.every(m => selectedMaterials.has(m.id));
+  const isPartiallySelected = filteredMaterials.some(m => selectedMaterials.has(m.id)) && !isAllSelected;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 h-full flex">
@@ -307,10 +348,8 @@ const BidEditing: React.FC<BidEditingProps> = ({
 
       {/* 中间可编辑区域 - 占据剩余空间 */}
       <div className="flex-1 flex flex-col">
-        {/* Word样式工具栏 */}
         <div className="flex items-center p-3 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center space-x-1">
-            {/* 文本格式工具 */}
             <button className="p-1 hover:bg-gray-200 rounded">
               <Bold className="w-4 h-4" />
             </button>
@@ -323,7 +362,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
             
             <div className="w-px h-6 bg-gray-300 mx-2" />
             
-            {/* 对齐工具 */}
             <button className="p-1 hover:bg-gray-200 rounded">
               <AlignLeft className="w-4 h-4" />
             </button>
@@ -336,7 +374,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
             
             <div className="w-px h-6 bg-gray-300 mx-2" />
             
-            {/* 列表工具 */}
             <button className="p-1 hover:bg-gray-200 rounded">
               <List className="w-4 h-4" />
             </button>
@@ -346,7 +383,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
             
             <div className="w-px h-6 bg-gray-300 mx-2" />
             
-            {/* 其他工具 */}
             <button className="p-1 hover:bg-gray-200 rounded">
               <Link className="w-4 h-4" />
             </button>
@@ -356,7 +392,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
           </div>
         </div>
 
-        {/* 文档编辑区域 */}
         <div className="flex-1 p-6 bg-white" style={{ backgroundColor: '#fafafa' }}>
           <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg min-h-full p-8">
             <Textarea
@@ -379,7 +414,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
           </h4>
           
           {currentFolder === 'root' ? (
-            // 显示文件夹列表
             <div className="space-y-2">
               {materialFolders.map(folder => (
                 <div
@@ -395,13 +429,15 @@ const BidEditing: React.FC<BidEditingProps> = ({
               ))}
             </div>
           ) : (
-            // 显示文件夹内容
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentFolder('root')}
+                  onClick={() => {
+                    setCurrentFolder('root');
+                    setSelectedMaterials(new Set());
+                  }}
                   className="text-xs"
                 >
                   返回
@@ -411,9 +447,11 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 </span>
               </div>
               
-              {/* 类型切换标签 */}
               <div className="border-b border-gray-200">
-                <Tabs value={materialTypeTab} onValueChange={(value) => setMaterialTypeTab(value as any)}>
+                <Tabs value={materialTypeTab} onValueChange={(value) => {
+                  setMaterialTypeTab(value as any);
+                  setSelectedMaterials(new Set());
+                }}>
                   <TabsList className="grid w-full grid-cols-4 h-8">
                     <TabsTrigger value="all" className="text-xs px-2">全部</TabsTrigger>
                     <TabsTrigger value="document" className="text-xs px-2">文档</TabsTrigger>
@@ -423,7 +461,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 </Tabs>
               </div>
               
-              {/* 搜索框 */}
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                 <Input
@@ -433,30 +470,54 @@ const BidEditing: React.FC<BidEditingProps> = ({
                   className="pl-8 h-8 text-xs"
                 />
               </div>
+
+              {filteredMaterials.length > 0 && (
+                <div className="flex items-center space-x-2 py-2">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onCheckedChange={handleSelectAllMaterials}
+                    className="h-4 w-4"
+                  />
+                  <span className="text-xs text-gray-600">
+                    {isAllSelected ? '取消全选' : '全选'}
+                    {selectedMaterials.size > 0 && ` (已选 ${selectedMaterials.size})`}
+                  </span>
+                </div>
+              )}
               
-              {/* 素材列表 */}
               <ScrollArea className="flex-1 max-h-80">
                 <div className="space-y-2">
-                  {getFilteredMaterials().map(material => (
+                  {filteredMaterials.map(material => (
                     <div
                       key={material.id}
-                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                        selectedMaterial?.id === material.id 
+                      className={`p-3 border rounded-lg transition-colors ${
+                        selectedMaterials.has(material.id) 
                           ? 'border-sky-500 bg-sky-50' 
                           : 'border-gray-200 hover:bg-gray-50'
                       }`}
-                      onClick={() => handleSelectMaterial(material)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          {renderMaterialIcon(material.type)}
-                          <span className="text-sm ml-2">{material.name}</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={selectedMaterials.has(material.id)}
+                            onCheckedChange={() => handleSelectMaterial(material.id)}
+                            className="h-4 w-4"
+                          />
+                          <div className="flex items-center">
+                            {renderMaterialIcon(material.type)}
+                            <span className="text-sm ml-2">{material.name}</span>
+                          </div>
                         </div>
-                        {selectedMaterial?.id === material.id && (
-                          <Check className="w-4 h-4 text-sky-600" />
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handlePreviewMaterial(material)}
+                          className="h-6 w-6 p-0"
+                        >
+                          <Eye className="w-3 h-3" />
+                        </Button>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500">
                         {material.description}
                       </p>
                     </div>
@@ -464,15 +525,14 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 </div>
               </ScrollArea>
               
-              {/* 确定按钮 */}
               <div className="mt-3 pt-3 border-t border-gray-200">
                 <Button
-                  onClick={handleInsertMaterial}
-                  disabled={!selectedMaterial}
+                  onClick={handleInsertMaterials}
+                  disabled={selectedMaterials.size === 0}
                   className="w-full text-xs"
                   size="sm"
                 >
-                  插入素材
+                  插入选中素材 ({selectedMaterials.size})
                 </Button>
               </div>
             </div>
@@ -480,7 +540,51 @@ const BidEditing: React.FC<BidEditingProps> = ({
         </div>
       </div>
 
-      {/* 生成确认弹窗 */}
+      <Sheet open={previewSheetOpen} onOpenChange={setPreviewSheetOpen}>
+        <SheetContent side="right" className="w-96">
+          <SheetHeader>
+            <SheetTitle className="flex items-center space-x-2">
+              {previewMaterial && renderMaterialIcon(previewMaterial.type)}
+              <span>{previewMaterial?.name}</span>
+            </SheetTitle>
+            <SheetDescription>
+              {previewMaterial?.description}
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="mt-6">
+            <div className="bg-gray-50 p-4 rounded-lg border">
+              <h5 className="text-sm font-medium mb-2">内容预览</h5>
+              <div className="text-sm text-gray-700 whitespace-pre-wrap">
+                {previewMaterial?.content || '暂无内容'}
+              </div>
+            </div>
+            
+            <div className="mt-4 flex space-x-2">
+              <Button
+                onClick={() => {
+                  if (previewMaterial) {
+                    handleSelectMaterial(previewMaterial.id);
+                  }
+                }}
+                variant={previewMaterial && selectedMaterials.has(previewMaterial.id) ? "secondary" : "default"}
+                size="sm"
+                className="flex-1"
+              >
+                {previewMaterial && selectedMaterials.has(previewMaterial.id) ? '已选中' : '选择'}
+              </Button>
+              <Button
+                onClick={() => setPreviewSheetOpen(false)}
+                variant="outline"
+                size="sm"
+              >
+                关闭
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <AlertDialog open={generateDialogOpen} onOpenChange={setGenerateDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
