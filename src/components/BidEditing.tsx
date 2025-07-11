@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter, Check } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -25,6 +25,7 @@ interface MaterialItem {
   type: 'document' | 'image' | 'table';
   folder: string;
   content?: string;
+  description?: string;
 }
 
 const BidEditing: React.FC<BidEditingProps> = ({
@@ -36,14 +37,15 @@ const BidEditing: React.FC<BidEditingProps> = ({
   setCatalogItems
 }) => {
   const [selectedOutlineItem, setSelectedOutlineItem] = useState<string>('');
-  const [knowledgeTab, setKnowledgeTab] = useState<'materials' | 'charts' | 'templates'>('materials');
+  const [materialTypeTab, setMaterialTypeTab] = useState<'all' | 'document' | 'image' | 'table'>('all');
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [materialFilter, setMaterialFilter] = useState<'all' | 'document' | 'image' | 'table'>('all');
   const [currentFolder, setCurrentFolder] = useState<string>('root');
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [selectedGenerateItem, setSelectedGenerateItem] = useState<{ id: string; title: string } | null>(null);
+  const [selectedMaterial, setSelectedMaterial] = useState<MaterialItem | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Mock 素材库数据
   const [materialFolders] = useState([
@@ -54,12 +56,15 @@ const BidEditing: React.FC<BidEditingProps> = ({
   ]);
 
   const [materials] = useState<MaterialItem[]>([
-    { id: '1', name: '公司简介模板', type: 'document', folder: 'company', content: '这是公司简介的详细内容...' },
-    { id: '2', name: '组织架构图', type: 'image', folder: 'company' },
-    { id: '3', name: '技术架构图', type: 'image', folder: 'technical' },
-    { id: '4', name: '项目经验表', type: 'table', folder: 'cases' },
-    { id: '5', name: '资质证书扫描件', type: 'image', folder: 'certificates' },
-    { id: '6', name: '类似项目案例', type: 'document', folder: 'cases', content: '项目案例详细描述...' }
+    { id: '1', name: '公司简介模板', type: 'document', folder: 'company', content: '这是公司简介的详细内容...', description: '公司基本信息介绍文档' },
+    { id: '2', name: '组织架构图', type: 'image', folder: 'company', content: '[组织架构图]', description: '公司组织架构示意图' },
+    { id: '3', name: '技术架构图', type: 'image', folder: 'technical', content: '[技术架构图]', description: '系统技术架构图' },
+    { id: '4', name: '项目经验表', type: 'table', folder: 'cases', content: '| 项目名称 | 完成时间 | 项目规模 |\n|---------|---------|----------|\n| 示例项目1 | 2023年 | 大型 |', description: '历史项目经验统计表格' },
+    { id: '5', name: '资质证书扫描件', type: 'image', folder: 'certificates', content: '[资质证书图片]', description: '公司相关资质证书' },
+    { id: '6', name: '类似项目案例', type: 'document', folder: 'cases', content: '项目案例详细描述...', description: '相似项目实施案例' },
+    { id: '7', name: '软件著作权证书', type: 'image', folder: 'certificates', content: '[软件著作权证书]', description: '软件著作权相关证书' },
+    { id: '8', name: '技术方案文档', type: 'document', folder: 'technical', content: '技术实施方案详细说明...', description: '详细技术实施方案' },
+    { id: '9', name: '人员配置表', type: 'table', folder: 'company', content: '| 岗位 | 人数 | 经验要求 |\n|-----|-----|----------|\n| 项目经理 | 1 | 5年以上 |', description: '项目人员配置统计' }
   ]);
 
   const handleToggleExpansion = (itemId: string) => {
@@ -180,9 +185,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
 
   const handleConfirmGenerate = () => {
     if (selectedGenerateItem) {
-      // 这里执行实际的生成逻辑
       console.log('生成章节:', selectedGenerateItem.title);
-      // 可以在这里添加生成内容的逻辑
       setEditingContent(editingContent + `\n\n## ${selectedGenerateItem.title}\n\n[AI生成的内容将在这里显示...]`);
     }
     setGenerateDialogOpen(false);
@@ -208,22 +211,42 @@ const BidEditing: React.FC<BidEditingProps> = ({
   const getFilteredMaterials = () => {
     let filtered = materials.filter(material => material.folder === currentFolder);
     
-    if (materialFilter !== 'all') {
-      filtered = filtered.filter(material => material.type === materialFilter);
+    if (materialTypeTab !== 'all') {
+      filtered = filtered.filter(material => material.type === materialTypeTab);
     }
     
     if (searchKeyword) {
       filtered = filtered.filter(material => 
-        material.name.toLowerCase().includes(searchKeyword.toLowerCase())
+        material.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        material.description?.toLowerCase().includes(searchKeyword.toLowerCase())
       );
     }
     
     return filtered;
   };
 
-  const handleInsertMaterial = (material: MaterialItem) => {
-    if (material.content) {
-      setEditingContent(editingContent + '\n\n' + material.content);
+  const handleSelectMaterial = (material: MaterialItem) => {
+    setSelectedMaterial(material);
+  };
+
+  const handleInsertMaterial = () => {
+    if (selectedMaterial && selectedMaterial.content && textareaRef.current) {
+      const textarea = textareaRef.current;
+      const cursorPosition = textarea.selectionStart;
+      const textBefore = editingContent.slice(0, cursorPosition);
+      const textAfter = editingContent.slice(cursorPosition);
+      
+      const newContent = textBefore + '\n\n' + selectedMaterial.content + '\n\n' + textAfter;
+      setEditingContent(newContent);
+      
+      // 重新设置光标位置
+      setTimeout(() => {
+        const newCursorPosition = cursorPosition + selectedMaterial.content.length + 4;
+        textarea.setSelectionRange(newCursorPosition, newCursorPosition);
+        textarea.focus();
+      }, 0);
+      
+      setSelectedMaterial(null);
     }
   };
 
@@ -337,6 +360,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
         <div className="flex-1 p-6 bg-white" style={{ backgroundColor: '#fafafa' }}>
           <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg min-h-full p-8">
             <Textarea
+              ref={textareaRef}
               value={editingContent}
               onChange={(e) => setEditingContent(e.target.value)}
               placeholder="在此输入或编辑标书内容..."
@@ -387,49 +411,69 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 </span>
               </div>
               
-              {/* 搜索和筛选 */}
-              <div className="space-y-2">
-                <div className="relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="搜索素材..."
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    className="pl-8 h-8 text-xs"
-                  />
-                </div>
-                
-                <Select value={materialFilter} onValueChange={(value) => setMaterialFilter(value as any)}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="筛选类型" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部类型</SelectItem>
-                    <SelectItem value="document">文档</SelectItem>
-                    <SelectItem value="image">图片</SelectItem>
-                    <SelectItem value="table">表格</SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* 类型切换标签 */}
+              <div className="border-b border-gray-200">
+                <Tabs value={materialTypeTab} onValueChange={(value) => setMaterialTypeTab(value as any)}>
+                  <TabsList className="grid w-full grid-cols-4 h-8">
+                    <TabsTrigger value="all" className="text-xs px-2">全部</TabsTrigger>
+                    <TabsTrigger value="document" className="text-xs px-2">文档</TabsTrigger>
+                    <TabsTrigger value="image" className="text-xs px-2">图片</TabsTrigger>
+                    <TabsTrigger value="table" className="text-xs px-2">表格</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+              
+              {/* 搜索框 */}
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="搜索素材..."
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  className="pl-8 h-8 text-xs"
+                />
               </div>
               
               {/* 素材列表 */}
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {getFilteredMaterials().map(material => (
-                  <div
-                    key={material.id}
-                    className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handleInsertMaterial(material)}
-                  >
-                    <div className="flex items-center">
-                      {renderMaterialIcon(material.type)}
-                      <span className="text-sm ml-2">{material.name}</span>
+              <ScrollArea className="flex-1 max-h-80">
+                <div className="space-y-2">
+                  {getFilteredMaterials().map(material => (
+                    <div
+                      key={material.id}
+                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        selectedMaterial?.id === material.id 
+                          ? 'border-sky-500 bg-sky-50' 
+                          : 'border-gray-200 hover:bg-gray-50'
+                      }`}
+                      onClick={() => handleSelectMaterial(material)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          {renderMaterialIcon(material.type)}
+                          <span className="text-sm ml-2">{material.name}</span>
+                        </div>
+                        {selectedMaterial?.id === material.id && (
+                          <Check className="w-4 h-4 text-sky-600" />
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {material.description}
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {material.type === 'document' ? '文档' : 
-                       material.type === 'image' ? '图片' : '表格'}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </ScrollArea>
+              
+              {/* 确定按钮 */}
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <Button
+                  onClick={handleInsertMaterial}
+                  disabled={!selectedMaterial}
+                  className="w-full text-xs"
+                  size="sm"
+                >
+                  插入素材
+                </Button>
               </div>
             </div>
           )}
