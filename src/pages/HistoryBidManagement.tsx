@@ -49,7 +49,7 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
     {
       id: '1',
       name: '城市道路改造工程投标',
-      type: '施工投标',
+      type: '工程建设',
       createDate: '2024-01-15',
       status: '已完成',
       description: '主要包括道路拓宽、排水系统改造等内容'
@@ -57,7 +57,7 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
     {
       id: '2',
       name: '办公楼装修项目投标',
-      type: '装修投标',
+      type: '工程建设',
       createDate: '2024-02-10',
       status: '已提交',
       description: '包含室内装修设计、施工等全套方案'
@@ -65,7 +65,7 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
     {
       id: '3',
       name: '智能化系统集成项目',
-      type: '技术投标',
+      type: '通用',
       createDate: '2024-02-20',
       status: '进行中',
       description: '智能监控、门禁、消防等系统集成'
@@ -73,7 +73,7 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
     {
       id: '4',
       name: '园林绿化工程投标',
-      type: '施工投标',
+      type: '工程建设',
       createDate: '2024-03-01',
       status: '已完成',
       description: '城市公园绿化改造项目'
@@ -81,14 +81,14 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
     {
       id: '5',
       name: '医院设备采购投标',
-      type: '采购投标',
+      type: '政府采购',
       createDate: '2024-03-05',
       status: '进行中',
       description: '医疗设备采购及安装调试'
     }
   ]);
 
-  const bidTypes = ['施工投标', '装修投标', '技术投标', '采购投标'];
+  const bidTypes = ['通用', '服务咨询', '工程建设', '政府采购'];
   const bidStatuses = ['已完成', '进行中', '已提交'];
 
   const filteredAndSortedProjects = projects
