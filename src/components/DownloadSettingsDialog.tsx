@@ -22,7 +22,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
 }) => {
   const [numberingStyle, setNumberingStyle] = useState('1');
   const [titleSettings, setTitleSettings] = useState({
-    level1: { font: '宋体', size: '16', indent: '0', spacing: '1.5', align: 'center', bold: true },
+    level1: { font: '黑体', size: '16', indent: '0', spacing: '1.5', align: 'center', bold: true },
     level2: { font: '宋体', size: '14', indent: '0', spacing: '1.5', align: 'left', bold: true },
     level3: { font: '宋体', size: '12', indent: '0', spacing: '1.5', align: 'left', bold: true },
     body: { font: '宋体', size: '12', indent: '2', spacing: '1.5', align: 'left', bold: false }
@@ -46,8 +46,8 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
     { id: '5', name: '模板五', preview: '壹、 一、 1、' }
   ];
 
-  const fontOptions = ['宋体', '黑体', '楷体', '仿宋', '微软雅黑'];
-  const sizeOptions = ['8', '9', '10', '10.5', '11', '12', '14', '16', '18', '20', '22', '24'];
+  const fontOptions = ['宋体', '仿宋' ,'黑体', '楷体', '微软雅黑'];
+  const sizeOptions = ['初号', '小初', '一号', '小一', '二号', '小二', '三号', '小三', '四号', '小四', '五号', '小五'];
   const spacingOptions = ['1.0', '1.15', '1.5', '2.0', '2.5', '3.0'];
 
   const renderTitleFormatSection = (
