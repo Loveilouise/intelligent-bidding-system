@@ -68,7 +68,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-sky-600 to-sky-500 bg-clip-text text-transparent">
             智能标书系统
           </CardTitle>
-          <p className="text-gray-600 mt-3 text-base">欢迎使用智能标书管理平台</p>
+          <p className="text-gray-600 mt-3 text-base">智能化标书编写平台</p>
         </CardHeader>
         <CardContent className="px-8 pb-8">
           {/* 登录方式切换 */}
