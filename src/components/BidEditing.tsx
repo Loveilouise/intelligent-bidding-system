@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter } from 'lucide-react';
+import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter, Zap } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import CatalogItem from '@/components/CatalogItem';
 import { CatalogItem as CatalogItemType } from '@/types/bid';
 
@@ -42,6 +43,8 @@ const BidEditing: React.FC<BidEditingProps> = ({
   const [currentFolder, setCurrentFolder] = useState<string>('root');
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
+  const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+  const [generateItemId, setGenerateItemId] = useState<string>('');
 
   // Mock 素材库数据
   const [materialFolders] = useState([
@@ -171,6 +174,17 @@ const BidEditing: React.FC<BidEditingProps> = ({
     setEditingText('');
   };
 
+  const handleGenerate = (itemId: string) => {
+    setGenerateItemId(itemId);
+    setGenerateDialogOpen(true);
+  };
+
+  const handleConfirmGenerate = () => {
+    console.log('生成章节:', generateItemId);
+    setGenerateDialogOpen(false);
+    setGenerateItemId('');
+  };
+
   const getItemLevel = (itemId: string): number | null => {
     const findItem = (items: CatalogItemType[]): CatalogItemType | null => {
       for (const item of items) {
@@ -243,20 +257,74 @@ const BidEditing: React.FC<BidEditingProps> = ({
         <ScrollArea className="flex-1 p-2">
           <div className="space-y-1">
             {getCurrentOutline().map(item => (
-              <CatalogItem
-                key={item.id}
-                item={item}
-                parentId={null}
-                onToggleExpansion={handleToggleExpansion}
-                onAddSameLevel={handleAddSameLevel}
-                onAddSubLevel={handleAddSubLevel}
-                onDelete={handleDelete}
-                onDoubleClick={handleDoubleClick}
-                editingItem={editingItem}
-                editingText={editingText}
-                setEditingText={setEditingText}
-                onSaveEdit={handleSaveEdit}
-              />
+              <div key={item.id} className="group">
+                <div 
+                  className="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer"
+                  style={{ paddingLeft: `${item.level * 16 + 8}px` }}
+                >
+                  <div className="flex items-center flex-1">
+                    {item.children && item.children.length > 0 && (
+                      <button
+                        onClick={() => handleToggleExpansion(item.id)}
+                        className="mr-2 p-0.5 hover:bg-gray-200 rounded"
+                      >
+                        {item.expanded ? (
+                          <ChevronDown className="h-3 w-3" />
+                        ) : (
+                          <ChevronRight className="h-3 w-3" />
+                        )}
+                      </button>
+                    )}
+                    
+                    {editingItem === item.id ? (
+                      <Input
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                        onBlur={handleSaveEdit}
+                        className="h-6 text-sm border-sky-600 focus:border-sky-600"
+                        autoFocus
+                      />
+                    ) : (
+                      <span 
+                        className="text-sm flex-1"
+                        onDoubleClick={() => handleDoubleClick(item.id, item.title)}
+                      >
+                        {item.title}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs bg-sky-600 text-white hover:bg-sky-700"
+                      onClick={() => handleGenerate(item.id)}
+                    >
+                      <Zap className="h-3 w-3 mr-1" />
+                      生成
+                    </Button>
+                  </div>
+                </div>
+                
+                {item.expanded && item.children && item.children.map(child => (
+                  <CatalogItem
+                    key={child.id}
+                    item={child}
+                    parentId={item.id}
+                    onToggleExpansion={handleToggleExpansion}
+                    onAddSameLevel={handleAddSameLevel}
+                    onAddSubLevel={handleAddSubLevel}
+                    onDelete={handleDelete}
+                    onDoubleClick={handleDoubleClick}
+                    editingItem={editingItem}
+                    editingText={editingText}
+                    setEditingText={setEditingText}
+                    onSaveEdit={handleSaveEdit}
+                  />
+                ))}
+              </div>
             ))}
           </div>
         </ScrollArea>
@@ -415,6 +483,22 @@ const BidEditing: React.FC<BidEditingProps> = ({
           )}
         </div>
       </div>
+
+      {/* 生成确认弹窗 */}
+      <AlertDialog open={generateDialogOpen} onOpenChange={setGenerateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认生成</AlertDialogTitle>
+            <AlertDialogDescription>
+              整章生成会替换已经生成的内容，确定生成吗？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmGenerate}>立即生成</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
