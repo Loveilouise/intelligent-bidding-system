@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, RotateCcw, FileText, Users, HelpCircle, Plus, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -295,88 +294,88 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                 企业信息
               </TabsTrigger>
             </TabsList>
+            
+            <div className="flex-1 p-6">
+              <TabsContent value="requirements" className="mt-0">
+                <div className="space-y-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h4 className="font-medium text-yellow-800 mb-2 flex items-center">
+                      <HelpCircle className="w-4 h-4 mr-2" />
+                      关键要求提醒
+                    </h4>
+                    <ul className="text-sm text-yellow-700 space-y-1">
+                      <li>• 项目经验要求：近3年内有类似项目经验</li>
+                      <li>• 技术要求：必须支持分布式架构</li>
+                      <li>• 资质要求：具备软件企业认定证书</li>
+                      <li>• 投标保证金：50万元人民币</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">技术规格要求</h4>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <p>• 系统架构：微服务架构，支持容器化部署</p>
+                      <p>• 数据库：支持MySQL 8.0及以上版本</p>
+                      <p>• 并发处理：支持10000+用户同时在线</p>
+                      <p>• 响应时间：页面响应时间不超过2秒</p>
+                      <p>• 安全要求：符合等保三级要求</p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="information" className="mt-0">
+                <div className="space-y-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h4 className="font-medium text-green-800 mb-2">企业基本信息</h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">公司名称：</span>
+                        <span className="text-gray-900">北京创新科技有限公司</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">成立时间：</span>
+                        <span className="text-gray-900">2015年3月</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">注册资本：</span>
+                        <span className="text-gray-900">5000万元</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">员工数量：</span>
+                        <span className="text-gray-900">280人</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">核心资质证书</h4>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <p>• 高新技术企业证书</p>
+                      <p>• ISO 9001质量管理体系认证</p>
+                      <p>• ISO 27001信息安全管理体系认证</p>
+                      <p>• CMMI 5级认证</p>
+                      <p>• 软件企业认定证书</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">近期项目经验</h4>
+                    <div className="space-y-3">
+                      <div className="border-l-4 border-sky-500 pl-3">
+                        <h5 className="font-medium text-gray-900">智慧城市综合管理平台</h5>
+                        <p className="text-sm text-gray-600">项目金额：2800万元 | 完成时间：2023年10月</p>
+                      </div>
+                      <div className="border-l-4 border-sky-500 pl-3">
+                        <h5 className="font-medium text-gray-900">企业数字化转型系统</h5>
+                        <p className="text-sm text-gray-600">项目金额：1500万元 | 完成时间：2023年8月</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </div>
           </Tabs>
-        </div>
-
-        <div className="flex-1 p-6">
-          <TabsContent value="requirements" className="mt-0">
-            <div className="space-y-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h4 className="font-medium text-yellow-800 mb-2 flex items-center">
-                  <HelpCircle className="w-4 h-4 mr-2" />
-                  关键要求提醒
-                </h4>
-                <ul className="text-sm text-yellow-700 space-y-1">
-                  <li>• 项目经验要求：近3年内有类似项目经验</li>
-                  <li>• 技术要求：必须支持分布式架构</li>
-                  <li>• 资质要求：具备软件企业认定证书</li>
-                  <li>• 投标保证金：50万元人民币</li>
-                </ul>
-              </div>
-              
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3">技术规格要求</h4>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <p>• 系统架构：微服务架构，支持容器化部署</p>
-                  <p>• 数据库：支持MySQL 8.0及以上版本</p>
-                  <p>• 并发处理：支持10000+用户同时在线</p>
-                  <p>• 响应时间：页面响应时间不超过2秒</p>
-                  <p>• 安全要求：符合等保三级要求</p>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="information" className="mt-0">
-            <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h4 className="font-medium text-green-800 mb-2">企业基本信息</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-600">公司名称：</span>
-                    <span className="text-gray-900">北京创新科技有限公司</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">成立时间：</span>
-                    <span className="text-gray-900">2015年3月</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">注册资本：</span>
-                    <span className="text-gray-900">5000万元</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">员工数量：</span>
-                    <span className="text-gray-900">280人</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3">核心资质证书</h4>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <p>• 高新技术企业证书</p>
-                  <p>• ISO 9001质量管理体系认证</p>
-                  <p>• ISO 27001信息安全管理体系认证</p>
-                  <p>• CMMI 5级认证</p>
-                  <p>• 软件企业认定证书</p>
-                </div>
-              </div>
-              
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3">近期项目经验</h4>
-                <div className="space-y-3">
-                  <div className="border-l-4 border-sky-500 pl-3">
-                    <h5 className="font-medium text-gray-900">智慧城市综合管理平台</h5>
-                    <p className="text-sm text-gray-600">项目金额：2800万元 | 完成时间：2023年10月</p>
-                  </div>
-                  <div className="border-l-4 border-sky-500 pl-3">
-                    <h5 className="font-medium text-gray-900">企业数字化转型系统</h5>
-                    <p className="text-sm text-gray-600">项目金额：1500万元 | 完成时间：2023年8月</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
         </div>
       </div>
 
