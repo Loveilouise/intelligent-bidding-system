@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,10 +7,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import CatalogItem from '@/components/CatalogItem';
 import { CatalogItem as CatalogItemType } from '@/types/bid';
-import { useToast } from '@/hooks/use-toast';
 
 interface BidEditingProps {
   editingTab: 'cover' | 'business' | 'technical';
@@ -18,7 +17,6 @@ interface BidEditingProps {
   setEditingContent: (content: string) => void;
   catalogItems: CatalogItemType[];
   setCatalogItems: (items: CatalogItemType[]) => void;
-  onGenerate?: (itemId: string, title: string) => void;
 }
 
 interface MaterialItem {
@@ -35,8 +33,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
   editingContent,
   setEditingContent,
   catalogItems,
-  setCatalogItems,
-  onGenerate
+  setCatalogItems
 }) => {
   const [selectedOutlineItem, setSelectedOutlineItem] = useState<string>('');
   const [knowledgeTab, setKnowledgeTab] = useState<'materials' | 'charts' | 'templates'>('materials');
@@ -45,41 +42,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
   const [currentFolder, setCurrentFolder] = useState<string>('root');
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
-  const [catalogTab, setCatalogTab] = useState<'business' | 'technical'>('business');
-  const { toast } = useToast();
-
-  // 商务标和技术标的目录数据
-  const [businessCatalog] = useState<CatalogItemType[]>([
-    { 
-      id: '1', 
-      title: '商务标书', 
-      level: 1,
-      expanded: true,
-      children: [
-        { id: '1-1', title: '投标函', level: 2 },
-        { id: '1-2', title: '法定代表人身份证明', level: 2 },
-        { id: '1-3', title: '授权委托书', level: 2 }
-      ]
-    },
-    { id: '2', title: '资质证明文件', level: 1, expanded: true },
-    { id: '3', title: '财务状况报告', level: 1, expanded: true }
-  ]);
-
-  const [technicalCatalog, setTechnicalCatalog] = useState<CatalogItemType[]>([
-    { 
-      id: 't1', 
-      title: '技术方案', 
-      level: 1,
-      expanded: true,
-      children: [
-        { id: 't1-1', title: '总体技术方案', level: 2, wordCount: 2000 },
-        { id: 't1-2', title: '系统架构设计', level: 2, wordCount: 1500 },
-        { id: 't1-3', title: '关键技术说明', level: 2, wordCount: 1200 }
-      ]
-    },
-    { id: 't2', title: '实施方案', level: 1, expanded: true, wordCount: 1800 },
-    { id: 't3', title: '质量保证措施', level: 1, expanded: true, wordCount: 1000 }
-  ]);
 
   // Mock 素材库数据
   const [materialFolders] = useState([
@@ -99,9 +61,6 @@ const BidEditing: React.FC<BidEditingProps> = ({
   ]);
 
   const handleToggleExpansion = (itemId: string) => {
-    const currentCatalog = catalogTab === 'business' ? businessCatalog : technicalCatalog;
-    const setCatalog = catalogTab === 'business' ? () => {} : setTechnicalCatalog;
-    
     const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
       return items.map(item => {
         if (item.id === itemId) {
@@ -113,21 +72,15 @@ const BidEditing: React.FC<BidEditingProps> = ({
         return item;
       });
     };
-    
-    if (catalogTab === 'technical') {
-      setTechnicalCatalog(updateItems(currentCatalog));
-    }
+    setCatalogItems(updateItems(catalogItems));
   };
 
   const handleAddSameLevel = (parentId: string | null, afterId: string) => {
-    if (catalogTab !== 'technical') return;
-    
     const newId = Date.now().toString();
     const newItem: CatalogItemType = {
       id: newId,
       title: '新章节',
-      level: getItemLevel(afterId) || 1,
-      wordCount: 1000
+      level: getItemLevel(afterId) || 1
     };
 
     const addItem = (items: CatalogItemType[]): CatalogItemType[] => {
@@ -149,19 +102,16 @@ const BidEditing: React.FC<BidEditingProps> = ({
       });
     };
 
-    setTechnicalCatalog(addItem(technicalCatalog));
+    setCatalogItems(addItem(catalogItems));
   };
 
   const handleAddSubLevel = (parentId: string) => {
-    if (catalogTab !== 'technical') return;
-    
     const newId = Date.now().toString();
     const parentLevel = getItemLevel(parentId) || 1;
     const newItem: CatalogItemType = {
       id: newId,
       title: '新子章节',
-      level: parentLevel + 1,
-      wordCount: 1000
+      level: parentLevel + 1
     };
 
     const addSubItem = (items: CatalogItemType[]): CatalogItemType[] => {
@@ -180,12 +130,10 @@ const BidEditing: React.FC<BidEditingProps> = ({
       });
     };
 
-    setTechnicalCatalog(addSubItem(technicalCatalog));
+    setCatalogItems(addSubItem(catalogItems));
   };
 
   const handleDelete = (itemId: string) => {
-    if (catalogTab !== 'technical') return;
-    
     const removeItem = (items: CatalogItemType[]): CatalogItemType[] => {
       return items.filter(item => {
         if (item.id === itemId) return false;
@@ -195,18 +143,16 @@ const BidEditing: React.FC<BidEditingProps> = ({
         return true;
       });
     };
-    setTechnicalCatalog(removeItem(technicalCatalog));
+    setCatalogItems(removeItem(catalogItems));
   };
 
   const handleDoubleClick = (itemId: string, title: string) => {
-    if (catalogTab !== 'technical') return;
-    
     setEditingItem(itemId);
     setEditingText(title);
   };
 
   const handleSaveEdit = () => {
-    if (!editingItem || !editingText.trim() || catalogTab !== 'technical') return;
+    if (!editingItem || !editingText.trim()) return;
     
     const updateItem = (items: CatalogItemType[]): CatalogItemType[] => {
       return items.map(item => {
@@ -220,33 +166,12 @@ const BidEditing: React.FC<BidEditingProps> = ({
       });
     };
     
-    setTechnicalCatalog(updateItem(technicalCatalog));
+    setCatalogItems(updateItem(catalogItems));
     setEditingItem(null);
     setEditingText('');
   };
 
-  const handleGenerate = (itemId: string, title: string) => {
-    console.log(`生成章节: ${title} (ID: ${itemId})`);
-    toast({
-      title: "章节生成中",
-      description: `正在生成"${title}"的内容...`,
-    });
-    
-    // 模拟生成过程
-    setTimeout(() => {
-      toast({
-        title: "生成完成",
-        description: `"${title}"的内容已生成完成`,
-      });
-      // 这里可以更新编辑内容
-      const newContent = editingContent + `\n\n# ${title}\n\n这是为"${title}"生成的内容。此内容基于技术要求和最佳实践生成，包含了详细的技术方案说明。`;
-      setEditingContent(newContent);
-    }, 2000);
-  };
-
   const getItemLevel = (itemId: string): number | null => {
-    const currentCatalog = catalogTab === 'business' ? businessCatalog : technicalCatalog;
-    
     const findItem = (items: CatalogItemType[]): CatalogItemType | null => {
       for (const item of items) {
         if (item.id === itemId) return item;
@@ -258,7 +183,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
       return null;
     };
     
-    const item = findItem(currentCatalog);
+    const item = findItem(catalogItems);
     return item?.level || null;
   };
 
@@ -298,7 +223,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
   };
 
   const getCurrentOutline = () => {
-    return catalogTab === 'business' ? businessCatalog : technicalCatalog;
+    return catalogItems;
   };
 
   return (
@@ -307,7 +232,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
       <div className="w-80 border-r border-gray-200 flex flex-col">
         <div className="p-3 border-b border-gray-200">
           <h4 className="font-medium text-gray-900 mb-3">目录</h4>
-          <Tabs value={catalogTab} onValueChange={(value) => setCatalogTab(value as 'business' | 'technical')}>
+          <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="business" className="text-xs">商务标</TabsTrigger>
               <TabsTrigger value="technical" className="text-xs">技术标</TabsTrigger>
@@ -327,13 +252,10 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 onAddSubLevel={handleAddSubLevel}
                 onDelete={handleDelete}
                 onDoubleClick={handleDoubleClick}
-                onGenerate={catalogTab === 'technical' ? handleGenerate : undefined}
                 editingItem={editingItem}
                 editingText={editingText}
                 setEditingText={setEditingText}
                 onSaveEdit={handleSaveEdit}
-                showWordCount={catalogTab === 'technical'}
-                showGenerateButton={catalogTab === 'technical'}
               />
             ))}
           </div>

@@ -115,26 +115,6 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
     }
   };
 
-  const handleGenerate = (itemId: string, title: string) => {
-    console.log(`生成章节: ${title} (ID: ${itemId})`);
-    toast({
-      title: "章节生成中",
-      description: `正在生成"${title}"的内容...`,
-    });
-    
-    // 模拟生成过程
-    setTimeout(() => {
-      toast({
-        title: "生成完成",
-        description: `"${title}"的内容已生成完成`,
-      });
-      // 这里可以更新编辑内容
-      setEditingContent(prevContent => 
-        prevContent + `\n\n# ${title}\n\n这是为"${title}"生成的内容。此内容基于技术要求和最佳实践生成，包含了详细的技术方案说明。`
-      );
-    }, 2000);
-  };
-
   if (fullTextGenerationStatus === 'generating') {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -444,7 +424,6 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
               setEditingContent={setEditingContent}
               catalogItems={catalogItems}
               setCatalogItems={setCatalogItems}
-              onGenerate={handleGenerate}
             />
           )}
         </div>
