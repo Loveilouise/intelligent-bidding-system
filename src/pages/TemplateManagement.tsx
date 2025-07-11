@@ -340,11 +340,10 @@ const TemplateManagement: React.FC = () => {
                     <SelectValue placeholder="请选择分类" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="市政工程">市政工程</SelectItem>
-                    <SelectItem value="装修工程">装修工程</SelectItem>
-                    <SelectItem value="系统集成">系统集成</SelectItem>
-                    <SelectItem value="建筑工程">建筑工程</SelectItem>
-                    <SelectItem value="其他">其他</SelectItem>
+                    <SelectItem value="通用">通用</SelectItem>
+                    <SelectItem value="服务咨询">服务咨询</SelectItem>
+                    <SelectItem value="工程建设">工程建设</SelectItem>
+                    <SelectItem value="政府采购">政府采购</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -456,11 +455,10 @@ const TemplateManagement: React.FC = () => {
                     <SelectValue placeholder="请选择分类" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="市政工程">市政工程</SelectItem>
-                    <SelectItem value="装修工程">装修工程</SelectItem>
-                    <SelectItem value="系统集成">系统集成</SelectItem>
-                    <SelectItem value="建筑工程">建筑工程</SelectItem>
-                    <SelectItem value="其他">其他</SelectItem>
+                    <SelectItem value="通用">通用</SelectItem>
+                    <SelectItem value="服务咨询">服务咨询</SelectItem>
+                    <SelectItem value="工程建设">工程建设</SelectItem>
+                    <SelectItem value="政府采购">政府采购</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
