@@ -229,7 +229,7 @@ const TemplateManagement: React.FC = () => {
                   <TableHead>更新时间</TableHead>
                   <TableHead>使用次数</TableHead>
                   <TableHead>模板描述</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
+                  <TableHead>操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
