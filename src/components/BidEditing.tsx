@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown, FileText, Image, BarChart3, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Link, Type, Search, Filter } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,6 +17,7 @@ interface BidEditingProps {
   setEditingContent: (content: string) => void;
   catalogItems: CatalogItemType[];
   setCatalogItems: (items: CatalogItemType[]) => void;
+  onGenerate?: (itemId: string, title: string) => void;
 }
 
 interface MaterialItem {
@@ -34,7 +34,8 @@ const BidEditing: React.FC<BidEditingProps> = ({
   editingContent,
   setEditingContent,
   catalogItems,
-  setCatalogItems
+  setCatalogItems,
+  onGenerate
 }) => {
   const [selectedOutlineItem, setSelectedOutlineItem] = useState<string>('');
   const [knowledgeTab, setKnowledgeTab] = useState<'materials' | 'charts' | 'templates'>('materials');
@@ -218,8 +219,9 @@ const BidEditing: React.FC<BidEditingProps> = ({
   };
 
   const handleGenerate = (itemId: string, title: string) => {
-    console.log('生成章节:', itemId, title);
-    // 这里可以添加生成逻辑
+    if (onGenerate) {
+      onGenerate(itemId, title);
+    }
   };
 
   const getItemLevel = (itemId: string): number | null => {
