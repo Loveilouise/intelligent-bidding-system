@@ -49,10 +49,10 @@ const PersonalKnowledge: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const [folders, setFolders] = useState<MaterialFolder[]>([
-    { id: '1', name: '新建文件夹' },
-    { id: '2', name: '项目文档' },
-    { id: '3', name: '设计素材' },
-    { id: '4', name: '表格数据' }
+    { id: '1', name: '施工建设素材' },
+    { id: '2', name: '系统集成方案素材' },
+    { id: '3', name: '工程设计图' },
+    { id: '4', name: '服务咨询类素材' }
   ]);
 
   const [files] = useState<KnowledgeFile[]>([
