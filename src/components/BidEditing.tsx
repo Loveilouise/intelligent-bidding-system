@@ -246,10 +246,10 @@ const BidEditing: React.FC<BidEditingProps> = ({
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 h-full flex">
-      {/* 左侧大纲目录 - 紧贴左边 */}
-      <div className="w-72 border-r border-gray-200 flex flex-col">
-        <div className="p-2 border-b border-gray-200">
-          <h4 className="font-medium text-gray-900 mb-2">目录</h4>
+      {/* 左侧大纲目录 - 固定宽度 */}
+      <div className="w-80 border-r border-gray-200 flex flex-col">
+        <div className="p-3 border-b border-gray-200">
+          <h4 className="font-medium text-gray-900 mb-3">目录</h4>
           <Tabs value={editingTab} onValueChange={(value) => setEditingTab(value as 'cover' | 'business' | 'technical')}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="business" className="text-xs">商务标</TabsTrigger>
@@ -258,7 +258,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
           </Tabs>
         </div>
         
-        <ScrollArea className="flex-1 p-1">
+        <ScrollArea className="flex-1 p-2">
           <div className="space-y-1">
             {getCurrentOutline().map(item => (
               <CatalogItem
@@ -282,10 +282,10 @@ const BidEditing: React.FC<BidEditingProps> = ({
         </ScrollArea>
       </div>
 
-      {/* 中间可编辑区域 - 增大并居中 */}
-      <div className="flex-1 flex flex-col mx-4">
+      {/* 中间可编辑区域 - 占据剩余空间 */}
+      <div className="flex-1 flex flex-col">
         {/* Word样式工具栏 */}
-        <div className="flex items-center p-2 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+        <div className="flex items-center p-3 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center space-x-1">
             {/* 文本格式工具 */}
             <button className="p-1 hover:bg-gray-200 rounded">
@@ -334,8 +334,8 @@ const BidEditing: React.FC<BidEditingProps> = ({
         </div>
 
         {/* 文档编辑区域 */}
-        <div className="flex-1 p-4 bg-white rounded-b-lg border border-t-0 border-gray-200">
-          <div className="w-full bg-white shadow-sm rounded-lg min-h-full p-6">
+        <div className="flex-1 p-6 bg-white" style={{ backgroundColor: '#fafafa' }}>
+          <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg min-h-full p-8">
             <Textarea
               value={editingContent}
               onChange={(e) => setEditingContent(e.target.value)}
@@ -346,10 +346,10 @@ const BidEditing: React.FC<BidEditingProps> = ({
         </div>
       </div>
 
-      {/* 右侧素材库 - 紧贴右边 */}
-      <div className="w-72 border-l border-gray-200 flex flex-col">
-        <div className="p-2 border-b border-gray-200">
-          <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+      {/* 右侧素材库 - 固定宽度 */}
+      <div className="w-80 border-l border-gray-200 flex flex-col">
+        <div className="p-3 border-b border-gray-200">
+          <h4 className="font-medium text-gray-900 mb-3 flex items-center">
             <FileText className="w-4 h-4 mr-2" />
             素材库
           </h4>
@@ -360,7 +360,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
               {materialFolders.map(folder => (
                 <div
                   key={folder.id}
-                  className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                  className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
                   onClick={() => setCurrentFolder(folder.id)}
                 >
                   <div className="flex items-center justify-between">
@@ -372,7 +372,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
             </div>
           ) : (
             // 显示文件夹内容
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -417,7 +417,7 @@ const BidEditing: React.FC<BidEditingProps> = ({
                 {getFilteredMaterials().map(material => (
                   <div
                     key={material.id}
-                    className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
                     onClick={() => handleInsertMaterial(material)}
                   >
                     <div className="flex items-center">
