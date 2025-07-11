@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
+import { RefreshCw, ChevronDown, ChevronRight, UnfoldVertical, FoldVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -37,6 +37,8 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
   const [technicalSelectAll, setTechnicalSelectAll] = useState(false);
   const [businessExpanded, setBusinessExpanded] = useState(true);
   const [technicalExpanded, setTechnicalExpanded] = useState(true);
+  const [businessAllExpanded, setBusinessAllExpanded] = useState(true);
+  const [technicalAllExpanded, setTechnicalAllExpanded] = useState(true);
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
   const [wordCountDialogOpen, setWordCountDialogOpen] = useState(false);
@@ -100,6 +102,36 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
       }
     });
     return ids;
+  };
+
+  const handleBusinessExpandCollapseAll = () => {
+    const newExpandedState = !businessAllExpanded;
+    setBusinessAllExpanded(newExpandedState);
+    
+    const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
+      return items.map(item => ({
+        ...item,
+        expanded: item.level === 1 ? newExpandedState : item.expanded,
+        children: item.children ? updateItems(item.children) : undefined
+      }));
+    };
+    
+    setBusinessCatalogItems(updateItems(businessCatalogItems));
+  };
+
+  const handleTechnicalExpandCollapseAll = () => {
+    const newExpandedState = !technicalAllExpanded;
+    setTechnicalAllExpanded(newExpandedState);
+    
+    const updateItems = (items: CatalogItemType[]): CatalogItemType[] => {
+      return items.map(item => ({
+        ...item,
+        expanded: item.level === 1 ? newExpandedState : item.expanded,
+        children: item.children ? updateItems(item.children) : undefined
+      }));
+    };
+    
+    setTechnicalCatalogItems(updateItems(technicalCatalogItems));
   };
 
   const handleBusinessBatchMode = () => {
@@ -298,9 +330,10 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => setBusinessExpanded(!businessExpanded)}
+                  onClick={handleBusinessExpandCollapseAll}
+                  title={businessAllExpanded ? "收起全部" : "展开全部"}
                 >
-                  {businessExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  {businessAllExpanded ? <FoldVertical className="w-4 h-4" /> : <UnfoldVertical className="w-4 h-4" />}
                 </Button>
               </div>
               
@@ -399,9 +432,10 @@ const BidGeneration: React.FC<BidGenerationProps> = ({
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => setTechnicalExpanded(!technicalExpanded)}
+                  onClick={handleTechnicalExpandCollapseAll}
+                  title={technicalAllExpanded ? "收起全部" : "展开全部"}
                 >
-                  {technicalExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  {technicalAllExpanded ? <FoldVertical className="w-4 h-4" /> : <UnfoldVertical className="w-4 h-4" />}
                 </Button>
                 <span className="text-sm text-gray-600">
                   预计生成字数：{calculateTotalWordCount(technicalCatalogItems)}
