@@ -24,7 +24,7 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
   const [titleSettings, setTitleSettings] = useState({
     level1: { font: '黑体', size: '二号', indent: '0', spacing: '1.5', align: 'center', bold: true },
     level2: { font: '黑体', size: '小二', indent: '0', spacing: '1.5', align: 'center', bold: true },
-    level3: { font: '宋体', size: '三号', indent: '2', spacing: '1.5', align: 'left', bold: true },
+    level3: { font: '宋体', size: '三号', indent: '2', spacing: '1.5', align: 'left', bold: false },
     body: { font: '宋体', size: '三号', indent: '2', spacing: '1.5', align: 'left', bold: false }
   });
   const [contentSettings, setContentSettings] = useState({
@@ -32,10 +32,10 @@ const DownloadSettingsDialog: React.FC<DownloadSettingsDialogProps> = ({
     table: { font: '宋体', size: '10', spacing: '1.0' }
   });
   const [pageSettings, setPageSettings] = useState({
-    topMargin: '2.5',
-    bottomMargin: '2.5',
-    leftMargin: '2.5',
-    rightMargin: '2.5'
+    topMargin: '2.54',
+    bottomMargin: '2.54',
+    leftMargin: '3.18',
+    rightMargin: '3.18'
   });
 
   const numberingTemplates = [
