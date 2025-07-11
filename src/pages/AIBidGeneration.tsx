@@ -119,73 +119,75 @@ const AIBidGeneration: React.FC<AIBidGenerationProps> = ({
     return (
       <div className="min-h-screen bg-gray-50">
         {showHeaderControls && (
-          <div className="bg-white border-b border-gray-200 px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Button
-                  variant="ghost"
-                  onClick={handleBackClick}
-                  className="mr-4 text-gray-600 hover:text-gray-800"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  返回
-                </Button>
-                <h1 className="text-lg font-semibold text-gray-900 mr-6">创建标书</h1>
+          <div className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between max-w-7xl mx-auto">
                 <div className="flex items-center">
-                  <span className="text-sm text-gray-600 mr-2">已自动保存</span>
                   <Button
                     variant="ghost"
-                    size="sm"
-                    onClick={handleAutoSave}
-                    className="h-6 w-6 p-0"
+                    onClick={handleBackClick}
+                    className="mr-4 text-gray-600 hover:text-gray-800"
                   >
-                    <Save className="h-4 w-4" />
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    返回
+                  </Button>
+                  <h1 className="text-lg font-semibold text-gray-900 mr-6">创建标书</h1>
+                  <div className="flex items-center">
+                    <span className="text-sm text-gray-600 mr-2">已自动保存</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleAutoSave}
+                      className="h-6 w-6 p-0"
+                    >
+                      <Save className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-6">
+                  {tabs.map((tab, index) => (
+                    <div key={tab.id} className="flex items-center">
+                      <div className="flex items-center">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                          activeTab === tab.id 
+                            ? 'bg-sky-600 text-white' 
+                            : tabs.findIndex(t => t.id === activeTab) > index
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-200 text-gray-500'
+                        }`}>
+                          {tabs.findIndex(t => t.id === activeTab) > index ? (
+                            <CheckCircle className="w-3 h-3" />
+                          ) : (
+                            index + 1
+                          )}
+                        </div>
+                        <span className={`ml-2 text-sm font-medium ${
+                          activeTab === tab.id ? 'text-sky-600' : 'text-gray-500'
+                        }`}>
+                          {tab.title}
+                        </span>
+                      </div>
+                      {index < tabs.length - 1 && (
+                        <div className={`w-8 h-0.5 mx-3 ${
+                          tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
+                        }`} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <Button variant="outline" onClick={handlePrevStep}>
+                    上一步
                   </Button>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-6">
-                {tabs.map((tab, index) => (
-                  <div key={tab.id} className="flex items-center">
-                    <div className="flex items-center">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                        activeTab === tab.id 
-                          ? 'bg-sky-600 text-white' 
-                          : tabs.findIndex(t => t.id === activeTab) > index
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-200 text-gray-500'
-                      }`}>
-                        {tabs.findIndex(t => t.id === activeTab) > index ? (
-                          <CheckCircle className="w-3 h-3" />
-                        ) : (
-                          index + 1
-                        )}
-                      </div>
-                      <span className={`ml-2 text-sm font-medium ${
-                        activeTab === tab.id ? 'text-sky-600' : 'text-gray-500'
-                      }`}>
-                        {tab.title}
-                      </span>
-                    </div>
-                    {index < tabs.length - 1 && (
-                      <div className={`w-8 h-0.5 mx-3 ${
-                        tabs.findIndex(t => t.id === activeTab) > index ? 'bg-green-500' : 'bg-gray-200'
-                      }`} />
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <Button variant="outline" onClick={handlePrevStep}>
-                  上一步
-                </Button>
               </div>
             </div>
           </div>
         )}
 
-        <div className={`flex-1 p-6 ${showHeaderControls ? 'pt-6' : ''}`}>
+        <div className={`flex-1 p-6 ${showHeaderControls ? 'pt-20' : ''}`}>
           <div className="max-w-7xl mx-auto">
             <div className="bg-white rounded-lg border border-gray-200 p-8 min-h-[600px] flex flex-col items-center justify-center">
               <div className="text-center">
