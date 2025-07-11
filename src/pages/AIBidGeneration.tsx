@@ -1,8 +1,7 @@
 
 import React, { useState } from 'react';
-import { Clock, CheckCircle, Save } from 'lucide-react';
+import { Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import BidSetup from '@/components/BidSetup';
 import BidGeneration from '@/components/BidGeneration';
 import BidEditing from '@/components/BidEditing';
@@ -44,18 +43,12 @@ const AIBidGeneration: React.FC = () => {
     { id: '3', title: '财务状况报告', level: 1, expanded: true }
   ]);
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
-  const { toast } = useToast();
 
   const tabs = [
     { id: 'setup', title: '创建标书' },
     { id: 'generation', title: '生成目录' },
     { id: 'editing', title: '生成全文' }
   ];
-
-  // 计算字数的函数
-  const getWordCount = () => {
-    return editingContent.replace(/\s/g, '').length;
-  };
 
   const handleNextStep = () => {
     if (activeTab === 'setup') {
@@ -89,11 +82,8 @@ const AIBidGeneration: React.FC = () => {
     }, 1500);
   };
 
-  const handleAutoSave = () => {
-    toast({
-      title: "文档保存成功",
-      duration: 2000,
-    });
+  const handleSave = () => {
+    console.log('保存标书');
   };
 
   const handleDownload = () => {
@@ -111,13 +101,7 @@ const AIBidGeneration: React.FC = () => {
       <div className="flex-1 p-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
-              <div className="ml-4 flex items-center text-sm text-gray-600">
-                <span>已自动保存</span>
-                <Save className="w-4 h-4 ml-1" />
-              </div>
-            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
             
             <div className="flex items-center space-x-6">
               {tabs.map((tab, index) => (
@@ -179,20 +163,7 @@ const AIBidGeneration: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* 页面标题和流程指示器 */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
-            {activeTab === 'editing' && (
-              <div className="ml-4 flex items-center text-sm text-gray-600">
-                <span>已自动保存</span>
-                <button 
-                  onClick={handleAutoSave}
-                  className="ml-1 hover:text-gray-800 transition-colors"
-                >
-                  <Save className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-          </div>
+          <h1 className="text-2xl font-semibold text-gray-900">AI生标</h1>
           
           {/* 流程步骤指示器 */}
           <div className="flex items-center space-x-6">
@@ -230,20 +201,20 @@ const AIBidGeneration: React.FC = () => {
           {/* 操作按钮 */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              {activeTab === 'editing' && (
-                <span className="text-sm text-gray-600">
-                  当前字数 {getWordCount()}
-                </span>
-              )}
               {activeTab !== 'setup' && (
                 <Button variant="outline" onClick={handlePrevStep}>
                   上一步
                 </Button>
               )}
               {activeTab === 'editing' && (
-                <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
-                  下载标书
-                </Button>
+                <>
+                  <Button variant="outline" onClick={handleSave}>
+                    保存
+                  </Button>
+                  <Button onClick={handleDownload} className="bg-sky-600 hover:bg-sky-700">
+                    下载标书
+                  </Button>
+                </>
               )}
               {activeTab === 'setup' && (
                 <Button onClick={handleNextStep} className="bg-sky-600 hover:bg-sky-700">
