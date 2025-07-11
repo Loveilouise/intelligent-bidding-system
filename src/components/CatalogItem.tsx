@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronDown, ChevronRight, Plus, Trash2, Settings2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Trash2, Settings2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -20,11 +20,13 @@ interface CatalogItemProps {
   onDelete: (itemId: string) => void;
   onDoubleClick?: (itemId: string, title: string) => void;
   onWordCountSetting?: (itemId: string, currentCount: number) => void;
+  onGenerate?: (itemId: string, title: string) => void;
   editingItem?: string | null;
   editingText?: string;
   setEditingText?: (text: string) => void;
   onSaveEdit?: () => void;
   showWordCount?: boolean;
+  showGenerateButton?: boolean;
 }
 
 const CatalogItem: React.FC<CatalogItemProps> = ({
@@ -39,11 +41,13 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
   onDelete,
   onDoubleClick,
   onWordCountSetting,
+  onGenerate,
   editingItem,
   editingText,
   setEditingText,
   onSaveEdit,
-  showWordCount = false
+  showWordCount = false,
+  showGenerateButton = false
 }) => {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && onSaveEdit) {
@@ -106,6 +110,18 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
         
         {!batchMode && (
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {showGenerateButton && onGenerate && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 px-2 text-xs border-sky-600 text-sky-600 hover:bg-sky-50"
+                onClick={() => onGenerate(item.id, item.title)}
+              >
+                <Play className="h-3 w-3 mr-1" />
+                生成
+              </Button>
+            )}
+            
             {showWordCount && onWordCountSetting && (
               <TooltipProvider>
                 <Tooltip>
@@ -194,11 +210,13 @@ const CatalogItem: React.FC<CatalogItemProps> = ({
           onDelete={onDelete}
           onDoubleClick={onDoubleClick}
           onWordCountSetting={onWordCountSetting}
+          onGenerate={onGenerate}
           editingItem={editingItem}
           editingText={editingText}
           setEditingText={setEditingText}
           onSaveEdit={onSaveEdit}
           showWordCount={showWordCount}
+          showGenerateButton={showGenerateButton}
         />
       ))}
     </div>
