@@ -372,7 +372,7 @@ const HistoryBidManagement: React.FC<HistoryBidManagementProps> = ({ onCreateBid
                   </TableHead>
                   <TableHead>状态</TableHead>
                   <TableHead>项目描述</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
+                  <TableHead>操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
